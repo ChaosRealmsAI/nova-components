@@ -1,0 +1,40 @@
+/**
+ * Button Base Config - ADR-001 标准 Tailwind 类
+ */
+export const buttonBaseConfig = {
+  slots: {
+    base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+  },
+  variants: {
+    variant: {
+      default: {
+        base: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm',
+      },
+      destructive: {
+        base: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
+      },
+      outline: {
+        base: 'border border-border bg-transparent text-foreground hover:bg-surface-2 shadow-sm',
+      },
+      secondary: {
+        base: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm',
+      },
+      ghost: {
+        base: 'text-foreground hover:bg-surface-2',
+      },
+      link: {
+        base: 'text-primary underline-offset-4 hover:underline',
+      },
+    },
+    size: {
+      default: { base: 'h-9 px-4 py-2' },
+      sm: { base: 'h-8 rounded-md px-3 text-xs' },
+      lg: { base: 'h-10 rounded-md px-6' },
+      icon: { base: 'h-9 w-9' },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+} as const;

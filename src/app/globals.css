@@ -1,0 +1,162 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+/**
+ * globals.css - 全局基础样式
+ *
+ * Nova Token 体系：
+ * - 接口源头: src/lib/themes/config/css-vars.ts
+ * - 真像源头: src/lib/themes/[theme]/tokens.ts
+ * - 运行时注入: PlaygroundThemeProvider
+ *
+ * 所有组件/特效统一使用 var(--xxx) 直接引用 Token
+ * 不使用 Tailwind 语义类名（bg-primary 等）
+ */
+
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    /* Figma-style Cursor - Black arrow with white stroke */
+    cursor: url("data:image/svg+xml,%3Csvg width='23' height='23' viewBox='0 0 23 23' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L7.34375 19.325L10.9375 12.5L18.5 12.5L1 1Z' fill='black' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), auto;
+  }
+
+  /* Override Tldraw default cursors where possible */
+  .tl-container, .tl-canvas {
+    cursor: url("data:image/svg+xml,%3Csvg width='23' height='23' viewBox='0 0 23 23' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L7.34375 19.325L10.9375 12.5L18.5 12.5L1 1Z' fill='black' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), auto !important;
+  }
+
+  /* Pointer Cursor Override (e.g. hover over buttons) */
+  button, a, [role="button"], .tl-shape-indicator {
+     cursor: url("data:image/svg+xml,%3Csvg width='23' height='23' viewBox='0 0 23 23' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L7.34375 19.325L10.9375 12.5L18.5 12.5L1 1Z' fill='black' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), pointer !important;
+  }
+}
+
+/*---break---
+ */
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+/*---break---
+ */
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+/*---break---
+ */
+
+@theme inline {
+  /**
+   * ADR-001: 标准 Tailwind 类映射
+   *
+   * 组件使用 bg-primary 而非 bg-[var(--primary)]
+   * Tailwind CSS 4 通过 @theme 将标准类映射到 CSS 变量
+   */
+
+  /* Base colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--ring);
+
+  /* Primary */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Secondary */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Accent */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Muted */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Destructive */
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Surface layers (Nova 特有) */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+
+  /* Card/Popover */
+  --color-card: var(--surface-1);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--surface-1);
+  --color-popover-foreground: var(--foreground);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Font Size (Typography) - Nova Token System */
+  --font-size-xs: var(--text-xs);
+  --font-size-sm: var(--text-sm);
+  --font-size-base: var(--text-base);
+  --font-size-lg: var(--text-lg);
+  --font-size-xl: var(--text-xl);
+  --font-size-2xl: var(--text-2xl);
+  --font-size-3xl: var(--text-3xl);
+}
+
+/*---break---
+ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* cmdk 组合框输入框 - 移除所有 focus 外框 */
+  [cmdk-input],
+  [cmdk-input]:focus,
+  [cmdk-input]:focus-visible,
+  [data-slot="combobox-input-wrapper"] input,
+  [data-slot="combobox-input-wrapper"] input:focus,
+  [data-slot="combobox-input-wrapper"] input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    ring: none !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+  }
+}
