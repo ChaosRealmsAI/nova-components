@@ -2,7 +2,7 @@
  * Textarea Component Entry
  */
 
-import { Textarea, textareaBaseConfig } from '@/components/nova-ui/atmos/textarea';
+import { Textarea } from '@/components/nova-ui/atmos/textarea';
 import type { ComponentRegistryEntry } from '../types';
 
 export const textareaEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const textareaEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeTextarea',
   category: 'atoms',
   component: Textarea,
-  baseConfig: textareaBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'placeholder',

@@ -2,11 +2,12 @@ import type { ThemeDefinition } from '@/types';
 import { tokens, meta } from './tokens';
 import { buttonConfig } from './components/button';
 import { badgeConfig } from './components/badge';
-import { inputBaseConfig } from '@/components/nova-ui/atmos/input/input.config';
+import { inputConfig } from './components/input';
+import { textareaConfig } from './components/textarea';
 import { labelBaseConfig } from '@/components/nova-ui/atmos/label/label.config';
 import { checkboxBaseConfig } from '@/components/nova-ui/atmos/checkbox/checkbox.config';
-import { switchBaseConfig } from '@/components/nova-ui/atmos/switch/switch.config';
-import { sliderBaseConfig } from '@/components/nova-ui/atmos/slider/slider.config';
+import { switchConfig } from './components/switch';
+import { sliderConfig } from './components/slider';
 import { progressBaseConfig } from '@/components/nova-ui/atmos/progress/progress.config';
 import { radioGroupBaseConfig, radioGroupItemBaseConfig } from '@/components/nova-ui/atmos/radio-group/radio-group.config';
 import { separatorBaseConfig } from '@/components/nova-ui/atmos/separator/separator.config';
@@ -31,21 +32,16 @@ export const shadcnDefaultTheme: ThemeDefinition = {
   components: {
     Button: buttonConfig,
     Badge: badgeConfig,
-    Input: {
-      extend: inputBaseConfig,
-    },
+    Input: inputConfig,
+    Textarea: textareaConfig,
     Label: {
       extend: labelBaseConfig,
     },
     Checkbox: {
       extend: checkboxBaseConfig,
     },
-    Switch: {
-      extend: switchBaseConfig,
-    },
-    Slider: {
-      extend: sliderBaseConfig,
-    },
+    Switch: switchConfig,
+    Slider: sliderConfig,
     Progress: {
       extend: progressBaseConfig,
     },

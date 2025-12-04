@@ -2,54 +2,95 @@
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { textareaBaseConfig } from './textarea.config';
 
 /**
  * Nova Textarea
  *
  * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `textareaBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
  */
 
-export { textareaBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type TextareaVariants = VariantProps<ReturnType<typeof tv>>;
-export type TextareaSlots = keyof typeof textareaBaseConfig.slots;
-export type TextareaClassNames = Partial<Record<TextareaSlots, string>>;
+export type TextareaClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Static Styles (Functional Layer)
+// ============================================================================
+
+const textareaBase = tv({
+  slots: {
+    base: 'flex w-full resize-y focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+  },
+});
+
+// ============================================================================
+// Component
+// ============================================================================
 
 export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
-    TextareaVariants {
+  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'> {
   classNames?: TextareaClassNames;
+  variant?: 'default' | 'filled';
+  textareaSize?: 'default' | 'sm' | 'lg';
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, classNames, variant, textareaSize, ...props }, ref) => {
-    // ADR-006: 从主题上下文获取 Textarea 的样式配置
+  ({ className, classNames, variant = 'default', textareaSize = 'default', ...props }, ref) => {
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Textarea;
 
-    // 合并基础配置和主题配置
-    const styles = tv({
-      extend: textareaBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1: Functional Layer
+    const base = textareaBase();
+
+    // L2: Theme Layer
+    const themeStyles = React.useMemo(() => {
+      const baseStyle = toClassString(themeConfig?.slots?.base);
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+      const sizeStyle = toClassString(themeConfig?.variants?.textareaSize?.[textareaSize]?.base);
+
+      return {
+        base: baseStyle,
+        variant: variantStyle,
+        size: sizeStyle
+      };
+    }, [themeConfig, variant, textareaSize]);
+
+    // Merge: L1 + L2 (Base + Variant + Size) + L3
+    const rootClass = twMerge(
+      base.base(),
+      themeStyles.base,
+      themeStyles.variant,
+      themeStyles.size,
+      classNames?.base,
+      className
+    );
 
     // Destructure children from props since textarea doesn't use children prop
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { children, ...rest } = props as React.TextareaHTMLAttributes<HTMLTextAreaElement> & { children?: React.ReactNode };
-
-    const baseClass = classNames?.base
-      ? classNames.base
-      : styles({ variant, textareaSize }).base();
 
     return (
       <textarea
-        className={cn(baseClass, className)}
+        className={rootClass}
         ref={ref}
         {...rest}
       />
