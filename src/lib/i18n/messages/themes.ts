@@ -109,6 +109,24 @@ export const themesMessages: MessageModule = {
     "ja": "サクラ・ブルーム",
     "ko": "사쿠라 블룸"
   },
+  themeNameNeoBrutalism: {
+    "en": "Neo Brutalism",
+    "zh-Hans": "新野兽派",
+    "zh-Hant": "新野獸派",
+    "zh": "新野兽派",
+    "hi": "Neo Brutalism",
+    "es": "Neo Brutalismo",
+    "fr": "Néo Brutalisme",
+    "ar": "الوحشية الجديدة",
+    "bn": "নিও ব্রুটালিজম",
+    "pt": "Neo Brutalismo",
+    "ru": "Нео Брутализм",
+    "ur": "Neo Brutalism",
+    "id": "Neo Brutalisme",
+    "de": "Neo Brutalismus",
+    "ja": "ネオ・ブルータリズム",
+    "ko": "네오 브루탈리즘"
+  },
   themeNameZenGarden: {
     "en": "Zen Garden",
     "zh-Hans": "禅意花园",
@@ -126,6 +144,24 @@ export const themesMessages: MessageModule = {
     "de": "Zen-Garten",
     "ja": "禅ガーデン",
     "ko": "젠 가든"
+  },
+  themeNameMonochromeInk: {
+    "en": "Monochrome Ink",
+    "zh-Hans": "水墨丹青",
+    "zh-Hant": "水墨丹青",
+    "zh": "水墨丹青",
+    "hi": "Monochrome Ink",
+    "es": "Tinta Monocroma",
+    "fr": "Encre Monochrome",
+    "ar": "حبر أحادي اللون",
+    "bn": "মনোক্রোম ইঙ্ক",
+    "pt": "Tinta Monocromática",
+    "ru": "Монохромная тушь",
+    "ur": "مونوکروم سیاہی",
+    "id": "Tinta Monokrom",
+    "de": "Monochromatische Tinte",
+    "ja": "水墨画",
+    "ko": "수묵화"
   },
   shuffleTheme: {
     "en": "Random Theme",
