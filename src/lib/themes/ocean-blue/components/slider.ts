@@ -2,6 +2,8 @@
 
 export const sliderConfig = {
   slots: {
+    // Ocean Blue: 现代简洁的滑块容器
+    base: '',
     track: [
       'rounded-full',
       'bg-surface-2',

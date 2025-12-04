@@ -141,37 +141,6 @@ export const tokens: Record<string, string> = {
   '--shadow-lg': '0 0 40px rgba(217, 70, 239, 0.5), 0 0 80px rgba(34, 211, 238, 0.2)',
   '--shadow-glow': '0 0 30px rgba(217, 70, 239, 0.6)',
 
-  // ========================================
-  // 8. 特效 (Effects) - 动画速度
-  // ========================================
-  '--effect-speed-slow': '0.5s',
-  '--effect-speed-normal': '0.3s',
-  '--effect-speed-fast': '0.15s',
-  '--effect-glow-primary': 'rgba(217, 70, 239, 0.5)',
-  '--effect-glow-secondary': 'rgba(34, 211, 238, 0.5)',
-
-  // ========================================
-  // 9. 特效 Token (ADR-005)
-  // ========================================
-  // BorderBeam - 霓虹边框光束
-  '--effect-beam-color': palette.neonPink,
-  '--effect-beam-glow': 'color-mix(in srgb, #D946EF, transparent 40%)',
-
-  // Shimmer - 流光扫描
-  '--effect-shimmer-color': 'rgba(217, 70, 239, 0.15)',
-
-  // CosmicBackground - 宇宙背景 (紫+青 渐变)
-  '--effect-cosmic-glow-1': palette.neonPink,
-  '--effect-cosmic-glow-2': palette.neonCyan,
-
-  // GridMatrix - 矩阵网格
-  '--effect-grid-color': 'rgba(217, 70, 239, 0.3)',
-
-  // Spotlight - 聚光灯
-  '--effect-spotlight-color': 'color-mix(in srgb, #D946EF, transparent 70%)',
-
-  // Tilt - 3D 倾斜 (无颜色，仅记录)
-  // '--effect-tilt-*': N/A
 };
 
 // ============================================================================

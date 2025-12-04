@@ -8,5 +8,7 @@ export const checkboxConfig = {
       'data-[state=checked]:border-primary',
       'shadow-sm',
     ],
+    // Ocean Blue: 清新的白色对勾，与海洋蓝背景形成对比
+    indicator: 'text-primary-foreground',
   },
 };

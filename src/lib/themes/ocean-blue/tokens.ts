@@ -148,34 +148,6 @@ export const tokens: Record<string, string> = {
   '--shadow-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
   '--shadow-glow': '0 0 20px rgba(2, 132, 199, 0.3)',
 
-  // ========================================
-  // 8. 特效 (Effects) - 动画速度
-  // ========================================
-  '--effect-speed-slow': '0.4s',
-  '--effect-speed-normal': '0.25s',
-  '--effect-speed-fast': '0.15s',
-  '--effect-glow-primary': 'rgba(2, 132, 199, 0.4)',
-  '--effect-glow-secondary': 'rgba(139, 92, 246, 0.4)',
-
-  // ========================================
-  // 9. 特效 Token (ADR-005)
-  // ========================================
-  // BorderBeam - 海洋蓝边框光束
-  '--effect-beam-color': palette.oceanDeep,
-  '--effect-beam-glow': 'color-mix(in srgb, #0284c7, transparent 50%)',
-
-  // Shimmer - 柔和白色流光
-  '--effect-shimmer-color': 'rgba(255, 255, 255, 0.12)',
-
-  // CosmicBackground - 海洋背景 (蓝+青 渐变)
-  '--effect-cosmic-glow-1': palette.oceanDeep,
-  '--effect-cosmic-glow-2': palette.oceanLight,
-
-  // GridMatrix - 海洋网格
-  '--effect-grid-color': 'rgba(2, 132, 199, 0.2)',
-
-  // Spotlight - 聚光灯
-  '--effect-spotlight-color': 'color-mix(in srgb, #0284c7, transparent 80%)',
 };
 
 // ============================================================================

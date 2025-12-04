@@ -148,34 +148,6 @@ export const tokens: Record<string, string> = {
   '--shadow-lg': '0 10px 15px -3px rgba(249, 115, 22, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
   '--shadow-glow': '0 0 20px rgba(249, 115, 22, 0.3)',
 
-  // ========================================
-  // 8. 特效 (Effects) - 动画速度
-  // ========================================
-  '--effect-speed-slow': '0.4s',
-  '--effect-speed-normal': '0.25s',
-  '--effect-speed-fast': '0.15s',
-  '--effect-glow-primary': 'rgba(249, 115, 22, 0.4)',
-  '--effect-glow-secondary': 'rgba(99, 102, 241, 0.4)',
-
-  // ========================================
-  // 9. 特效 Token (ADR-005)
-  // ========================================
-  // BorderBeam - 日落橙边框光束
-  '--effect-beam-color': palette.sunsetOrange,
-  '--effect-beam-glow': 'color-mix(in srgb, #f97316, transparent 50%)',
-
-  // Shimmer - 金色流光
-  '--effect-shimmer-color': 'rgba(251, 191, 36, 0.15)',
-
-  // CosmicBackground - 日落背景 (橙+粉 渐变)
-  '--effect-cosmic-glow-1': palette.sunsetOrange,
-  '--effect-cosmic-glow-2': palette.sunsetPink,
-
-  // GridMatrix - 温暖网格
-  '--effect-grid-color': 'rgba(249, 115, 22, 0.2)',
-
-  // Spotlight - 聚光灯
-  '--effect-spotlight-color': 'color-mix(in srgb, #f97316, transparent 75%)',
 };
 
 // ============================================================================

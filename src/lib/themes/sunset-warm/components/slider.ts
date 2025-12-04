@@ -2,6 +2,8 @@
 
 export const sliderConfig = {
   slots: {
+    // Sunset Warm: 温暖的滑块容器
+    base: '',
     track: [
       'rounded-full',
       'bg-surface-2',
