@@ -2,7 +2,7 @@
  * Badge Component Entry
  */
 
-import { Badge, badgeBaseConfig } from '@/components/nova-ui/atmos/badge';
+import { Badge } from '@/components/nova-ui/atmos/badge';
 import type { ComponentRegistryEntry } from '../types';
 
 export const badgeEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const badgeEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeBadge',
   category: 'atoms',
   component: Badge,
-  baseConfig: badgeBaseConfig,
+  baseConfig: null, // 纯槽位模式，无 baseConfig
   props: [
     {
       name: 'variant',
@@ -24,7 +24,7 @@ export const badgeEntry: ComponentRegistryEntry = {
         { value: 'destructive', label: 'Destructive', labelKey: 'valDestructive' },
         { value: 'outline', label: 'Outline', labelKey: 'valOutline' },
       ],
-      defaultValue: badgeBaseConfig.defaultVariants.variant,
+      defaultValue: 'default',
     },
     {
       name: 'children',

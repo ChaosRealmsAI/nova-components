@@ -10,13 +10,15 @@
  */
 
 import type { ComponentType as ReactComponentType, ComponentProps } from 'react';
+import { useI18n } from '@/lib/i18n/use-i18n';
+import type { MessageKey } from '@/lib/i18n/messages';
 
 // ============================================================================
 // Atmos 组件导入
 // ============================================================================
 
 import { Button, buttonBaseConfig } from '@/components/nova-ui/atmos/button';
-import { Badge, badgeBaseConfig } from '@/components/nova-ui/atmos/badge';
+import { Badge } from '@/components/nova-ui/atmos/badge';
 import { Input, inputBaseConfig } from '@/components/nova-ui/atmos/input';
 import { Label, labelBaseConfig } from '@/components/nova-ui/atmos/label';
 import { Checkbox, checkboxBaseConfig } from '@/components/nova-ui/atmos/checkbox';
@@ -97,6 +99,31 @@ const CardDemo = (props: ComponentProps<typeof Card>) => (
   </Card>
 );
 
+/** ScrollArea 演示组件（使用 i18n） */
+const ScrollAreaDemo = (props: ComponentProps<typeof ScrollArea>) => {
+  const { t } = useI18n();
+
+  // 使用 i18n 构建本地化演示数据
+  const items = [
+    { id: '01', text: t('scrollAreaSystemInit' as MessageKey) },
+    { id: '02', text: t('scrollAreaLoadingModules' as MessageKey) },
+    { id: '03', text: t('scrollAreaConnecting' as MessageKey) },
+    { id: '04', text: t('scrollAreaAuthenticating' as MessageKey) },
+    { id: '05', text: t('scrollAreaFetchingData' as MessageKey) },
+    { id: '06', text: t('scrollAreaProcessing' as MessageKey) },
+    { id: '07', text: t('scrollAreaUpdatingCache' as MessageKey) },
+    { id: '08', text: t('scrollAreaSyncingState' as MessageKey) },
+    { id: '09', text: t('scrollAreaRendering' as MessageKey) },
+    { id: '10', text: t('scrollAreaTaskCompleted' as MessageKey) },
+    { id: '11', text: t('scrollAreaIdleMode' as MessageKey) },
+    { id: '12', text: t('scrollAreaWaitingInput' as MessageKey) },
+  ];
+
+  const header = t('scrollAreaItems' as MessageKey);
+
+  return <ScrollArea {...props} items={items} header={header} />;
+};
+
 // ============================================================================
 // 组件映射
 // ============================================================================
@@ -116,7 +143,7 @@ export interface ComponentMapEntry {
 export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   // Atmos
   'button': { component: Button, baseConfig: buttonBaseConfig },
-  'badge': { component: Badge, baseConfig: badgeBaseConfig },
+  'badge': { component: Badge, baseConfig: null }, // 纯槽位模式，无 baseConfig
   'input': { component: Input, baseConfig: inputBaseConfig },
   'label': { component: Label, baseConfig: labelBaseConfig },
   'checkbox': { component: Checkbox, baseConfig: checkboxBaseConfig },
@@ -132,7 +159,7 @@ export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   'avatar': { component: AvatarDemo, baseConfig: avatarBaseConfig },
   'kbd': { component: Kbd, baseConfig: kbdBaseConfig },
   'aspect-ratio': { component: AspectRatio, baseConfig: aspectRatioBaseConfig },
-  'scroll-area': { component: ScrollArea, baseConfig: null }, // 纯槽位模式，无 baseConfig
+  'scroll-area': { component: ScrollAreaDemo, baseConfig: null }, // 纯槽位模式，使用 i18n Demo
   'popover': { component: PopoverDemo, baseConfig: popoverBaseConfig },
   'tooltip': { component: TooltipDemo, baseConfig: tooltipBaseConfig },
   'card': { component: CardDemo, baseConfig: null }, // 纯槽位模式，无 baseConfig

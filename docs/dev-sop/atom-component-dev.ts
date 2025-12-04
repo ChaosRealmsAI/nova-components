@@ -1,16 +1,14 @@
 /**
  * Nova Components - 原子组件开发规范
  *
- * 版本: v2.0
+ * 版本: v3.0
  * 更新时间: 2025-12-04
  *
- * 参考实现: src/components/nova-ui/atmos/button/
+ * 参考实现:
+ * - 三层架构: src/components/nova-ui/atmos/scroll-area/
+ * - 复合组件: src/components/nova-ui/atmos/card/
  *
- * ⚠️ 关键注意（导出系统）:
- * 1. 主题配置文件必须在 4 个地方创建（3 个生产主题 + theme-template）
- * 2. themeFile 和 themeConfigs 必须正确配置（否则导出的主题文件为空）
- * 3. 导出名为 {component}Config（不是 BaseConfig）
- * 4. theme-template 必须同步更新（否则新创建的主题会缺少组件）
+ * 架构模式详见: docs/dev-sop/component-architecture-pattern.ts
  */
 
 // ============================================================================
@@ -20,32 +18,48 @@
 /**
  * 当前 atmos 组件列表:
  *
- * | 组件           | 说明                 | Demo组件 |
+ * | 组件           | 说明                 | 架构状态 |
  * |----------------|---------------------|----------|
- * | aspect-ratio   | 宽高比容器           | -        |
- * | avatar         | 头像                 | ✓        |
- * | badge          | 徽章                 | -        |
- * | button         | 按钮                 | -        |
- * | card           | 卡片                 | ✓        |
- * | checkbox       | 复选框               | -        |
- * | collapsible    | 折叠面板             | ✓        |
- * | input          | 输入框               | -        |
- * | kbd            | 键盘按键             | -        |
- * | label          | 标签                 | -        |
- * | popover        | 弹出框               | ✓        |
- * | progress       | 进度条               | -        |
- * | radio-group    | 单选组               | -        |
- * | scroll-area    | 滚动区域             | -        |
- * | separator      | 分隔线               | -        |
- * | skeleton       | 骨架屏               | -        |
- * | slider         | 滑块                 | -        |
- * | spinner        | 加载动画             | -        |
- * | switch         | 开关                 | -        |
- * | textarea       | 多行文本框           | -        |
- * | toggle         | 切换按钮             | -        |
- * | tooltip        | 提示框               | ✓        |
+ * | aspect-ratio   | 宽高比容器           | 待重构   |
+ * | avatar         | 头像                 | 待重构   |
+ * | badge          | 徽章                 | 待重构   |
+ * | button         | 按钮                 | 待重构   |
+ * | card           | 卡片                 | ✅ 三层  |
+ * | checkbox       | 复选框               | 待重构   |
+ * | collapsible    | 折叠面板             | 待重构   |
+ * | input          | 输入框               | 待重构   |
+ * | kbd            | 键盘按键             | 待重构   |
+ * | label          | 标签                 | 待重构   |
+ * | popover        | 弹出框               | 待重构   |
+ * | progress       | 进度条               | 待重构   |
+ * | radio-group    | 单选组               | 待重构   |
+ * | scroll-area    | 滚动区域             | ✅ 三层  |
+ * | separator      | 分隔线               | 待重构   |
+ * | skeleton       | 骨架屏               | 待重构   |
+ * | slider         | 滑块                 | 待重构   |
+ * | spinner        | 加载动画             | 待重构   |
+ * | switch         | 开关                 | 待重构   |
+ * | textarea       | 多行文本框           | 待重构   |
+ * | toggle         | 切换按钮             | 待重构   |
+ * | tooltip        | 提示框               | 待重构   |
  *
  * 路径: src/components/nova-ui/atmos/{component}/
+ * 重构任务池: docs/dev-sop/refactor-task-pool.md
+ */
+
+// ============================================================================
+// 核心架构：三层样式
+// ============================================================================
+
+/**
+ * ⭐ 必读: docs/dev-sop/component-architecture-pattern.ts
+ *
+ * 核心要点:
+ * - L1（功能层）：静态 tv 定义，组件外部，只保留功能必需样式
+ * - L2（主题层）：useTheme 获取，完全自定义视觉样式
+ * - L3（实例层）：用户 className/classNames
+ * - 合并方式：twMerge(L1, L2, L3)
+ * - 组件纯净化：不依赖项目内部文件
  */
 
 // ============================================================================
@@ -53,221 +67,293 @@
 // ============================================================================
 
 /**
- * 步骤 0: 参考 shadcn/ui
+ * 步骤 0: 阅读架构文档 ⭐
+ * - 必读: docs/dev-sop/component-architecture-pattern.ts
+ * - 参考: src/components/nova-ui/atmos/scroll-area/（三层架构）
+ * - 参考: src/components/nova-ui/atmos/card/（复合组件）
+ *
+ * 步骤 1: 参考 shadcn/ui
  * - 本地: src/shadcn_ui/{component}.tsx
  * - 文档: https://ui.shadcn.com/docs/components/{component}
  *
- * 步骤 1: 创建组件
+ * 步骤 2: 创建组件
  * - 文件: src/components/nova-ui/atmos/{component}/index.tsx
- *   - 导出 {component}BaseConfig
- *   - 导出 {Component}, {Component}Props, {Component}ClassNames
- *   - 如需 Demo 组件（弹出类），导出 {Component}Demo
- * - 配置: src/components/nova-ui/atmos/{component}/{component}.config.ts
+ * - 遵循三层架构:
+ *   - L1: 静态 tv 定义在组件外部
+ *   - L2: useTheme + useMemo 获取主题样式
+ *   - L3: 支持 className/classNames 覆盖
+ *   - 合并: twMerge(L1, L2, L3)
+ * - 导出: {Component}, {Component}Props, {Component}ClassNames
+ * - 注意: 不再需要导出 BaseConfig！
  *
- * 步骤 2: 创建主题配置文件 ⭐⭐⭐
+ * 步骤 3: 创建主题配置文件 ⭐⭐⭐
  * - 文件: src/lib/themes/{theme}/components/{component}.ts
- * - 必须: 4 个地方都要创建:
- *   - cyberpunk-dark（生产主题）
- *   - ocean-blue（生产主题）
- *   - sunset-warm（生产主题）
+ * - 必须: 所有主题都要创建:
+ *   - shadcn-default（基础主题）
+ *   - vintage-nostalgia（复古怀旧）
+ *   - ice-glass（冰川玻璃）
+ *   - midnight-lilac（午夜丁香）
+ *   - obsidian-shard（黑曜碎片）
+ *   - cyberpunk（赛博朋克）
  *   - theme-template（模板）⭐ 新主题创建依赖此模板
- * - 导出: {component}Config（注意命名：不是 BaseConfig，是 Config）
- * - 格式: 参考 themes/cyberpunk-dark/components/button.ts
- * - theme-template 格式: 参考 themes/theme-template/components/button.ts（含 TODO 注释）
+ * - 导出: {component}Config
+ * - 内容: slots（视觉样式）+ variants（变体）
  *
- * 步骤 3: 注册主题配置导出
+ * 步骤 4: 注册主题配置导出
  * - 文件: src/lib/themes/{theme}/components/index.ts
  * - 操作: 添加 export { {component}Config } from './{component}';
- * - 必须: 4 个地方的 components/index.ts 都要更新
+ * - 必须: 所有主题的 components/index.ts 都要更新
  *
- * 步骤 4: 在主题入口注册组件 ⭐⭐⭐ 关键！
+ * 步骤 5: 在主题入口注册组件 ⭐⭐⭐ 关键！
  * - 文件: src/lib/themes/{theme}/index.ts
  * - 操作:
  *   1. 在 import 中添加: {component}Config
  *   2. 在 components: {} 中添加: {Component}: {component}Config,
- * - 必须: 4 个地方的 index.ts 都要更新
- * - ⚠️ 漏掉此步骤会导致组件没有主题样式（只显示基础样式）
- * - ⚠️ 漏掉 theme-template 会导致新创建的主题缺少此组件
+ * - 必须: 所有主题的 index.ts 都要更新
+ * - ⚠️ 漏掉此步骤会导致组件没有主题样式
  *
- * 步骤 5: 创建 Manifest（单一数据源）⭐
+ * 步骤 6: 创建 Manifest（单一数据源）⭐
  * - 文件: src/components/nova-ui/atmos/{component}/manifest.ts
- * - 包含所有配置:
+ * - 包含:
  *   - 身份: type, name, category, label, labelKey
  *   - 导出: files, themeConfigs, themeFile, cssVars, dependencies
  *   - 画布: canvas.size, canvas.props, canvas.defaultProps
+ *   - 演示数据: DEMO_ITEMS 等
  *
- * ⚠️ 关键配置（导出功能依赖这些）:
- *   themeFile: 'components/{component}.ts',  // 指向主题配置文件
- *   themeConfigs: [
- *     { componentName: '{Component}', configName: '{component}Config' },
- *   ],
- *
- * 步骤 6: 注册 Manifest
+ * 步骤 7: 注册 Manifest
  * - 文件: src/registry/manifests.ts
  * - 操作: import manifest, 添加到 MANIFESTS 对象
  *
- * 步骤 7: 注册组件映射（画布渲染用）
- * - 文件: src/registry/component-map.ts
- * - 添加: '{component}': { component: {Component}, baseConfig: {component}BaseConfig }
+ * 步骤 8: 注册组件映射（画布渲染用）
+ * - 文件: src/registry/component-map.tsx
+ * - 添加: '{component}': { component: {Component}, baseConfig: null }
+ * - 注意: baseConfig 设为 null（三层架构不再需要）
+ * - 如需 Demo 包装器，定义本地 Demo 组件
  *
- * 步骤 8: 注册代码生成器（导出功能用）⭐⭐⭐ 关键！
- * - 文件: src/registry/components/atoms/{component}.ts
+ * 步骤 9: 注册代码生成器（导出功能用）⭐⭐⭐
+ * - 文件: src/registry/components/atoms/{component}.tsx
  * - 操作:
- *   1. 创建文件，参考 registry/components/atoms/button.ts
+ *   1. 创建文件，参考 registry/components/atoms/card.tsx
  *   2. 在 registry/components/atoms/index.ts 添加 export
  * - ⚠️ 漏掉此步骤会导致导出代码显示 "Unknown component type"
  *
- * 步骤 9: 添加到画布顺序
+ * 步骤 10: 添加到画布顺序
  * - 文件: src/stores/canvas-store.ts
  * - 在 COMPONENT_ORDER 数组中添加 '{component}'
  *
- * 步骤 10: 国际化（分目录）
+ * 步骤 11: 国际化（分目录）
  * - 组件类型名: src/lib/i18n/messages/components/_types.ts
- *   - 添加: componentType{Component}
  * - 通用属性名: src/lib/i18n/messages/components/_props.ts
- *   - 添加: prop{PropName}（如属性名是新的）
  * - 通用属性值: src/lib/i18n/messages/components/_values.ts
- *   - 添加: val{Value}（如属性值是新的）
  * - 组件专属翻译: src/lib/i18n/messages/components/atmos/{component}.ts
- *   - 创建文件，添加组件专属文本（如按钮默认文字、提示等）
- *   - 在 atmos/index.ts 中导入并合并
  *
- * 步骤 11: 验证
+ * 步骤 12: 验证
  * - npx tsc --noEmit && npm run build
- * - 刷新画布页面，确认组件出现在抽屉中
- * - 测试导出功能，确认生成的代码包含:
- *   □ components/{component}.tsx（不是 "Unknown component type"）
- *   □ themes/{theme}/components/{component}.ts
- *   □ themes/{theme}/index.ts 中有 components: { {Component}: {component}Config }
+ * - 画布渲染测试
+ * - 主题切换测试
+ * - 导出功能测试
  */
 
 // ============================================================================
-// 组件结构（伪代码）
+// 组件结构（三层架构）
 // ============================================================================
 
 /*
-// {component}.config.ts - 基础配置（组件内部）
-export const {component}BaseConfig = {
-  slots: { base: '...' },
-  variants: {
-    variant: { default: {}, outline: {} },
-    size: { default: {}, sm: {}, lg: {} }
-  },
-  defaultVariants: { variant: 'default', size: 'default' }
-} as const;
+// index.tsx - 三层架构模板
 
-// themes/cyberpunk-dark/components/{component}.ts - 主题配置
-export const {component}Config = {
-  slots: {
-    base: ['rounded-none', 'font-mono', ...],  // cyberpunk 风格
-  },
-  variants: {
-    variant: {
-      default: { base: ['hover:shadow-[0_0_20px_var(--primary)]'] },
-    },
-  },
+'use client';
+
+import * as React from 'react';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
 };
 
-// index.tsx
-'use client';
-import { tv, VariantProps } from 'tailwind-variants';
-import { {component}BaseConfig } from './{component}.config';
+// ============================================================================
+// L1: 功能层（静态，组件外部定义）
+// ============================================================================
 
-const {component} = tv({component}BaseConfig);
+const componentBase = tv({
+  slots: {
+    base: 'relative',           // 功能必需
+    content: 'overflow-hidden', // 功能必需
+    // 只放功能必需样式，视觉样式放 L2
+  },
+});
 
-export type {Component}ClassNames = Partial<Record<keyof typeof {component}BaseConfig.slots, string>>;
+// ============================================================================
+// Theme Hook
+// ============================================================================
 
-export interface {Component}Props extends VariantProps<typeof {component}> {
-  classNames?: {Component}ClassNames;
+const useComponentTheme = () => {
+  const { currentTheme } = useTheme();
+  const themeConfig = currentTheme?.components?.Component;
+
+  return React.useMemo(() => ({
+    base: toClassString(themeConfig?.slots?.base),
+    content: toClassString(themeConfig?.slots?.content),
+    // 缓存所有 slot 的主题样式
+  }), [themeConfig]);
+};
+
+// ============================================================================
+// Component
+// ============================================================================
+
+export interface ComponentClassNames {
+  base?: string;
+  content?: string;
 }
 
-export const {Component} = forwardRef<HTMLElement, {Component}Props>(
-  ({ className, classNames, variant, size, ...props }, ref) => {
-    // classNames 优先：有则完全使用，无则计算
-    const baseClass = classNames?.base ?? {component}({ variant, size }).base();
-    return <element className={cn(baseClass, className)} ref={ref} {...props} />;
+export interface ComponentProps extends React.HTMLAttributes<HTMLDivElement> {
+  classNames?: ComponentClassNames;
+}
+
+const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
+  ({ className, classNames, children, ...props }, ref) => {
+    // L1: 功能层（静态）
+    const base = componentBase();
+
+    // L2: 主题层（动态，缓存）
+    const themeStyles = useComponentTheme();
+
+    // 合并: L1 + L2 + L3
+    const baseClass = twMerge(
+      base.base(),           // L1: 功能层
+      themeStyles.base,      // L2: 主题层
+      classNames?.base,      // L3: 实例层
+      className              // L3: 实例层
+    );
+
+    const contentClass = twMerge(
+      base.content(),
+      themeStyles.content,
+      classNames?.content
+    );
+
+    return (
+      <div ref={ref} className={baseClass} {...props}>
+        <div className={contentClass}>{children}</div>
+      </div>
+    );
   }
 );
+Component.displayName = 'Component';
+
+export { Component };
 */
 
 // ============================================================================
-// 样式规则
+// 主题配置结构
 // ============================================================================
 
-/**
- * ADR-001: 标准 Tailwind 类
- *
- * ✅ 正确: bg-primary, text-foreground, border-border
- * ❌ 禁止: bg-[var(--primary)], bg-blue-500, #ff00ff
- */
+/*
+// themes/{theme}/components/{component}.ts
+
+export const componentConfig = {
+  slots: {
+    base: [
+      'bg-card',
+      'text-card-foreground',
+      'rounded-lg',
+      'border',
+      'shadow-sm',
+      // 所有视觉样式放这里
+    ],
+    content: [
+      'p-6',
+    ],
+  },
+
+  variants: {
+    variant: {
+      default: {},
+      outline: {
+        base: ['border-2', 'shadow-none'],
+      },
+      ghost: {
+        base: ['border-transparent', 'bg-transparent'],
+      },
+    },
+    size: {
+      sm: {
+        base: ['text-sm'],
+        content: ['p-4'],
+      },
+      default: {},
+      lg: {
+        base: ['text-lg'],
+        content: ['p-8'],
+      },
+    },
+  },
+};
+*/
 
 // ============================================================================
-// 检查清单（新系统）
+// 检查清单
 // ============================================================================
 
 /**
  * □ 组件源码 (index.tsx)
  *   □ 'use client' 指令
- *   □ 导出 {component}BaseConfig
+ *   □ L1 静态 tv 在组件外部定义
+ *   □ useTheme + useMemo 获取 L2 主题样式
+ *   □ twMerge(L1, L2, L3) 合并样式
  *   □ 导出 {Component}, {Component}Props, {Component}ClassNames
- *   □ 支持 classNames 完全覆盖
- *   □ 使用标准 Tailwind 类（ADR-001）
- *   □ forwardRef 支持
+ *   □ 不再导出 BaseConfig
+ *   □ 不依赖项目内部文件
  *
- * □ 主题配置 ⭐⭐⭐（4 个地方都要创建！）
- *   □ themes/cyberpunk-dark/components/{component}.ts 创建
- *   □ themes/ocean-blue/components/{component}.ts 创建
- *   □ themes/sunset-warm/components/{component}.ts 创建
- *   □ themes/theme-template/components/{component}.ts 创建 ⭐ 模板！
- *   □ 4 个地方的 components/index.ts 都更新导出
- *   □ 导出名为 {component}Config（不是 BaseConfig）
+ * □ 主题配置 ⭐⭐⭐（所有主题都要创建！）
+ *   □ themes/shadcn-default/components/{component}.ts
+ *   □ themes/vintage-nostalgia/components/{component}.ts
+ *   □ themes/ice-glass/components/{component}.ts
+ *   □ themes/midnight-lilac/components/{component}.ts
+ *   □ themes/obsidian-shard/components/{component}.ts
+ *   □ themes/cyberpunk/components/{component}.ts
+ *   □ themes/theme-template/components/{component}.ts ⭐ 模板
+ *   □ 所有主题的 components/index.ts 都更新导出
+ *   □ 导出名为 {component}Config
  *
- * □ 主题入口注册 ⭐⭐⭐ 关键！
- *   □ themes/cyberpunk-dark/index.ts - import 并添加到 components
- *   □ themes/ocean-blue/index.ts - import 并添加到 components
- *   □ themes/sunset-warm/index.ts - import 并添加到 components
- *   □ themes/theme-template/index.ts - import 并添加到 components ⭐ 模板！
- *   □ ⚠️ 漏掉此步骤会导致组件没有主题样式
- *   □ ⚠️ 漏掉 theme-template 会导致新创建的主题缺少此组件
+ * □ 主题入口注册 ⭐⭐⭐
+ *   □ 所有主题的 index.ts 都 import 并添加到 components
+ *   □ 包括 theme-template
  *
- * □ Manifest（单一数据源）⭐
+ * □ Manifest（单一数据源）
  *   □ manifest.ts 创建
  *   □ registry/manifests.ts 注册
- *   □ themeFile: 'components/{component}.ts' ← 必须配置！
- *   □ themeConfigs: [{ componentName, configName }] ← 必须配置！
- *   □ 包含 label, labelKey
- *   □ 包含 canvas.size, canvas.props, canvas.defaultProps
+ *   □ themeFile 和 themeConfigs 正确配置
  *
- * □ 组件映射（画布渲染用）
- *   □ registry/component-map.ts 添加映射
+ * □ 组件映射
+ *   □ registry/component-map.tsx 添加映射
+ *   □ baseConfig: null
  *
- * □ 代码生成器（导出功能用）⭐⭐⭐ 关键！
- *   □ registry/components.ts 添加 import
- *   □ registry/components.ts 创建 {component}Entry
- *   □ registry/components.ts 添加到 COMPONENT_REGISTRY
- *   □ registry/components.ts 导出 Props 类型
- *   □ ⚠️ 漏掉此步骤会导致导出代码显示 "Unknown component type"
+ * □ 代码生成器
+ *   □ registry/components/atoms/{component}.tsx 创建
+ *   □ registry/components/atoms/index.ts 导出
  *
  * □ 画布顺序
- *   □ stores/canvas-store.ts - COMPONENT_ORDER 添加
+ *   □ stores/canvas-store.ts COMPONENT_ORDER 添加
  *
- * □ 国际化（分目录结构）
- *   □ _types.ts: componentType{Component}
- *   □ _props.ts: prop{PropName}（如新属性名）
- *   □ _values.ts: val{Value}（如新属性值）
- *   □ atmos/{component}.ts: 组件专属翻译
- *   □ atmos/index.ts: 导入并合并
- *   □ 16 种语言翻译
+ * □ 国际化
+ *   □ _types.ts, _props.ts, _values.ts
+ *   □ atmos/{component}.ts
  *
  * □ 验证
- *   □ npx tsc --noEmit 无错误
- *   □ npm run build 无错误
- *   □ 画布抽屉显示组件
- *   □ 切换主题样式变化
- *   □ 导出功能正常:
- *     □ components/{component}.tsx 生成（不是 "Unknown component type"）
- *     □ themes/{theme}/components/{component}.ts 生成
- *     □ 依赖的 atoms 一起导出
+ *   □ npx tsc --noEmit
+ *   □ npm run build
+ *   □ 画布渲染正常
+ *   □ 主题切换正常
+ *   □ 导出功能正常
  */
 
 export {};

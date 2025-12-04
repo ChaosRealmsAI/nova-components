@@ -17,7 +17,8 @@ import { useThemeStore } from '@/stores/theme-store';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import { HUD } from './HUD'; // Stage 2 Component
 import { Dock } from './Dock'; // Dock Component
-import { getComponentEntry } from '@/registry/components';
+// 使用自动生成的 registry（从 COMPONENT_MAP 构建，支持 i18n Demo 组件）
+import { getComponentEntry } from '@/registry/component-registry';
 import { getLocalizedPropValue } from '@/lib/i18n/utils';
 import type { MessageKey } from '@/lib/i18n/messages';
 

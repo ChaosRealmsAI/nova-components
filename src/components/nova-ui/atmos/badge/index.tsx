@@ -2,58 +2,94 @@
 
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/lib/themes/use-theme';
-import { badgeBaseConfig } from './badge.config';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
 
 /**
  * Nova Badge
  *
- * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `badgeBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * 纯净组件，只依赖外部库，不依赖项目内部文件。
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
-export { badgeBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type BadgeVariants = VariantProps<ReturnType<typeof tv>>;
-export type BadgeSlots = keyof typeof badgeBaseConfig.slots;
-export type BadgeClassNames = Partial<Record<BadgeSlots, string>>;
+export type BadgeClassNames = Partial<{
+  base: string;
+}>;
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    BadgeVariants {
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: 静态样式定义（功能层）- 在组件外部定义
+// ============================================================================
+
+/** Badge 功能层样式 - 只保留功能必需的样式 */
+const badgeBase = tv({
+  slots: {
+    // 功能必需：inline-flex 布局 + 居中对齐
+    base: 'inline-flex items-center',
+  },
+});
+
+// ============================================================================
+// Badge Component
+// ============================================================================
+
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   asChild?: boolean;
   classNames?: BadgeClassNames;
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className, classNames, variant, asChild = false, children, ...props }, ref) => {
+  ({ className, classNames, variant = 'default', asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'div';
 
-    // ADR-006: 从主题上下文获取 Badge 的样式配置
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Badge;
 
-    // 合并基础配置和主题配置
-    const styles = tv({
-      extend: badgeBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1: 功能层（静态）
+    const base = badgeBase();
 
-    // 如果提供了 classNames.base，完全使用它（主题烘焙样式）
-    // 否则使用内部 variant 样式
-    const baseClass = classNames?.base
-      ? classNames.base
-      : styles({ variant }).base();
+    // L2: 主题层（用 useMemo 缓存）
+    const themeStyles = React.useMemo(() => {
+      const baseStyle = toClassString(themeConfig?.slots?.base);
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+      return { base: baseStyle, variant: variantStyle };
+    }, [themeConfig, variant]);
+
+    // 合并: L1 + L2(base) + L2(variant) + L3
+    const rootClass = twMerge(
+      base.base(),
+      themeStyles.base,
+      themeStyles.variant,
+      classNames?.base,
+      className
+    );
 
     return (
       <Comp
-        className={cn(baseClass, className)}
         ref={ref}
+        data-slot="badge"
+        className={rootClass}
         {...props}
       >
         {children}

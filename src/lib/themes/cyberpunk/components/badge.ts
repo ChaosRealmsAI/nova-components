@@ -1,13 +1,32 @@
 /**
- * Badge 组件样式 - Cyberpunk (Upgraded)
+ * Badge - Cyberpunk Theme
+ *
+ * 赛博朋克：霓虹灯、故障效果、科技切角、全息感
  */
 export const badgeConfig = {
   slots: {
     base: [
-      'inline-flex items-center rounded-none border px-2 py-0.5 text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-      'uppercase tracking-widest font-mono',
-      // Tech corners
-      '[clip-path:polygon(4px_0,100%_0,100%_calc(100%_-_4px),calc(100%_-_4px)_100%,0_100%,0_4px)]',
+      // 科技切角形状
+      'rounded-none',
+      '[clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)]',
+      // 边框
+      'border',
+      // 内边距
+      'px-3',
+      'py-1',
+      // 字体：终端风格
+      'text-xs',
+      'font-bold',
+      'font-mono',
+      'uppercase',
+      'tracking-[0.2em]',
+      // 过渡
+      'transition-all',
+      'duration-150',
+      // 焦点
+      'focus:outline-none',
+      'focus:ring-1',
+      'focus:ring-primary',
     ],
   },
 
@@ -15,31 +34,59 @@ export const badgeConfig = {
     variant: {
       default: {
         base: [
-          'border-transparent bg-primary/10 text-primary border border-primary', // Hollow look
-          'shadow-[0_0_10px_rgba(0,229,255,0.3)]',
-          'hover:bg-primary hover:text-primary-foreground',
+          // 霓虹青色
+          'bg-primary/10',
+          'text-primary',
+          'border-primary',
+          // 霓虹发光
+          'shadow-[0_0_10px_rgba(0,255,255,0.5),0_0_20px_rgba(0,255,255,0.3),inset_0_0_10px_rgba(0,255,255,0.1)]',
+          // hover: 实心填充
+          'hover:bg-primary',
+          'hover:text-primary-foreground',
+          'hover:shadow-[0_0_15px_rgba(0,255,255,0.7),0_0_30px_rgba(0,255,255,0.4)]',
         ],
       },
 
       secondary: {
         base: [
-          'border-transparent bg-secondary/10 text-secondary border border-secondary',
-          'hover:bg-secondary hover:text-secondary-foreground',
+          // 霓虹粉/紫
+          'bg-secondary/10',
+          'text-secondary',
+          'border-secondary',
+          'shadow-[0_0_8px_rgba(255,0,255,0.3)]',
+          'hover:bg-secondary',
+          'hover:text-secondary-foreground',
+          'hover:shadow-[0_0_15px_rgba(255,0,255,0.5)]',
         ],
       },
 
       destructive: {
         base: [
-          'border-transparent bg-destructive/10 text-destructive border border-destructive',
-          'hover:bg-destructive hover:text-destructive-foreground',
-          'animate-pulse', // Warning pulse
+          // 警报红
+          'bg-destructive/10',
+          'text-destructive',
+          'border-destructive',
+          // 脉冲发光动画
+          'shadow-[0_0_10px_rgba(255,0,60,0.5)]',
+          'animate-pulse',
+          // hover
+          'hover:bg-destructive',
+          'hover:text-destructive-foreground',
+          'hover:animate-none',
+          'hover:shadow-[0_0_20px_rgba(255,0,60,0.8)]',
         ],
       },
 
       outline: {
         base: [
-          'text-foreground border-border',
-          'hover:border-primary hover:text-primary',
+          // 低调线框
+          'bg-transparent',
+          'text-muted-foreground',
+          'border-muted-foreground/50',
+          // hover 激活
+          'hover:text-primary',
+          'hover:border-primary',
+          'hover:shadow-[0_0_8px_rgba(0,255,255,0.3)]',
         ],
       },
     },

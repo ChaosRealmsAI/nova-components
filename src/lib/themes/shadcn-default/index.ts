@@ -1,7 +1,7 @@
 import type { ThemeDefinition } from '@/types';
 import { tokens, meta } from './tokens';
 import { buttonBaseConfig } from '@/components/nova-ui/atmos/button/button.config';
-import { badgeBaseConfig } from '@/components/nova-ui/atmos/badge/badge.config';
+import { badgeConfig } from './components/badge';
 import { inputBaseConfig } from '@/components/nova-ui/atmos/input/input.config';
 import { labelBaseConfig } from '@/components/nova-ui/atmos/label/label.config';
 import { checkboxBaseConfig } from '@/components/nova-ui/atmos/checkbox/checkbox.config';
@@ -32,9 +32,7 @@ export const shadcnDefaultTheme: ThemeDefinition = {
     Button: {
       extend: buttonBaseConfig,
     },
-    Badge: {
-      extend: badgeBaseConfig,
-    },
+    Badge: badgeConfig,
     Input: {
       extend: inputBaseConfig,
     },

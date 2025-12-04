@@ -17,7 +17,6 @@
  * │ 背景   │ 纯色、渐变、半透明、模糊、图案                                   │
  *
  *
-
  * 🎨 颜色语义：
  *    - default: bg-primary（品牌标签）
  *    - secondary: bg-secondary（次要标签）
@@ -65,7 +64,22 @@ export const badgeConfig = {
      * - 任何符合主题风格的样式
      */
     base: [
-      // TODO: 根据主题风格自由发挥
+      // 形状
+      'rounded-md',
+      'border',
+      // 内边距
+      'px-2.5',
+      'py-0.5',
+      // 字体
+      'text-xs',
+      'font-semibold',
+      // 动效
+      'transition-colors',
+      // 焦点状态
+      'focus:outline-none',
+      'focus:ring-2',
+      'focus:ring-ring',
+      'focus:ring-offset-2',
     ],
   },
 
@@ -81,7 +95,11 @@ export const badgeConfig = {
        */
       default: {
         base: [
-          // TODO
+          'border-transparent',
+          'bg-primary',
+          'text-primary-foreground',
+          'shadow',
+          'hover:bg-primary/80',
         ],
       },
 
@@ -95,7 +113,10 @@ export const badgeConfig = {
        */
       secondary: {
         base: [
-          // TODO
+          'border-transparent',
+          'bg-secondary',
+          'text-secondary-foreground',
+          'hover:bg-secondary/80',
         ],
       },
 
@@ -109,7 +130,11 @@ export const badgeConfig = {
        */
       destructive: {
         base: [
-          // TODO
+          'border-transparent',
+          'bg-destructive',
+          'text-destructive-foreground',
+          'shadow',
+          'hover:bg-destructive/80',
         ],
       },
 
@@ -123,7 +148,8 @@ export const badgeConfig = {
        */
       outline: {
         base: [
-          // TODO
+          'text-foreground',
+          'border-border',
         ],
       },
     },
