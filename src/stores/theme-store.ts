@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ThemeDefinition } from '@/types';
-import { THEMES } from '@/lib/themes';
+import { THEMES } from '@/lib/themes/theme-registry';
 
 /**
  * 可自定义的 Token 类型
