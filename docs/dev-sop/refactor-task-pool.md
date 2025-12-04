@@ -40,6 +40,7 @@ docs/dev-sop/component-architecture-pattern.ts
 | 4 | button | ✅ | variants 多 |
 | 5 | input | ✅ | |
 | 6 | textarea | ✅ | |
+| 7 | label | ✅ | |
 | 10 | slider | ✅ | 含 track/range/thumb |
 | 14 | skeleton | ✅ | |
 | 11 | toggle | ✅ | |
@@ -49,16 +50,15 @@ docs/dev-sop/component-architecture-pattern.ts
 | # | 组件 | 状态 | 复杂度 | 备注 |
 |---|------|------|--------|------|
 | 6 | textarea | ✅ | |
-| 7 | label | 🔄 | 低 | |
 | 9 | switch | ✅ | 中 | 含 thumb |
 
 | 12 | radio-group | ✅ | 中 | 含 item/indicator |
 | 13 | progress | ✅ | 低 | 含 indicator |
 
-| 15 | spinner | ⏳ | 低 | |
+| 15 | spinner | 🔄 | 低 | |
 | 16 | avatar | ⏳ | 中 | 含 fallback |
 | 17 | kbd | ⏳ | 低 | |
-| 18 | separator | ⏳ | 低 | |
+| 18 | separator | 🔄 | 低 | |
 | 19 | aspect-ratio | ⏳ | 低 | |
 | 20 | popover | ⏳ | 中 | 弹出类，需 Demo |
 | 21 | tooltip | ⏳ | 中 | 弹出类，需 Demo |
@@ -148,13 +148,13 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | badge | badge.config.ts | ✅ 已删除 |
 | input | input.config.ts | ✅ 已删除 |
 | textarea | textarea.config.ts | ✅ |
-| label | label.config.ts | ⏳ |
+| label | label.config.ts | ✅ |
 | checkbox | checkbox.config.ts | ✅ 已删除 |
 | switch | switch.config.ts | ✅ 已删除 |
 | slider | slider.config.ts | ✅ 已删除 |
 | toggle | toggle.config.ts | ✅ 已删除 |
 | radio-group | radio-group.config.ts | ✅ 已删除 |
-| progress | progress.config.ts | ⏳ |
+| progress | progress.config.ts | ✅ 已删除 |
 | skeleton | skeleton.config.ts | ✅ 已删除 |
 | spinner | spinner.config.ts | ⏳ |
 | avatar | avatar.config.ts | ⏳ |
@@ -217,7 +217,7 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 ## 进度追踪
 
 - 总数: 22
-- 已完成: 8
-- 进行中: 5
+- 已完成: 9
+- 进行中: 4
 - 待开始: 9
 - 完成率: 36%

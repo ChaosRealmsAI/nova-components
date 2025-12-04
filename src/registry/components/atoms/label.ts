@@ -2,7 +2,7 @@
  * Label Component Entry
  */
 
-import { Label, labelBaseConfig } from '@/components/nova-ui/atmos/label';
+import { Label } from '@/components/nova-ui/atmos/label';
 import type { ComponentRegistryEntry } from '../types';
 
 export const labelEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const labelEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeLabel',
   category: 'atoms',
   component: Label,
-  baseConfig: labelBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'children',
