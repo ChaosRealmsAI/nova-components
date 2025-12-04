@@ -2,7 +2,7 @@
  * Slider Component Entry
  */
 
-import { Slider, sliderBaseConfig } from '@/components/nova-ui/atmos/slider';
+import { Slider } from '@/components/nova-ui/atmos/slider';
 import type { ComponentRegistryEntry } from '../types';
 
 export const sliderEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const sliderEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSlider',
   category: 'atoms',
   component: Slider,
-  baseConfig: sliderBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'value',
@@ -42,12 +42,14 @@ export const sliderEntry: ComponentRegistryEntry = {
       defaultValue: 1,
     },
     {
-      name: 'variant',
+      name: 'size',
       type: 'select',
-      label: 'Variant',
-      labelKey: 'propVariant',
+      label: 'Size',
+      labelKey: 'propSize',
       options: [
         { value: 'default', label: 'Default', labelKey: 'valDefault' },
+        { value: 'sm', label: 'Small', labelKey: 'valSmall' },
+        { value: 'lg', label: 'Large', labelKey: 'valLarge' },
       ],
       defaultValue: 'default',
     },
@@ -64,7 +66,7 @@ export const sliderEntry: ComponentRegistryEntry = {
     min: 0,
     max: 100,
     step: 1,
-    variant: 'default',
+    size: 'default',
     disabled: false,
   },
   availableEffects: ['glow'],

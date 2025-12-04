@@ -5,7 +5,7 @@ import { badgeConfig } from './components/badge';
 import { inputConfig } from './components/input';
 import { textareaConfig } from './components/textarea';
 import { labelBaseConfig } from '@/components/nova-ui/atmos/label/label.config';
-import { checkboxBaseConfig } from '@/components/nova-ui/atmos/checkbox/checkbox.config';
+import { checkboxConfig } from './components/checkbox';
 import { switchConfig } from './components/switch';
 import { sliderConfig } from './components/slider';
 import { progressBaseConfig } from '@/components/nova-ui/atmos/progress/progress.config';
@@ -37,9 +37,7 @@ export const shadcnDefaultTheme: ThemeDefinition = {
     Label: {
       extend: labelBaseConfig,
     },
-    Checkbox: {
-      extend: checkboxBaseConfig,
-    },
+    Checkbox: checkboxConfig,
     Switch: switchConfig,
     Slider: sliderConfig,
     Progress: {

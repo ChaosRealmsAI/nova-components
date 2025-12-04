@@ -100,4 +100,21 @@ export const sliderConfig = {
       // TODO
     ],
   },
+
+  variants: {
+    size: {
+      default: {
+        track: '',
+        thumb: '',
+      },
+      sm: {
+        track: '',
+        thumb: '',
+      },
+      lg: {
+        track: '',
+        thumb: '',
+      },
+    },
+  },
 };

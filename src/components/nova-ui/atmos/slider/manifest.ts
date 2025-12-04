@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'slider.config.ts',
   },
 
   themeConfigs: [
@@ -32,6 +31,7 @@ export const manifest: ComponentManifest = {
 
   exportOptions: {
     noChildren: true,
+    customJsx: `<Slider defaultValue={[50]} max={100} step={1} />`,
   },
 
   canvas: {
@@ -66,12 +66,14 @@ export const manifest: ComponentManifest = {
         defaultValue: 1,
       },
       {
-        name: 'variant',
+        name: 'size',
         type: 'select',
-        label: 'Variant',
-        labelKey: 'propVariant',
+        label: 'Size',
+        labelKey: 'propSize',
         options: [
           { value: 'default', label: 'Default', labelKey: 'valDefault' },
+          { value: 'sm', label: 'Small', labelKey: 'valSmall' },
+          { value: 'lg', label: 'Large', labelKey: 'valLarge' },
         ],
         defaultValue: 'default',
       },
@@ -88,7 +90,7 @@ export const manifest: ComponentManifest = {
       min: 0,
       max: 100,
       step: 1,
-      variant: 'default',
+      size: 'default',
       disabled: false,
     },
     availableEffects: ['glow'],
