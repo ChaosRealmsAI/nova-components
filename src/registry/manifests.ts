@@ -58,7 +58,6 @@ import { manifest as inputOtpManifest } from '@/components/nova-ui/blocks/input-
 import { manifest as toggleGroupManifest } from '@/components/nova-ui/blocks/toggle-group/manifest';
 import { manifest as calendarManifest } from '@/components/nova-ui/blocks/calendar/manifest';
 import { manifest as carouselManifest } from '@/components/nova-ui/blocks/carousel/manifest';
-import { manifest as chartManifest } from '@/components/nova-ui/blocks/chart/manifest';
 import { manifest as comboboxManifest } from '@/components/nova-ui/blocks/combobox/manifest';
 import { manifest as datePickerManifest } from '@/components/nova-ui/blocks/date-picker/manifest';
 import { manifest as navigationMenuManifest } from '@/components/nova-ui/blocks/navigation-menu/manifest';
@@ -119,7 +118,6 @@ export const MANIFESTS: ManifestRegistry = {
   'toggle-group': toggleGroupManifest,
   'calendar': calendarManifest,
   'carousel': carouselManifest,
-  'chart': chartManifest,
   'combobox': comboboxManifest,
   'date-picker': datePickerManifest,
   'navigation-menu': navigationMenuManifest,

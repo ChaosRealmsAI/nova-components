@@ -7,6 +7,39 @@
 
 import type { ComponentManifest } from '@/registry/manifest-types';
 
+// ============================================================================
+// Demo Data（演示数据）
+// ============================================================================
+
+/** 数据项类型 */
+export interface ScrollAreaItem {
+  id: string;
+  text: string;
+}
+
+/** 默认演示数据 */
+export const DEMO_ITEMS: ScrollAreaItem[] = [
+  { id: '01', text: 'System initialization' },
+  { id: '02', text: 'Loading modules' },
+  { id: '03', text: 'Connecting to server' },
+  { id: '04', text: 'Authenticating user' },
+  { id: '05', text: 'Fetching data' },
+  { id: '06', text: 'Processing request' },
+  { id: '07', text: 'Updating cache' },
+  { id: '08', text: 'Syncing state' },
+  { id: '09', text: 'Rendering view' },
+  { id: '10', text: 'Task completed' },
+  { id: '11', text: 'Idle mode' },
+  { id: '12', text: 'Waiting for input' },
+];
+
+/** 默认演示标题 */
+export const DEMO_HEADER = 'ITEMS';
+
+// ============================================================================
+// Manifest
+// ============================================================================
+
 export const manifest: ComponentManifest = {
   // 组件标识
   type: 'scroll-area',
@@ -46,12 +79,32 @@ export const manifest: ComponentManifest = {
   // 导出选项
   exportOptions: {
     noChildren: true,  // 使用默认内容，不需要传 children
+    customJsx: `<ScrollArea
+      header="ITEMS"
+      items={[
+        { id: '01', text: 'System initialization' },
+        { id: '02', text: 'Loading modules' },
+        { id: '03', text: 'Connecting to server' },
+        { id: '04', text: 'Authenticating user' },
+        { id: '05', text: 'Fetching data' },
+        { id: '06', text: 'Processing request' },
+        { id: '07', text: 'Updating cache' },
+        { id: '08', text: 'Syncing state' },
+        { id: '09', text: 'Rendering view' },
+        { id: '10', text: 'Task completed' },
+        { id: '11', text: 'Idle mode' },
+        { id: '12', text: 'Waiting for input' },
+      ]}
+    />`,
   },
 
   canvas: {
     size: { width: 320, height: 280 },
     props: [],
-    defaultProps: {},
+    defaultProps: {
+      items: DEMO_ITEMS,
+      header: DEMO_HEADER,
+    },
     availableEffects: [],
   },
 };

@@ -79,7 +79,6 @@ import {
   datePickerEntry,
   calendarEntry,
   carouselEntry,
-  chartEntry,
   navigationMenuEntry,
   resizableEntry,
   sonnerEntry,
@@ -140,7 +139,6 @@ export const COMPONENT_REGISTRY: Record<string, ComponentRegistryEntry> = {
   'date-picker': datePickerEntry,
   calendar: calendarEntry,
   carousel: carouselEntry,
-  chart: chartEntry,
   'navigation-menu': navigationMenuEntry,
   resizable: resizableEntry,
   sonner: sonnerEntry,
@@ -199,7 +197,7 @@ export type { AspectRatioProps } from '@/components/nova-ui/atmos/aspect-ratio';
 export type { ScrollAreaProps } from '@/components/nova-ui/atmos/scroll-area';
 export type { PopoverDemoProps } from '@/components/nova-ui/atmos/popover';
 export type { TooltipDemoProps } from '@/components/nova-ui/atmos/tooltip';
-export type { CardDemoProps } from '@/components/nova-ui/atmos/card';
+export type { CardProps } from '@/components/nova-ui/atmos/card';
 export type { CollapsibleDemoProps } from '@/components/nova-ui/atmos/collapsible';
 
 // Blocks

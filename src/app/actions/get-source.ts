@@ -61,7 +61,6 @@ const BLOCK_SOURCES: Record<string, string> = {
   'date-picker': 'src/components/nova-ui/blocks/date-picker/index.tsx',
   'calendar': 'src/components/nova-ui/blocks/calendar/index.tsx',
   'carousel': 'src/components/nova-ui/blocks/carousel/index.tsx',
-  'chart': 'src/components/nova-ui/blocks/chart/index.tsx',
   combobox: 'src/components/nova-ui/blocks/combobox/index.tsx',
   resizable: 'src/components/nova-ui/blocks/resizable/index.tsx',
   sonner: 'src/components/nova-ui/blocks/sonner/index.tsx',

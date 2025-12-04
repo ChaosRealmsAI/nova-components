@@ -385,10 +385,6 @@ export function Canvas() {
         aria-label="Interactive Canvas - Pan, zoom, and click on components to select them"
         data-testid="canvas-region"
         className="flex-1 relative overflow-hidden"
-        onContextMenuCapture={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
         style={{
           '--tl-background': bgColor,
           '--tl-bg': bgColor,
@@ -400,6 +396,7 @@ export function Canvas() {
           hideUi
           inferDarkMode={false}
           options={{ maxPages: 1 }}
+          components={{ ContextMenu: null }}
         >
           {/* HUD 需要访问 Editor Context，所以移到这里 */}
           <HUD />

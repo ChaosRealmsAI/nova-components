@@ -4,7 +4,6 @@
  * Inspector - 右侧检查器面板
  *
  * 功能说明：
- * - 当 inspectorMode === 'theme_config' 时，显示主题配置面板
  * - 当选中组件时，显示组件信息 + 特效配置
  * - 未选中时显示提示
  *
@@ -16,19 +15,13 @@
 
 import { useCanvasStore } from '@/stores/canvas-store';
 import { InspectorHeader } from './InspectorHeader';
-import { ThemeConfigPanel } from './ThemeConfigPanel';
 import { PropsPanel } from './PropsPanel';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import type { MessageKey } from '@/lib/i18n/messages';
 
 export function Inspector() {
   const { t } = useI18n();
-  const { components, selectedId, inspectorMode } = useCanvasStore();
-
-  // Theme Config Mode - 主题配置模式
-  if (inspectorMode === 'theme_config') {
-    return <ThemeConfigPanel />;
-  }
+  const { components, selectedId } = useCanvasStore();
 
   // 查找选中的组件
   const selectedComponent = components.find((c) => c.id === selectedId);

@@ -1,0 +1,52 @@
+/**
+ * Sonner 组件 - Vintage Nostalgia 复古怀旧风格
+ */
+export const sonnerConfig = {
+  slots: {
+    root: [
+      'group',
+      'pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden',
+      'rounded-[2px]',
+      'border-2 border-border',
+      'p-4',
+      'shadow-[2px_2px_0_0_rgba(44,24,16,0.2)]',
+      'transition-all duration-200',
+      'data-[swipe=cancel]:translate-x-0',
+      'data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)]',
+      'data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]',
+      'data-[swipe=move]:transition-none',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out',
+      'data-[swipe=end]:animate-out',
+      'data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full',
+      'data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full',
+    ],
+    title: 'font-serif text-sm font-semibold',
+    description: 'font-serif text-sm opacity-90',
+    actionButton: [
+      'inline-flex h-8 shrink-0 items-center justify-center',
+      'rounded-[2px]',
+      'border-2 border-border',
+      'bg-primary px-3',
+      'font-serif text-xs font-medium text-primary-foreground',
+      'shadow-[inset_0_-1px_0_0_rgba(92,64,51,0.3),1px_1px_0_0_rgba(44,24,16,0.2)]',
+      'transition-all duration-150',
+      'hover:brightness-110',
+      'focus:outline-none focus:ring-2 focus:ring-primary/40',
+    ],
+    cancelButton: [
+      'inline-flex h-8 shrink-0 items-center justify-center',
+      'rounded-[2px]',
+      'border-2 border-border',
+      'bg-transparent px-3',
+      'font-serif text-xs font-medium',
+      'transition-colors duration-150',
+      'hover:bg-surface-1',
+    ],
+    closeButton: '',
+    success: '',
+    error: '',
+    warning: '',
+    info: '',
+    icon: '',
+  },
+};

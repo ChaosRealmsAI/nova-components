@@ -24,6 +24,22 @@ export interface CustomTokens {
   [key: string]: string | undefined;
 }
 
+// 默认空主题（无主题时使用）
+const DEFAULT_THEME: ThemeDefinition = {
+  id: 'default',
+  name: 'Default',
+  cssVars: {},
+  components: {},
+};
+
+function getDefaultTheme(): ThemeDefinition {
+  const themeIds = Object.keys(THEMES);
+  if (themeIds.length > 0) {
+    return THEMES[themeIds[0]];
+  }
+  return DEFAULT_THEME;
+}
+
 interface ThemeStore {
   currentThemeId: string;
   theme: ThemeDefinition;
@@ -38,14 +54,15 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      currentThemeId: 'cyberpunk-dark',
-      theme: THEMES['cyberpunk-dark'],
+      currentThemeId: 'shadcn-default',
+      theme: THEMES['shadcn-default'] || getDefaultTheme(),
       customTokens: {},
 
       setTheme: (id) => {
+        const newTheme = THEMES[id] || getDefaultTheme();
         set({
           currentThemeId: id,
-          theme: THEMES[id] || THEMES['cyberpunk-dark'],
+          theme: newTheme,
           customTokens: {},
         });
       },
@@ -70,7 +87,7 @@ export const useThemeStore = create<ThemeStore>()(
 
       getMergedCssVars: () => {
         const state = get();
-        const themeVars = state.theme.cssVars || {};
+        const themeVars = state.theme?.cssVars || {};
         return {
           ...themeVars,
           ...state.customTokens,

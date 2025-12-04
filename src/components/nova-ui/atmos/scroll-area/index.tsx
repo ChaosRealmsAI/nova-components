@@ -3,28 +3,83 @@
 import * as React from 'react';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { useI18n } from '@/lib/i18n/use-i18n';
-import { scrollAreaBaseConfig, scrollBarBaseConfig } from './scroll-area.config';
 
 /**
  * Nova ScrollArea
  *
- * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports base configs for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * 纯净组件，只依赖外部库，不依赖项目内部文件。
+ * 演示数据由调用方（画布/页面）注入。
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
-export { scrollAreaBaseConfig, scrollBarBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
+
+/** 数据项类型 */
+export interface ScrollAreaItem {
+  id: string;
+  text: string;
+}
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: 静态样式定义（功能层）
+// ============================================================================
+
+/** ScrollArea 功能层样式 */
+const scrollAreaBase = tv({
+  slots: {
+    root: 'relative overflow-hidden',
+    viewport: 'h-full w-full',
+    content: '',
+    header: 'sticky top-0 z-10',
+    item: '',
+    itemIndex: '',
+    itemText: '',
+  },
+});
+
+/** ScrollBar 功能层样式 */
+const scrollBarBase = tv({
+  slots: {
+    root: 'flex touch-none select-none transition-colors',
+    thumb: 'relative flex-1',
+  },
+  variants: {
+    orientation: {
+      vertical: { root: 'h-full w-2.5' },
+      horizontal: { root: 'h-2.5 flex-col' },
+    },
+  },
+  defaultVariants: {
+    orientation: 'vertical',
+  },
+});
 
 // ============================================================================
 // ScrollBar Component
 // ============================================================================
 
 type ScrollBarVariantProps = {
-  orientation?: keyof typeof scrollBarBaseConfig.variants.orientation;
+  orientation?: 'vertical' | 'horizontal';
 };
 
 export interface ScrollBarProps
@@ -37,25 +92,28 @@ const ScrollBar = React.forwardRef<
   React.ComponentRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
   ScrollBarProps
 >(({ className, classNames, orientation = 'vertical', ...props }, ref) => {
-  // ADR-006: 从主题上下文获取 ScrollBar 的样式配置
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.ScrollBar;
 
-  const styles = tv({
-    extend: scrollBarBaseConfig,
-    ...(themeConfig || {}),
-  })({ orientation });
+  // L1: 功能层（静态）
+  const base = scrollBarBase({ orientation });
+
+  // L2: 主题层
+  const themeBase = toClassString(themeConfig?.slots?.base);
+  const themeThumb = toClassString(themeConfig?.slots?.thumb);
+
+  // 合并: L1 + L2 + L3 (功能层始终保留)
+  const rootClass = twMerge(base.root(), themeBase, classNames?.base, className);
+  const thumbClass = twMerge(base.thumb(), themeThumb, classNames?.thumb);
 
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       ref={ref}
       orientation={orientation}
-      className={classNames?.base ?? styles.base({ className })}
+      className={rootClass}
       {...props}
     >
-      <ScrollAreaPrimitive.ScrollAreaThumb
-        className={classNames?.thumb ?? styles.thumb()}
-      />
+      <ScrollAreaPrimitive.ScrollAreaThumb className={thumbClass} />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   );
 });
@@ -68,62 +126,74 @@ ScrollBar.displayName = 'ScrollBar';
 export interface ScrollAreaProps
   extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
   classNames?: { base?: string; viewport?: string };
+  items?: ScrollAreaItem[];
+  header?: string;
 }
 
 const ScrollArea = React.forwardRef<
   React.ComponentRef<typeof ScrollAreaPrimitive.Root>,
   ScrollAreaProps
->(({ className, classNames, children, ...props }, ref) => {
-  // ADR-006: 从主题上下文获取 ScrollArea 的样式配置
+>(({
+  className,
+  classNames,
+  children,
+  items,
+  header,
+  ...props
+}, ref) => {
   const { currentTheme } = useTheme();
-  const { t } = useI18n();
   const themeConfig = currentTheme?.components?.ScrollArea;
 
-  const styles = tv({
-    extend: scrollAreaBaseConfig,
-    ...(themeConfig || {}),
-  })();
+  // L1: 功能层（静态）
+  const base = scrollAreaBase();
 
-  // 默认演示内容 - 通过 slots 控制样式，使用国际化
-  const defaultItems = [
-    { id: '01', textKey: 'scrollAreaSystemInit' as const, fallback: 'System initialization' },
-    { id: '02', textKey: 'scrollAreaLoadingModules' as const, fallback: 'Loading modules' },
-    { id: '03', textKey: 'scrollAreaConnecting' as const, fallback: 'Connecting to server' },
-    { id: '04', textKey: 'scrollAreaAuthenticating' as const, fallback: 'Authenticating user' },
-    { id: '05', textKey: 'scrollAreaFetchingData' as const, fallback: 'Fetching data' },
-    { id: '06', textKey: 'scrollAreaProcessing' as const, fallback: 'Processing request' },
-    { id: '07', textKey: 'scrollAreaUpdatingCache' as const, fallback: 'Updating cache' },
-    { id: '08', textKey: 'scrollAreaSyncingState' as const, fallback: 'Syncing state' },
-    { id: '09', textKey: 'scrollAreaRendering' as const, fallback: 'Rendering view' },
-    { id: '10', textKey: 'scrollAreaTaskCompleted' as const, fallback: 'Task completed' },
-    { id: '11', textKey: 'scrollAreaIdleMode' as const, fallback: 'Idle mode' },
-    { id: '12', textKey: 'scrollAreaWaitingInput' as const, fallback: 'Waiting for input' },
-  ];
+  // L2: 主题层（用 useMemo 缓存，避免每次渲染重复计算）
+  const themeStyles = React.useMemo(() => ({
+    root: toClassString(themeConfig?.slots?.base),
+    viewport: toClassString(themeConfig?.slots?.viewport),
+    content: toClassString(themeConfig?.slots?.content),
+    header: toClassString(themeConfig?.slots?.header),
+    item: toClassString(themeConfig?.slots?.item),
+    itemIndex: toClassString(themeConfig?.slots?.itemIndex),
+    itemText: toClassString(themeConfig?.slots?.itemText),
+  }), [themeConfig]);
 
-  const defaultContent = (
-    <div className={styles.content()}>
-      <div className={styles.header()}>
-        {t('scrollAreaItems', '// ITEMS')}
-      </div>
-      {defaultItems.map((item) => (
-        <div key={item.id} className={styles.item()}>
-          <span className={styles.itemIndex()}>{item.id}</span>
-          <span className={styles.itemText()}>{t(item.textKey, item.fallback)}</span>
+  // 合并: L1 + L2 + L3 (功能层始终保留)
+  const rootClass = twMerge(base.root(), themeStyles.root, classNames?.base, className);
+  const viewportClass = twMerge(base.viewport(), themeStyles.viewport, classNames?.viewport);
+  const contentClass = twMerge(base.content(), themeStyles.content);
+  const headerClass = twMerge(base.header(), themeStyles.header);
+  const itemClass = twMerge(base.item(), themeStyles.item);
+  const itemIndexClass = twMerge(base.itemIndex(), themeStyles.itemIndex);
+  const itemTextClass = twMerge(base.itemText(), themeStyles.itemText);
+
+  // 渲染内容：children 优先，否则用 items 渲染列表
+  const renderContent = () => {
+    if (children) return children;
+    if (items && items.length > 0) {
+      return (
+        <div className={contentClass}>
+          {header && <div className={headerClass}>{header}</div>}
+          {items.map((item) => (
+            <div key={item.id} className={itemClass}>
+              <span className={itemIndexClass}>{item.id}</span>
+              <span className={itemTextClass}>{item.text}</span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  );
+      );
+    }
+    return null;
+  };
 
   return (
     <ScrollAreaPrimitive.Root
       ref={ref}
-      className={classNames?.base ?? styles.base({ className })}
+      className={rootClass}
       {...props}
     >
-      <ScrollAreaPrimitive.Viewport
-        className={classNames?.viewport ?? styles.viewport()}
-      >
-        {children || defaultContent}
+      <ScrollAreaPrimitive.Viewport className={viewportClass}>
+        {renderContent()}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />
       <ScrollAreaPrimitive.Corner />

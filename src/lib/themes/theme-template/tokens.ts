@@ -154,34 +154,6 @@ export const tokens: Record<string, string> = {
   '--shadow-lg': '',   // TODO: 大阴影
   '--shadow-glow': '', // TODO: 发光效果 (可选)
 
-  // ========================================
-  // 8. 特效 (Effects)
-  // ========================================
-  '--effect-speed-slow': '0.5s',   // 慢速动画
-  '--effect-speed-normal': '0.3s', // 正常动画
-  '--effect-speed-fast': '0.15s',  // 快速动画
-  '--effect-glow-primary': '',     // TODO: 主色发光
-  '--effect-glow-secondary': '',   // TODO: 次要色发光
-
-  // ========================================
-  // 9. 特效 Token (ADR-005) - 可选
-  // ========================================
-  // BorderBeam
-  '--effect-beam-color': '', // TODO: 边框光束颜色
-  '--effect-beam-glow': '',  // TODO: 边框光束发光
-
-  // Shimmer
-  '--effect-shimmer-color': '', // TODO: 流光颜色
-
-  // CosmicBackground
-  '--effect-cosmic-glow-1': '', // TODO: 宇宙背景发光1
-  '--effect-cosmic-glow-2': '', // TODO: 宇宙背景发光2
-
-  // GridMatrix
-  '--effect-grid-color': '', // TODO: 网格颜色
-
-  // Spotlight
-  '--effect-spotlight-color': '', // TODO: 聚光灯颜色
 };
 
 // ============================================================================

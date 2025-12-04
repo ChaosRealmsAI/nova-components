@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "validate:themes": "tsx scripts/validate-themes.ts"
+    "validate:themes": "tsx scripts/validate-themes.ts",
+    "create:theme": "tsx scripts/create-theme.ts"
   },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",

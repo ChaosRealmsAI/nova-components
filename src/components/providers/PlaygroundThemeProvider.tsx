@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useThemeStore } from '@/stores/theme-store';
+import { createPlaygroundBaseCss } from '@/lib/themes/styles/playground-base';
 
 /**
  * Playground 主题 Provider
@@ -53,9 +54,9 @@ export function PlaygroundThemeProvider({
     // 3. 注入 playgroundGlobalCss
     // 这些样式定义了 .playground-main, .playground-right-panel 等类的样式
     // 它们会消费上面的 :root 变量 (var(--xxx))
-    if (theme.playgroundGlobalCss) {
-      cssContent += theme.playgroundGlobalCss;
-    }
+    // 如果主题没有定义 playgroundGlobalCss，使用默认的 base css
+    const globalCss = theme.playgroundGlobalCss || createPlaygroundBaseCss(theme.cssVars || {});
+    cssContent += globalCss;
 
     // 更新 style 内容
     styleRef.current.textContent = cssContent;

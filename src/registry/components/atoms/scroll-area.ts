@@ -2,7 +2,8 @@
  * ScrollArea Component Entry
  */
 
-import { ScrollArea, scrollAreaBaseConfig } from '@/components/nova-ui/atmos/scroll-area';
+import { ScrollArea } from '@/components/nova-ui/atmos/scroll-area';
+import { DEMO_ITEMS, DEMO_HEADER } from '@/components/nova-ui/atmos/scroll-area/manifest';
 import type { ComponentRegistryEntry } from '../types';
 
 export const scrollAreaEntry: ComponentRegistryEntry = {
@@ -11,8 +12,11 @@ export const scrollAreaEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeScrollArea',
   category: 'atoms',
   component: ScrollArea,
-  baseConfig: scrollAreaBaseConfig,
+  baseConfig: null, // 纯槽位模式，无 baseConfig
   props: [],
-  defaultProps: {},
+  defaultProps: {
+    items: DEMO_ITEMS,
+    header: DEMO_HEADER,
+  },
   availableEffects: [],
 };

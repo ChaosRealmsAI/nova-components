@@ -37,7 +37,7 @@ const COMPONENT_ORDER: string[] = [
   'alert-dialog', 'tabs', 'dropdown-menu', 'select', 'combobox', 'pagination', 'form', 'table', 'data-table',
   'toggle-group', 'button-group', 'alert', 'breadcrumb', 'input-group',
   'input-otp', 'drawer', 'sheet', 'hover-card', 'context-menu', 'calendar',
-  'date-picker', 'carousel', 'chart', 'navigation-menu', 'resizable', 'sonner', 'accordion', 'dialog', 'sidebar',
+  'date-picker', 'carousel', 'navigation-menu', 'resizable', 'sonner', 'accordion', 'dialog', 'sidebar',
 ];
 
 // ============================================================================

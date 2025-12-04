@@ -5,7 +5,6 @@ import { breadcrumbMessages } from './breadcrumb';
 import { buttongroupMessages } from './button-group';
 import { calendarMessages } from './calendar';
 import { carouselMessages } from './carousel';
-import { chartMessages } from './chart';
 import { comboboxMessages } from './combobox';
 import { commandMessages } from './command';
 import { contextmenuMessages } from './context-menu';
@@ -40,7 +39,6 @@ export const blocksMessages: MessageModule = {
   ...buttongroupMessages,
   ...calendarMessages,
   ...carouselMessages,
-  ...chartMessages,
   ...comboboxMessages,
   ...commandMessages,
   ...contextmenuMessages,

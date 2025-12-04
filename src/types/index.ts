@@ -105,7 +105,6 @@ export type ComponentType =
   | 'input-otp'
   | 'calendar'
   | 'carousel'
-  | 'chart'
   | 'combobox'
   | 'navigation-menu'
   | 'resizable'

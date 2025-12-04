@@ -23,7 +23,6 @@ export { dataTableEntry } from './data-table';
 export { inputOtpEntry } from './input-otp';
 export { calendarEntry } from './calendar';
 export { carouselEntry } from './carousel';
-export { chartEntry } from './chart';
 export { comboboxEntry } from './combobox';
 export { datePickerEntry } from './date-picker';
 export { navigationMenuEntry } from './navigation-menu';

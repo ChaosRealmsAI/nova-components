@@ -5,7 +5,7 @@ import { useThemeStore } from '@/stores/theme-store';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { getAllThemes } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
-import { ChevronDown, Shuffle, SlidersHorizontal, Minus, Plus } from 'lucide-react';
+import { ChevronDown, Shuffle, Minus, Plus } from 'lucide-react';
 import { LANGUAGES } from '@/lib/i18n/languages';
 import { useEditor } from 'tldraw';
 
@@ -80,8 +80,8 @@ const ZoomControl = () => {
 
 export function HUD() {
   const { theme, setTheme, getMergedCssVars } = useThemeStore();
-  const { setInspectorMode, inspectorMode, toggleAboutModal } = useCanvasStore();
-  const { t, translate, locale, setLocale } = useI18n();
+  const { toggleAboutModal } = useCanvasStore();
+  const { t, locale, setLocale } = useI18n();
   const allThemes = getAllThemes();
   const [isThemeOpen, setIsThemeOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -105,7 +105,6 @@ export function HUD() {
 
   const handleShuffle = () => {
     // 随机切换主题（排除当前主题）
-    // Randomly switch themes (excluding the current one)
     const candidates = allThemes.filter((t) => t.id !== theme.id);
     if (candidates.length === 0) return;
 
@@ -114,13 +113,13 @@ export function HUD() {
     setTheme(randomTheme.id);
   };
 
-  const currentThemeLabel = theme.nameKey ? t(theme.nameKey, theme.name) : theme.name;
-  
+  const currentThemeLabel = theme?.nameKey ? t(theme.nameKey, theme.name) : (theme?.name || 'Default');
+
   // Active theme colors (merged with user customization for real-time preview)
   const activeColors = getMergedCssVars();
   // For logo gradient
-  const primaryColor = activeColors['--primary'] || theme.colors?.['--primary'];
-  const secondaryColor = activeColors['--secondary'] || theme.colors?.['--secondary'];
+  const primaryColor = activeColors['--primary'] || theme?.cssVars?.['--primary'];
+  const secondaryColor = activeColors['--secondary'] || theme?.cssVars?.['--secondary'];
 
   return (
     <>
@@ -154,7 +153,7 @@ export function HUD() {
         {/* Global Tools Group */}
         <nav
           role="toolbar"
-          aria-label="Theme Tools - Switch themes, randomize, and customize colors"
+          aria-label="Theme Tools - Switch themes and randomize"
           data-testid="hud-theme-toolbar"
           className="playground-hud-container flex items-center gap-2 border rounded-lg p-1 shadow-xl"
         >
@@ -190,7 +189,7 @@ export function HUD() {
                 </div>
                 {allThemes.map((item) => {
                   const label = item.nameKey ? t(item.nameKey, item.name) : item.name;
-                  const isActive = item.id === theme.id;
+                  const isActive = item.id === theme?.id;
 
                   return (
                     <button
@@ -208,7 +207,7 @@ export function HUD() {
                         isActive ? 'playground-hud-dropdown-item-active' : ''
                       }`}
                     >
-                      <ThemePalettePreview colors={item.cssVars || item.colors} />
+                      <ThemePalettePreview colors={item.cssVars} />
                       <span className="text-[length:var(--text-sm)]">
                         {label}
                       </span>
@@ -234,23 +233,6 @@ export function HUD() {
             title={t('shuffleTheme')}
           >
             <Shuffle className="w-4 h-4" />
-          </button>
-
-          <div className="playground-hud-divider w-px h-4" />
-
-          {/* Theme Config Settings Button */}
-          <button
-            onClick={() => setInspectorMode(inspectorMode === 'theme_config' ? 'component' : 'theme_config')}
-            aria-label="Theme Configuration"
-            aria-description="Open the theme configuration panel in the Inspector sidebar to customize colors, fonts, and other theme tokens"
-            aria-pressed={inspectorMode === 'theme_config'}
-            data-testid="hud-theme-config"
-            className={`playground-hud-btn flex items-center justify-center px-3 py-1.5 rounded-md transition-colors active:scale-95 h-full ${
-              inspectorMode === 'theme_config' ? 'playground-hud-btn-active' : ''
-            }`}
-            title={t('themeConfigTitle')}
-          >
-            <SlidersHorizontal className="w-4 h-4" />
           </button>
 
         </nav>

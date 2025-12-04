@@ -11,6 +11,8 @@ import { progressBaseConfig } from '@/components/nova-ui/atmos/progress/progress
 import { radioGroupBaseConfig, radioGroupItemBaseConfig } from '@/components/nova-ui/atmos/radio-group/radio-group.config';
 import { separatorBaseConfig } from '@/components/nova-ui/atmos/separator/separator.config';
 import { skeletonBaseConfig } from '@/components/nova-ui/atmos/skeleton/skeleton.config';
+import { scrollAreaConfig, scrollBarConfig } from './components/scroll-area';
+import { cardConfig } from './components/card';
 
 /**
  * Shadcn Default Theme
@@ -63,5 +65,8 @@ export const shadcnDefaultTheme: ThemeDefinition = {
     Skeleton: {
       extend: skeletonBaseConfig,
     },
+    ScrollArea: scrollAreaConfig,
+    ScrollBar: scrollBarConfig,
+    Card: cardConfig,
   },
 };

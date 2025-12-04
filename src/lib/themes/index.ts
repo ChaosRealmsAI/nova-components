@@ -1,23 +1,23 @@
 'use client';
 
 import type { ThemeDefinition } from '@/types';
-import { cyberpunkDarkTheme } from './cyberpunk-dark';
-import { oceanBlueTheme } from './ocean-blue';
-import { sunsetWarmTheme } from './sunset-warm';
 import { shadcnDefaultTheme } from './shadcn-default';
-import { neoBrutalismTheme } from './neo-brutalism';
-import { monochromeInkTheme } from './monochrome-ink';
+import { midnightLilacTheme } from './midnight-lilac';
+import { cyberpunkTheme } from './cyberpunk';
+import { iceGlassTheme } from './ice-glass';
+import { vintageNostalgiaTheme } from './vintage-nostalgia';
+import { obsidianShardTheme } from './obsidian-shard';
 
 /**
  * 主题注册表
  */
 export const THEMES: Record<string, ThemeDefinition> = {
   'shadcn-default': shadcnDefaultTheme,
-  'cyberpunk-dark': cyberpunkDarkTheme,
-  'ocean-blue': oceanBlueTheme,
-  'sunset-warm': sunsetWarmTheme,
-  'neo-brutalism': neoBrutalismTheme,
-  'monochrome-ink': monochromeInkTheme,
+  'midnight-lilac': midnightLilacTheme,
+  'cyberpunk': cyberpunkTheme,
+  'ice-glass': iceGlassTheme,
+  'vintage-nostalgia': vintageNostalgiaTheme,
+  'obsidian-shard': obsidianShardTheme,
 };
 
 export function getThemeById(id: string): ThemeDefinition | undefined {
@@ -32,10 +32,10 @@ export function getThemeIds(): string[] {
   return Object.keys(THEMES);
 }
 
-export { cyberpunkDarkTheme } from './cyberpunk-dark';
-export { oceanBlueTheme } from './ocean-blue';
-export { sunsetWarmTheme } from './sunset-warm';
 export { shadcnDefaultTheme } from './shadcn-default';
-export { neoBrutalismTheme } from './neo-brutalism';
-export { monochromeInkTheme } from './monochrome-ink';
+export { midnightLilacTheme } from './midnight-lilac';
+export { cyberpunkTheme } from './cyberpunk';
+export { iceGlassTheme } from './ice-glass';
+export { vintageNostalgiaTheme } from './vintage-nostalgia';
+export { obsidianShardTheme } from './obsidian-shard';
 export { useTheme } from './use-theme';
