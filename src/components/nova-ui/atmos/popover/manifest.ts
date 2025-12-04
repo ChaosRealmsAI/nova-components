@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'popover.config.ts',
   },
 
   themeConfigs: [
@@ -26,24 +25,33 @@ export const manifest: ComponentManifest = {
     '--primary',
     '--background',
     '--border',
+    '--foreground',
+    '--muted',
+    '--muted-foreground',
   ],
 
-  dependencies: [],
+  dependencies: ['@radix-ui/react-popover'],
 
   exportOptions: {
-    noChildren: false,
     customJsx: `<Popover>
   <PopoverTrigger asChild>
     <Button variant="outline">Open Popover</Button>
   </PopoverTrigger>
-  <PopoverContent>
-    <p>Popover content here</p>
+  <PopoverContent className="w-80">
+    <div className="grid gap-4">
+      <div className="space-y-2">
+        <h4 className="font-medium leading-none">Dimensions</h4>
+        <p className="text-sm text-muted-foreground">
+          Set the dimensions for the layer.
+        </p>
+      </div>
+    </div>
   </PopoverContent>
 </Popover>`,
   },
 
   canvas: {
-    size: { width: 140, height: 70 },
+    size: { width: 400, height: 300 }, // Increased size to allow popover to open comfortably
     props: [
       {
         name: 'content',

@@ -52,15 +52,14 @@ docs/dev-sop/component-architecture-pattern.ts
 | 17 | kbd | ✅ | |
 | 18 | separator | ✅ | |
 | 19 | aspect-ratio | ✅ | |
-| 20 | popover | ✅ | 弹出类，需 Demo |
-| 21 | tooltip | ✅ | 弹出类，需 Demo |
 | 22 | collapsible | ✅ | 含 trigger/content |
 
 ### 待重构
 
 | # | 组件 | 状态 | 复杂度 | 备注 |
 |---|------|------|--------|------|
-(无)
+| 20 | popover | 🔄 | 中 | 弹出类，需 Demo |
+| 21 | tooltip | 🔄 | 中 | 弹出类，需 Demo |
 
 ## 单个任务执行步骤
 
@@ -145,8 +144,8 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | button | button.config.ts | ✅ 已删除 |
 | badge | badge.config.ts | ✅ 已删除 |
 | input | input.config.ts | ✅ 已删除 |
-| textarea | textarea.config.ts | ✅ 已删除 |
-| label | label.config.ts | ✅ 已删除 |
+| textarea | textarea.config.ts | ✅ |
+| label | label.config.ts | ✅ |
 | checkbox | checkbox.config.ts | ✅ 已删除 |
 | switch | switch.config.ts | ✅ 已删除 |
 | slider | slider.config.ts | ✅ 已删除 |
@@ -155,12 +154,12 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | progress | progress.config.ts | ✅ 已删除 |
 | skeleton | skeleton.config.ts | ✅ 已删除 |
 | spinner | spinner.config.ts | ✅ 已删除 |
-| avatar | avatar.config.ts | ✅ 已删除 |
+| avatar | avatar.config.ts | ✅ |
 | kbd | kbd.config.ts | ✅ 已删除 |
 | separator | separator.config.ts | ✅ 已删除 |
-| aspect-ratio | aspect-ratio.config.ts | ✅ 已删除 |
-| popover | popover.config.ts | ✅ 已删除 |
-| tooltip | tooltip.config.ts | ✅ 已删除 |
+| aspect-ratio | aspect-ratio.config.ts | ✅ |
+| popover | popover.config.ts | ⏳ |
+| tooltip | tooltip.config.ts | ⏳ |
 | collapsible | collapsible.config.ts | ✅ 已删除 |
 
 ## 注意事项
@@ -215,7 +214,7 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 ## 进度追踪
 
 - 总数: 22
-- 已完成: 22
-- 进行中: 0
+- 已完成: 20
+- 进行中: 2
 - 待开始: 0
-- 完成率: 100%
+- 完成率: 91%

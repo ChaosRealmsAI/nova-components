@@ -1,152 +1,123 @@
 'use client';
 
-/**
- * Popover Component
- *
- * 基于 Radix UI Popover 的弹出框组件。
- * 支持主题定制和特效扩展。
- */
-
 import * as React from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { useTheme } from '@/lib/themes/use-theme';
-import { useI18n } from '@/lib/i18n/use-i18n';
-import { popoverBaseConfig } from './popover.config';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
+
+/**
+ * Nova Popover
+ *
+ * Architecture Notes:
+ * - L1 (Functional): Position, animations, z-index.
+ * - L2 (Thematic): Colors, spacing, typography, border.
+ * - L3 (Instance): User className.
+ */
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Functional Styles
+// ============================================================================
+
+const popoverBase = tv({
+  slots: {
+    content: [
+      'z-50 w-72 outline-hidden',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out',
+      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+      'data-[side=bottom]:slide-in-from-top-2',
+      'data-[side=left]:slide-in-from-right-2',
+      'data-[side=right]:slide-in-from-left-2',
+      'data-[side=top]:slide-in-from-bottom-2',
+    ],
+  },
+});
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type PopoverVariant = 'default';
-
 export interface PopoverProps extends React.ComponentProps<typeof PopoverPrimitive.Root> {}
 
+export interface PopoverTriggerProps extends React.ComponentProps<typeof PopoverPrimitive.Trigger> {}
+
+export interface PopoverAnchorProps extends React.ComponentProps<typeof PopoverPrimitive.Anchor> {}
+
 export interface PopoverContentProps
-  extends React.ComponentProps<typeof PopoverPrimitive.Content>,
-    VariantProps<ReturnType<typeof tv>> {
-  variant?: PopoverVariant;
-}
-
-export interface PopoverDemoProps {
-  content?: string;
-  variant?: PopoverVariant;
+  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> {
+  classNames?: {
+    content?: string;
+  };
 }
 
 // ============================================================================
-// Popover Root
+// Components
 // ============================================================================
 
-function Popover({ ...props }: PopoverProps) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
-}
+const Popover = PopoverPrimitive.Root;
 
-// ============================================================================
-// Popover Trigger
-// ============================================================================
+const PopoverTrigger = PopoverPrimitive.Trigger;
 
-function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
-}
+const PopoverAnchor = PopoverPrimitive.Anchor;
 
-// ============================================================================
-// Popover Anchor
-// ============================================================================
-
-function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
-  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
-}
-
-// ============================================================================
-// Popover Content
-// ============================================================================
-
-function PopoverContent({
+const PopoverContent = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Content>,
+  PopoverContentProps
+>(({
   className,
+  classNames,
   align = 'center',
   sideOffset = 4,
-  variant = 'default',
   ...props
-}: PopoverContentProps) {
+}, ref) => {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Popover;
 
-  const styles = tv({
-    extend: popoverBaseConfig,
-    ...(themeConfig || {}),
-  });
+  // L1: Functional
+  const base = popoverBase();
 
-  const { content } = styles({ variant });
+  // L2: Theme
+  const themeContent = React.useMemo(() => 
+    toClassString(themeConfig?.slots?.content),
+    [themeConfig]
+  );
+
+  // Merge
+  const contentClass = twMerge(
+    base.content(),
+    themeContent,
+    classNames?.content,
+    className
+  );
 
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
-        data-slot="popover-content"
+        ref={ref}
         align={align}
         sideOffset={sideOffset}
-        className={content({ className })}
+        className={contentClass}
         {...props}
       />
     </PopoverPrimitive.Portal>
   );
-}
-
-// ============================================================================
-// Popover Demo (for Canvas display) - Interactive Version
-// ============================================================================
-
-function PopoverDemo({
-  content,
-  variant = 'default',
-}: PopoverDemoProps) {
-  const { currentTheme } = useTheme();
-  const { t } = useI18n();
-  const themeConfig = currentTheme?.components?.Popover;
-
-  const styles = tv({
-    extend: popoverBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { content: contentClass } = styles({ variant });
-  const displayContent = content || t('popoverContentDefault', 'Place content for the popover here.');
-
-  // 交互式 Demo：使用真正的 Radix Popover，不使用 Portal
-  return (
-    <PopoverPrimitive.Root>
-      <PopoverPrimitive.Trigger asChild>
-        <button className="px-3 py-1.5 border border-border rounded text-[length:var(--text-sm)] bg-background text-foreground hover:bg-muted transition-colors">
-          {t('popoverOpenButton', 'Open Popover')}
-        </button>
-      </PopoverPrimitive.Trigger>
-      {/* 不使用 Portal，直接渲染在 trigger 旁边 */}
-      <PopoverPrimitive.Content
-        data-slot="popover-content"
-        align="center"
-        sideOffset={4}
-        className={contentClass()}
-      >
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <h4 className="font-medium leading-none text-[length:var(--text-sm)]">{t('popoverTitle', 'Popover')}</h4>
-            <p className="text-[length:var(--text-sm)] text-muted-foreground">{displayContent}</p>
-          </div>
-        </div>
-        <PopoverPrimitive.Arrow className="fill-popover" />
-      </PopoverPrimitive.Content>
-    </PopoverPrimitive.Root>
-  );
-}
-
-// ============================================================================
-// Exports
-// ============================================================================
+});
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 export {
   Popover,
   PopoverTrigger,
   PopoverAnchor,
   PopoverContent,
-  PopoverDemo,
-  popoverBaseConfig,
 };
