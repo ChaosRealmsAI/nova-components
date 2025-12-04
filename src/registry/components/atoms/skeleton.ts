@@ -2,7 +2,7 @@
  * Skeleton Component Entry
  */
 
-import { Skeleton, skeletonBaseConfig } from '@/components/nova-ui/atmos/skeleton';
+import { Skeleton } from '@/components/nova-ui/atmos/skeleton';
 import type { ComponentRegistryEntry } from '../types';
 
 export const skeletonEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const skeletonEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSkeleton',
   category: 'atoms',
   component: Skeleton,
-  baseConfig: skeletonBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

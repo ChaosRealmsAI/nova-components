@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'skeleton.config.ts',
   },
 
   themeConfigs: [
@@ -28,6 +27,7 @@ export const manifest: ComponentManifest = {
 
   exportOptions: {
     noChildren: true,
+    customJsx: `<Skeleton className="w-[100px] h-[20px] rounded-full" />`,
   },
 
   canvas: {

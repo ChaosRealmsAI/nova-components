@@ -20,17 +20,17 @@ import type { MessageKey } from '@/lib/i18n/messages';
 import { Button } from '@/components/nova-ui/atmos/button';
 import { Badge } from '@/components/nova-ui/atmos/badge';
 import { Input } from '@/components/nova-ui/atmos/input';
-import { Label, labelBaseConfig } from '@/components/nova-ui/atmos/label';
-import { Checkbox, checkboxBaseConfig } from '@/components/nova-ui/atmos/checkbox';
+import { Label } from '@/components/nova-ui/atmos/label';
+import { Checkbox } from '@/components/nova-ui/atmos/checkbox';
 import { Switch } from '@/components/nova-ui/atmos/switch';
 import { Slider } from '@/components/nova-ui/atmos/slider';
-import { Progress, progressBaseConfig } from '@/components/nova-ui/atmos/progress';
-import { RadioGroup, radioGroupBaseConfig } from '@/components/nova-ui/atmos/radio-group';
+import { Progress } from '@/components/nova-ui/atmos/progress';
+import { RadioGroup } from '@/components/nova-ui/atmos/radio-group';
 import { Separator, separatorBaseConfig } from '@/components/nova-ui/atmos/separator';
-import { Skeleton, skeletonBaseConfig } from '@/components/nova-ui/atmos/skeleton';
+import { Skeleton } from '@/components/nova-ui/atmos/skeleton';
 import { Spinner, spinnerBaseConfig } from '@/components/nova-ui/atmos/spinner';
 import { Textarea } from '@/components/nova-ui/atmos/textarea';
-import { Toggle, toggleBaseConfig } from '@/components/nova-ui/atmos/toggle';
+import { Toggle } from '@/components/nova-ui/atmos/toggle';
 import { AvatarDemo, avatarBaseConfig } from '@/components/nova-ui/atmos/avatar';
 import { Kbd, kbdBaseConfig } from '@/components/nova-ui/atmos/kbd';
 import { AspectRatio, aspectRatioBaseConfig } from '@/components/nova-ui/atmos/aspect-ratio';
@@ -145,17 +145,17 @@ export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   'button': { component: Button, baseConfig: null },
   'badge': { component: Badge, baseConfig: null }, // 纯槽位模式，无 baseConfig
   'input': { component: Input, baseConfig: null },
-  'label': { component: Label, baseConfig: labelBaseConfig },
-  'checkbox': { component: Checkbox, baseConfig: checkboxBaseConfig },
+  'label': { component: Label, baseConfig: null },
+  'checkbox': { component: Checkbox, baseConfig: null },
   'switch': { component: Switch, baseConfig: null },
   'slider': { component: Slider, baseConfig: null },
-  'progress': { component: Progress, baseConfig: progressBaseConfig },
-  'radio-group': { component: RadioGroup, baseConfig: radioGroupBaseConfig },
+  'progress': { component: Progress, baseConfig: null },
+  'radio-group': { component: RadioGroup, baseConfig: null },
   'separator': { component: Separator, baseConfig: separatorBaseConfig },
-  'skeleton': { component: Skeleton, baseConfig: skeletonBaseConfig },
+  'skeleton': { component: Skeleton, baseConfig: null },
   'spinner': { component: Spinner, baseConfig: spinnerBaseConfig },
   'textarea': { component: Textarea, baseConfig: null },
-  'toggle': { component: Toggle, baseConfig: toggleBaseConfig },
+  'toggle': { component: Toggle, baseConfig: null },
   'avatar': { component: AvatarDemo, baseConfig: avatarBaseConfig },
   'kbd': { component: Kbd, baseConfig: kbdBaseConfig },
   'aspect-ratio': { component: AspectRatio, baseConfig: aspectRatioBaseConfig },

@@ -1,52 +1,61 @@
 'use client';
 
 import * as React from 'react';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { skeletonBaseConfig } from './skeleton.config';
 
-/**
- * Nova Skeleton
- *
- * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `skeletonBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
- */
+// ============================================================================
+// L1: Static Functional Styles
+// ============================================================================
 
-export { skeletonBaseConfig };
+const skeletonBase = tv({
+  slots: {
+    base: 'animate-pulse w-full h-full',
+  },
+});
 
-export type SkeletonVariants = VariantProps<ReturnType<typeof tv>>;
-export type SkeletonSlots = keyof typeof skeletonBaseConfig.slots;
-export type SkeletonClassNames = Partial<Record<SkeletonSlots, string>>;
+// ============================================================================
+// Component
+// ============================================================================
 
-export interface SkeletonProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    SkeletonVariants {
-  classNames?: SkeletonClassNames;
+export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  classNames?: {
+    base?: string;
+  };
+  variant?: 'default' | 'circular' | 'text';
 }
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ className, classNames, variant, ...props }, ref) => {
-    // ADR-006: 从主题上下文获取 Skeleton 的样式配置
+  ({ className, classNames, variant = 'default', ...props }, ref) => {
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Skeleton;
 
-    // 合并基础配置和主题配置
-    const styles = tv({
-      extend: skeletonBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1
+    const base = skeletonBase();
 
-    const baseClass = classNames?.base
-      ? classNames.base
-      : styles({ variant }).base();
+    // L2: Theme Styles
+    const themeStyles = React.useMemo(() => {
+      if (!themeConfig) return { base: '' };
+
+      try {
+        const themeTv = tv(themeConfig as any);
+        const slots = themeTv({ variant } as any) as any;
+        return {
+          base: slots.base ? slots.base() : '',
+        };
+      } catch (e) {
+        console.warn('Error applying theme styles for Skeleton:', e);
+        return { base: '' };
+      }
+    }, [themeConfig, variant]);
+
+    // L3: Merge
+    const baseClass = twMerge(base.base(), themeStyles.base, classNames?.base, className);
 
     return (
       <div
-        className={cn(baseClass, className)}
+        className={baseClass}
         ref={ref}
         {...props}
       />
