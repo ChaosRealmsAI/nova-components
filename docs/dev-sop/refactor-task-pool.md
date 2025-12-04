@@ -36,33 +36,31 @@ docs/dev-sop/component-architecture-pattern.ts
 | 1 | scroll-area | ✅ | 参考实现，含 i18n Demo |
 | 2 | card | ✅ | 含子组件 (Header/Title/Description/Content/Footer) |
 | 3 | badge | ✅ | 简单组件参考实现 |
-| 8 | checkbox | ✅ | |
 | 4 | button | ✅ | variants 多 |
 | 5 | input | ✅ | |
 | 6 | textarea | ✅ | |
 | 7 | label | ✅ | |
+| 8 | checkbox | ✅ | |
+| 9 | switch | ✅ | 含 thumb |
 | 10 | slider | ✅ | 含 track/range/thumb |
-| 14 | skeleton | ✅ | |
-| 16 | avatar | ✅ | 含 fallback |
 | 11 | toggle | ✅ | |
+| 12 | radio-group | ✅ | 含 item/indicator |
+| 13 | progress | ✅ | 含 indicator |
+| 14 | skeleton | ✅ | |
+| 15 | spinner | ✅ | |
+| 16 | avatar | ✅ | 含 fallback |
+| 17 | kbd | ✅ | |
+| 18 | separator | ✅ | |
+| 19 | aspect-ratio | ✅ | |
+| 20 | popover | ✅ | 弹出类，需 Demo |
+| 21 | tooltip | ✅ | 弹出类，需 Demo |
+| 22 | collapsible | ✅ | 含 trigger/content |
 
 ### 待重构
 
 | # | 组件 | 状态 | 复杂度 | 备注 |
 |---|------|------|--------|------|
-| 6 | textarea | ✅ | |
-| 9 | switch | ✅ | 中 | 含 thumb |
-
-| 12 | radio-group | ✅ | 中 | 含 item/indicator |
-| 13 | progress | ✅ | 低 | 含 indicator |
-
-| 16 | avatar | ✅ | 含 fallback |
-| 17 | kbd | ✅ | 低 | |
-| 18 | separator | ✅ | 低 | |
-| 19 | aspect-ratio | 🔄 | 低 | |
-| 20 | popover | ⏳ | 中 | 弹出类，需 Demo |
-| 21 | tooltip | ⏳ | 中 | 弹出类，需 Demo |
-| 22 | collapsible | ⏳ | 中 | 含 trigger/content |
+(无)
 
 ## 单个任务执行步骤
 
@@ -147,8 +145,8 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | button | button.config.ts | ✅ 已删除 |
 | badge | badge.config.ts | ✅ 已删除 |
 | input | input.config.ts | ✅ 已删除 |
-| textarea | textarea.config.ts | ✅ |
-| label | label.config.ts | ✅ |
+| textarea | textarea.config.ts | ✅ 已删除 |
+| label | label.config.ts | ✅ 已删除 |
 | checkbox | checkbox.config.ts | ✅ 已删除 |
 | switch | switch.config.ts | ✅ 已删除 |
 | slider | slider.config.ts | ✅ 已删除 |
@@ -157,13 +155,13 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | progress | progress.config.ts | ✅ 已删除 |
 | skeleton | skeleton.config.ts | ✅ 已删除 |
 | spinner | spinner.config.ts | ✅ 已删除 |
-| avatar | avatar.config.ts | ✅ |
+| avatar | avatar.config.ts | ✅ 已删除 |
 | kbd | kbd.config.ts | ✅ 已删除 |
 | separator | separator.config.ts | ✅ 已删除 |
-| aspect-ratio | aspect-ratio.config.ts | ⏳ |
-| popover | popover.config.ts | ⏳ |
-| tooltip | tooltip.config.ts | ⏳ |
-| collapsible | collapsible.config.ts | ⏳ |
+| aspect-ratio | aspect-ratio.config.ts | ✅ 已删除 |
+| popover | popover.config.ts | ✅ 已删除 |
+| tooltip | tooltip.config.ts | ✅ 已删除 |
+| collapsible | collapsible.config.ts | ✅ 已删除 |
 
 ## 注意事项
 
@@ -217,7 +215,7 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 ## 进度追踪
 
 - 总数: 22
-- 已完成: 10
-- 进行中: 4
-- 待开始: 8
-- 完成率: 45%
+- 已完成: 22
+- 进行中: 0
+- 待开始: 0
+- 完成率: 100%

@@ -16,6 +16,9 @@ import { separatorConfig } from './components/separator';
 import { spinnerConfig } from './components/spinner';
 import { skeletonConfig } from './components/skeleton';
 import { scrollAreaConfig, scrollBarConfig } from './components/scroll-area';
+import { aspectRatioConfig } from './components/aspect-ratio';
+import { popoverConfig } from './components/popover';
+
 import { cardConfig } from './components/card';
 
 /**
@@ -53,5 +56,7 @@ export const shadcnDefaultTheme: ThemeDefinition = {
     ScrollArea: scrollAreaConfig,
     ScrollBar: scrollBarConfig,
     Card: cardConfig,
+    AspectRatio: aspectRatioConfig,
+    Popover: popoverConfig,
   },
 };

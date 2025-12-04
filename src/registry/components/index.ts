@@ -195,7 +195,7 @@ export type { AvatarProps } from '@/components/nova-ui/atmos/avatar';
 export type { KbdProps } from '@/components/nova-ui/atmos/kbd';
 export type { AspectRatioProps } from '@/components/nova-ui/atmos/aspect-ratio';
 export type { ScrollAreaProps } from '@/components/nova-ui/atmos/scroll-area';
-export type { PopoverDemoProps } from '@/components/nova-ui/atmos/popover';
+export type { PopoverProps } from '@/components/nova-ui/atmos/popover';
 export type { TooltipDemoProps } from '@/components/nova-ui/atmos/tooltip';
 export type { CardProps } from '@/components/nova-ui/atmos/card';
 export type { CollapsibleDemoProps } from '@/components/nova-ui/atmos/collapsible';

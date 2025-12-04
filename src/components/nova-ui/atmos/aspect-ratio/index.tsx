@@ -3,23 +3,21 @@
 import * as React from 'react';
 import * as AspectRatioPrimitive from '@radix-ui/react-aspect-ratio';
 import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { aspectRatioBaseConfig } from './aspect-ratio.config';
-
-/**
- * Nova AspectRatio
- *
- * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `aspectRatioBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
- */
-
-export { aspectRatioBaseConfig };
 
 // ============================================================================
-// AspectRatio Component
+// L1: Static Functional Styles
+// ============================================================================
+
+const aspectRatioBase = tv({
+  slots: {
+    base: 'relative w-full flex-1 overflow-hidden',
+  },
+});
+
+// ============================================================================
+// Component
 // ============================================================================
 
 // Ratio string to number mapping
@@ -30,31 +28,45 @@ const RATIO_MAP: Record<string, number> = {
   '21/9': 21 / 9,
 };
 
-type AspectRatioVariantProps = {
-  ratio?: keyof typeof aspectRatioBaseConfig.variants.ratio;
-};
-
 export interface AspectRatioProps
-  extends Omit<React.ComponentPropsWithoutRef<typeof AspectRatioPrimitive.Root>, 'ratio'>,
-    AspectRatioVariantProps {
+  extends Omit<React.ComponentPropsWithoutRef<typeof AspectRatioPrimitive.Root>, 'ratio'> {
   classNames?: { base?: string };
+  ratio?: '1/1' | '16/9' | '4/3' | '21/9';
 }
 
 const AspectRatio = React.forwardRef<
   React.ComponentRef<typeof AspectRatioPrimitive.Root>,
   AspectRatioProps
 >(({ className, classNames, ratio = '16/9', children, ...props }, ref) => {
-  // ADR-006: 从主题上下文获取 AspectRatio 的样式配置
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.AspectRatio;
 
-  const styles = tv({
-    extend: aspectRatioBaseConfig,
-    ...(themeConfig || {}),
-  })({ ratio });
+  // L1
+  const base = aspectRatioBase();
+
+  // L2: Theme Styles
+  const themeStyles = React.useMemo(() => {
+    if (!themeConfig) return { base: '' };
+
+    try {
+      const themeTv = tv(themeConfig as any);
+      const slots = themeTv({ ratio } as any) as any;
+      return {
+        base: slots.base ? slots.base() : '',
+      };
+    } catch (e) {
+      console.warn('Error applying theme styles for AspectRatio:', e);
+      return { base: '' };
+    }
+  }, [themeConfig, ratio]);
+
+  // L3: Merge
+  const baseClass = twMerge(base.base(), themeStyles.base, classNames?.base, className);
+
+  // Numeric ratio for Radix
   const numericRatio = RATIO_MAP[ratio] ?? 16 / 9;
 
-  // 默认占位内容 - 显示比例信息
+  // Default placeholder content
   const defaultContent = (
     <div className="flex size-full items-center justify-center bg-muted text-muted-foreground text-[length:var(--text-sm)] font-mono">
       {ratio}
@@ -62,7 +74,7 @@ const AspectRatio = React.forwardRef<
   );
 
   return (
-    <div className={classNames?.base ?? styles.base({ className })}>
+    <div className={baseClass}>
       <AspectRatioPrimitive.Root ref={ref} ratio={numericRatio} {...props}>
         {children || defaultContent}
       </AspectRatioPrimitive.Root>

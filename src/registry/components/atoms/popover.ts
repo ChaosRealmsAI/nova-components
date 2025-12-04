@@ -2,7 +2,7 @@
  * Popover Component Entry
  */
 
-import { PopoverDemo, popoverBaseConfig } from '@/components/nova-ui/atmos/popover';
+import { Popover } from '@/components/nova-ui/atmos/popover';
 import type { ComponentRegistryEntry } from '../types';
 
 export const popoverEntry: ComponentRegistryEntry = {
@@ -10,8 +10,8 @@ export const popoverEntry: ComponentRegistryEntry = {
   label: 'Popover',
   labelKey: 'componentTypePopover',
   category: 'atoms',
-  component: PopoverDemo,
-  baseConfig: popoverBaseConfig,
+  component: Popover,
+  baseConfig: null,
   props: [
     {
       name: 'content',
@@ -22,8 +22,6 @@ export const popoverEntry: ComponentRegistryEntry = {
       defaultValueKey: 'popoverContentDefault',
     },
   ],
-  defaultProps: {
-    content: 'Place content for the popover here.',
-  },
+  defaultProps: {},
   availableEffects: ['spotlight'],
 };

@@ -2,7 +2,7 @@
  * AspectRatio Component Entry
  */
 
-import { AspectRatio, aspectRatioBaseConfig } from '@/components/nova-ui/atmos/aspect-ratio';
+import { AspectRatio } from '@/components/nova-ui/atmos/aspect-ratio';
 import type { ComponentRegistryEntry } from '../types';
 
 export const aspectRatioEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const aspectRatioEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeAspectRatio',
   category: 'atoms',
   component: AspectRatio,
-  baseConfig: aspectRatioBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'ratio',

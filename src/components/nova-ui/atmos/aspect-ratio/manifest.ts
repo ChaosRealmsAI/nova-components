@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'aspect-ratio.config.ts',
   },
 
   themeConfigs: [
@@ -33,10 +32,17 @@ export const manifest: ComponentManifest = {
 
   exportOptions: {
     noChildren: false,
+    customJsx: `<AspectRatio ratio="16/9">
+  <img
+    src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+    alt="Photo by Drew Beamer"
+    className="h-full w-full object-cover rounded-md"
+  />
+</AspectRatio>`,
   },
 
   canvas: {
-    size: { width: 160, height: 90 },
+    size: { width: 320, height: 200 },
     props: [
       {
         name: 'ratio',
@@ -54,6 +60,8 @@ export const manifest: ComponentManifest = {
     ],
     defaultProps: {
       ratio: '16/9',
+      // We don't pass children here for simple canvas testing, relying on defaultContent in component
+      // OR we could pass an image. The component defaults to a placeholder if no children.
     },
     availableEffects: [],
   },

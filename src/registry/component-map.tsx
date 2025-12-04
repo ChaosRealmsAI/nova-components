@@ -33,10 +33,10 @@ import { Textarea } from '@/components/nova-ui/atmos/textarea';
 import { Toggle } from '@/components/nova-ui/atmos/toggle';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/nova-ui/atmos/avatar';
 import { Kbd } from '@/components/nova-ui/atmos/kbd';
-import { AspectRatio, aspectRatioBaseConfig } from '@/components/nova-ui/atmos/aspect-ratio';
+import { AspectRatio } from '@/components/nova-ui/atmos/aspect-ratio';
 import { ScrollArea } from '@/components/nova-ui/atmos/scroll-area';
-import { PopoverDemo, popoverBaseConfig } from '@/components/nova-ui/atmos/popover';
-import { TooltipDemo, tooltipBaseConfig } from '@/components/nova-ui/atmos/tooltip';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/nova-ui/atmos/popover';
+import { TooltipDemo } from '@/components/nova-ui/atmos/tooltip';
 import {
   Card,
   CardHeader,
@@ -45,7 +45,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/nova-ui/atmos/card';
-import { CollapsibleDemo, collapsibleBaseConfig } from '@/components/nova-ui/atmos/collapsible';
+import { CollapsibleDemo } from '@/components/nova-ui/atmos/collapsible';
 
 // ============================================================================
 // Blocks 组件导入
@@ -157,6 +157,34 @@ const AvatarDemo = (props: AvatarDemoProps) => {
   );
 };
 
+// Popover Demo
+interface PopoverDemoProps extends ComponentProps<typeof Popover> {
+  content?: string;
+}
+
+const PopoverDemo = ({ content, ...props }: PopoverDemoProps) => {
+  const { t } = useI18n();
+  const displayContent = content || t('popoverContentDefault' as MessageKey, 'Place content for the popover here.');
+
+  return (
+    <Popover {...props}>
+      <PopoverTrigger asChild>
+        <button className="px-3 py-1.5 border border-border rounded text-[length:var(--text-sm)] bg-background text-foreground hover:bg-muted transition-colors">
+          {t('popoverOpenButton' as MessageKey, 'Open Popover')}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none text-[length:var(--text-sm)]">{t('popoverTitle' as MessageKey, 'Popover')}</h4>
+            <p className="text-[length:var(--text-sm)] text-muted-foreground">{displayContent}</p>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 // ============================================================================
 // 组件映射
 // ============================================================================
@@ -191,12 +219,12 @@ export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   'toggle': { component: Toggle, baseConfig: null },
   'avatar': { component: AvatarDemo, baseConfig: null },
   'kbd': { component: Kbd, baseConfig: null },
-  'aspect-ratio': { component: AspectRatio, baseConfig: aspectRatioBaseConfig },
+  'aspect-ratio': { component: AspectRatio, baseConfig: null },
   'scroll-area': { component: ScrollAreaDemo, baseConfig: null }, // 纯槽位模式，使用 i18n Demo
-  'popover': { component: PopoverDemo, baseConfig: popoverBaseConfig },
-  'tooltip': { component: TooltipDemo, baseConfig: tooltipBaseConfig },
+  'popover': { component: PopoverDemo, baseConfig: null },
+  'tooltip': { component: TooltipDemo, baseConfig: null },
   'card': { component: CardDemo, baseConfig: null }, // 纯槽位模式，无 baseConfig
-  'collapsible': { component: CollapsibleDemo, baseConfig: collapsibleBaseConfig },
+  'collapsible': { component: CollapsibleDemo, baseConfig: null },
 
   // Blocks
   'alert-dialog': { component: AlertDialogDemo, baseConfig: alertDialogBaseConfig },
