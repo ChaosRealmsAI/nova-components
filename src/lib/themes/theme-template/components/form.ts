@@ -30,35 +30,60 @@ export const formConfig = {
      */
     message: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认表单
        */
-      default: {},
+      default: {
+        root: [],
+        item: [],
+        label: [],
+        control: [],
+        description: [],
+        message: [],
+      },
 
       /**
        * inline: 行内表单
        */
-      inline: {},
+      inline: {
+        root: [],
+        item: [],
+        label: [],
+        control: [],
+        description: [],
+        message: [],
+      },
     },
-
     size: {
       /**
        * default: 默认尺寸
        */
-      default: {},
+      default: {
+        item: [],
+        label: [],
+      },
 
       /**
        * sm: 小尺寸
        */
-      sm: {},
+      sm: {
+        item: [],
+        label: [],
+      },
 
       /**
        * lg: 大尺寸
        */
-      lg: {},
+      lg: {
+        item: [],
+        label: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
   },
 };

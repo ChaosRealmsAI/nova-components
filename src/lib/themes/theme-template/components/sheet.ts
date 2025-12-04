@@ -40,22 +40,33 @@ export const sheetConfig = {
       /**
        * right: 右侧
        */
-      right: {},
+      right: {
+        content: [],
+      },
 
       /**
        * left: 左侧
        */
-      left: {},
+      left: {
+        content: [],
+      },
 
       /**
        * top: 顶部
        */
-      top: {},
+      top: {
+        content: [],
+      },
 
       /**
        * bottom: 底部
        */
-      bottom: {},
+      bottom: {
+        content: [],
+      },
     },
+  },
+  defaultVariants: {
+    side: 'right',
   },
 };

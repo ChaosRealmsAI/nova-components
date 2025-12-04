@@ -25,40 +25,62 @@ export const paginationConfig = {
      */
     ellipsis: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认分页
        */
-      default: {},
+      default: {
+        root: [],
+        content: [],
+        item: [],
+        link: [],
+        ellipsis: [],
+      },
 
       /**
        * outline: 轮廓分页
        */
-      outline: {},
+      outline: {
+        root: [],
+        content: [],
+        item: [],
+        link: [],
+        ellipsis: [],
+      },
     },
-
     size: {
       /**
        * default: 默认尺寸
        */
-      default: {},
+      default: {
+        link: [],
+      },
 
       /**
        * sm: 小尺寸
        */
-      sm: {},
+      sm: {
+        link: [],
+      },
 
       /**
        * lg: 大尺寸
        */
-      lg: {},
+      lg: {
+        link: [],
+      },
 
       /**
        * icon: 图标尺寸
        */
-      icon: {},
+      icon: {
+        link: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
   },
 };

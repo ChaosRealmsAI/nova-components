@@ -15,13 +15,19 @@ export const hoverCardConfig = {
      */
     content: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认悬停卡片
        */
-      default: {},
+      default: {
+        root: [],
+        trigger: [],
+        content: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

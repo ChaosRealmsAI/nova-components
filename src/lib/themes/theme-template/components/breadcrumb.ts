@@ -35,13 +35,23 @@ export const breadcrumbConfig = {
      */
     ellipsis: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认面包屑
        */
-      default: {},
+      default: {
+        root: [],
+        list: [],
+        item: [],
+        link: [],
+        page: [],
+        separator: [],
+        ellipsis: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

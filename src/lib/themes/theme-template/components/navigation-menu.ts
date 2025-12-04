@@ -80,7 +80,20 @@ export const navigationMenuConfig = {
       /**
        * default: 默认样式
        */
-      default: {},
+      default: {
+        root: [],
+        list: [],
+        item: [],
+        trigger: [],
+        content: [],
+        viewport: [],
+        link: [],
+        indicator: [],
+        chevron: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

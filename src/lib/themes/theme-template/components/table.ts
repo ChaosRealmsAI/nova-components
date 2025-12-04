@@ -45,13 +45,25 @@ export const tableConfig = {
      */
     caption: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认表格
        */
-      default: {},
+      default: {
+        container: [],
+        table: [],
+        header: [],
+        body: [],
+        footer: [],
+        row: [],
+        head: [],
+        cell: [],
+        caption: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

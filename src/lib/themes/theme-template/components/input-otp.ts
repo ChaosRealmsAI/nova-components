@@ -35,13 +35,23 @@ export const inputOtpConfig = {
      */
     caretLine: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认 OTP 输入
        */
-      default: {},
+      default: {
+        root: [],
+        container: [],
+        group: [],
+        slot: [],
+        separator: [],
+        caret: [],
+        caretLine: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

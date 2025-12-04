@@ -75,28 +75,50 @@ export const sidebarConfig = {
       /**
        * default: 默认样式
        */
-      default: {},
+      default: {
+        root: [],
+        header: [],
+        content: [],
+        footer: [],
+        menuButton: [],
+      },
 
       /**
        * inset: 内嵌样式
        */
-      inset: {},
+      inset: {
+        root: [],
+        header: [],
+        content: [],
+        footer: [],
+        menuButton: [],
+      },
     },
     collapsible: {
       /**
        * none: 不可折叠
        */
-      none: {},
+      none: {
+        root: [],
+      },
 
       /**
        * icon: 图标折叠
        */
-      icon: {},
+      icon: {
+        root: [],
+      },
 
       /**
        * offcanvas: 侧边栏折叠
        */
-      offcanvas: {},
+      offcanvas: {
+        root: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
+    collapsible: 'none',
   },
 };

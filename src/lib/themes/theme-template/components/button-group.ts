@@ -5,37 +5,44 @@ export const buttonGroupConfig = {
      */
     root: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认按钮组
        */
-      default: {},
+      default: {
+        root: [],
+      },
 
       /**
        * outline: 轮廓按钮组
        */
-      outline: {},
+      outline: {
+        root: [],
+      },
     },
-
     size: {
       /**
        * default: 默认尺寸
        */
-      default: {},
+      default: {
+        root: [],
+      },
 
       /**
        * sm: 小尺寸
        */
-      sm: {},
+      sm: {
+        root: [],
+      },
 
       /**
        * lg: 大尺寸
        */
-      lg: {},
+      lg: {
+        root: [],
+      },
     },
-
     /**
      * attached: 按钮连接样式
      */
@@ -43,12 +50,21 @@ export const buttonGroupConfig = {
       /**
        * true: 连接状态
        */
-      true: {},
+      true: {
+        root: [],
+      },
 
       /**
        * false: 分离状态
        */
-      false: {},
+      false: {
+        root: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+    attached: 'false',
   },
 };

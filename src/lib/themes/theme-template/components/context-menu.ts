@@ -55,13 +55,27 @@ export const contextMenuConfig = {
      */
     trigger: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认右键菜单
        */
-      default: {},
+      default: {
+        content: [],
+        item: [],
+        label: [],
+        separator: [],
+        shortcut: [],
+        checkboxItem: [],
+        radioItem: [],
+        indicator: [],
+        subTrigger: [],
+        subContent: [],
+        trigger: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

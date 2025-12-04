@@ -45,13 +45,25 @@ export const commandConfig = {
      */
     shortcut: [],
   },
-
   variants: {
     variant: {
       /**
        * default: 默认命令面板
        */
-      default: {},
+      default: {
+        root: [],
+        inputWrapper: [],
+        input: [],
+        list: [],
+        empty: [],
+        group: [],
+        separator: [],
+        item: [],
+        shortcut: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };
