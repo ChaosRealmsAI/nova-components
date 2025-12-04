@@ -87,4 +87,6 @@ export interface ComponentRegistryEntry {
   availableEffects: string[];
   /** 依赖的 Atoms 列表（仅 Blocks 使用） */
   atoms?: readonly string[];
+  /** 依赖的 Blocks 列表（仅 Blocks 使用） */
+  blocks?: readonly string[];
 }

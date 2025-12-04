@@ -2,7 +2,7 @@
  * Spinner Component Entry
  */
 
-import { Spinner, spinnerBaseConfig } from '@/components/nova-ui/atmos/spinner';
+import { Spinner } from '@/components/nova-ui/atmos/spinner';
 import type { ComponentRegistryEntry } from '../types';
 
 export const spinnerEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const spinnerEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSpinner',
   category: 'atoms',
   component: Spinner,
-  baseConfig: spinnerBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'drawer.config.ts',
   },
 
   themeConfigs: [
@@ -27,7 +26,22 @@ export const manifest: ComponentManifest = {
   dependencies: [],
 
   exportOptions: {
-    noChildren: false,
+    customImports: ['Drawer', 'DrawerContent', 'DrawerHeader', 'DrawerTitle', 'DrawerDescription', 'DrawerFooter', 'DrawerClose', 'DrawerTrigger'],
+    customJsx: `<Drawer>
+  <DrawerTrigger>Open</DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+      <DrawerDescription>This action cannot be undone.</DrawerDescription>
+    </DrawerHeader>
+    <DrawerFooter>
+      <Button>Submit</Button>
+      <DrawerClose>
+        <Button variant="outline">Cancel</Button>
+      </DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>`,
   },
 
   canvas: {

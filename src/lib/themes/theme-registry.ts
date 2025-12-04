@@ -1,6 +1,9 @@
 import type { ThemeDefinition } from '@/types';
 import { shadcnDefaultTheme } from './shadcn-default';
 import { cyberpunkTheme } from './cyberpunk';
+import { neoBrutalismTheme } from './neo-brutalism';
+import { glassmorphismTheme } from './glassmorphism';
+import { retro80sTheme } from './retro-80s';
 
 /**
  * 主题注册表
@@ -8,6 +11,9 @@ import { cyberpunkTheme } from './cyberpunk';
 export const THEMES: Record<string, ThemeDefinition> = {
   'shadcn-default': shadcnDefaultTheme,
   'cyberpunk': cyberpunkTheme,
+  'neo-brutalism': neoBrutalismTheme,
+  'glassmorphism': glassmorphismTheme,
+  'retro-80s': retro80sTheme,
 };
 
 export function getThemeById(id: string): ThemeDefinition | undefined {

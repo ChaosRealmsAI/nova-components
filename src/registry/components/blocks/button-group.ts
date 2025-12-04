@@ -2,7 +2,7 @@
  * ButtonGroup Component Entry
  */
 
-import { ButtonGroupDemo, buttonGroupBaseConfig, buttonGroupAtoms } from '@/components/nova-ui/blocks/button-group';
+import { ButtonGroupDemo } from '@/components/nova-ui/blocks/button-group';
 import type { ComponentRegistryEntry } from '../types';
 
 export const buttonGroupEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const buttonGroupEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeButtonGroup',
   category: 'blocks',
   component: ButtonGroupDemo,
-  baseConfig: buttonGroupBaseConfig,
-  atoms: buttonGroupAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

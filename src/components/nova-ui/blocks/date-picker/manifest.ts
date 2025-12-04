@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'date-picker.config.ts',
   },
 
   themeConfigs: [
@@ -28,7 +27,13 @@ export const manifest: ComponentManifest = {
 
   exportOptions: {
     noChildren: true,
-    customJsx: `<DatePicker />`,
+    customJsx: `function DatePickerExample() {
+  const [date, setDate] = React.useState<Date>();
+
+  return (
+    <DatePicker date={date} setDate={setDate} />
+  );
+}`,
     customImports: ['DatePicker'],
     extraImports: `import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"`,
@@ -46,9 +51,7 @@ import { Calendar as CalendarIcon } from "lucide-react"`,
         defaultValueKey: 'datePickerPlaceholder',
       },
     ],
-    defaultProps: {
-      placeholder: 'Pick a date',
-    },
+    defaultProps: {},
     availableEffects: [],
   },
 };

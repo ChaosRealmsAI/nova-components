@@ -52,14 +52,20 @@ docs/dev-sop/component-architecture-pattern.ts
 | 17 | kbd | ✅ | |
 | 18 | separator | ✅ | |
 | 19 | aspect-ratio | ✅ | |
+| 20 | popover | ✅ | 弹出类，含 Demo |
+| 21 | tooltip | ✅ | 弹出类，含 Demo |
 | 22 | collapsible | ✅ | 含 trigger/content |
+| 23 | calendar | ✅ | Block 组件，依赖 button |
+| 24 | menubar | ✅ | Block 组件，含多个子组件 |
+| 25 | date-picker | ✅ | Block 组件，依赖 popover/button/calendar |
+| 26 | data-table | ✅ | Block 组件，依赖 button/input/checkbox/dropdown-menu/table |
+| 27 | combobox | ✅ | Block 组件，依赖 button/popover |
 
 ### 待重构
 
 | # | 组件 | 状态 | 复杂度 | 备注 |
 |---|------|------|--------|------|
-| 20 | popover | 🔄 | 中 | 弹出类，需 Demo |
-| 21 | tooltip | 🔄 | 中 | 弹出类，需 Demo |
+| - | - | - | - | - |
 
 ## 单个任务执行步骤
 
@@ -158,9 +164,10 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | kbd | kbd.config.ts | ✅ 已删除 |
 | separator | separator.config.ts | ✅ 已删除 |
 | aspect-ratio | aspect-ratio.config.ts | ✅ |
-| popover | popover.config.ts | ⏳ |
-| tooltip | tooltip.config.ts | ⏳ |
+| popover | popover.config.ts | ✅ 已删除 |
+| tooltip | tooltip.config.ts | ✅ 已删除 |
 | collapsible | collapsible.config.ts | ✅ 已删除 |
+| menubar | menubar.config.ts | ✅ 已删除 |
 
 ## 注意事项
 
@@ -213,8 +220,8 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 
 ## 进度追踪
 
-- 总数: 22
-- 已完成: 20
-- 进行中: 2
+- 总数: 27
+- 已完成: 27
+- 进行中: 0
 - 待开始: 0
-- 完成率: 91%
+- 完成率: 100%

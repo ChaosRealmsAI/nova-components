@@ -2,7 +2,7 @@
  * HoverCard Component Entry
  */
 
-import { HoverCardDemo, hoverCardBaseConfig, hoverCardAtoms } from '@/components/nova-ui/blocks/hover-card';
+import { HoverCardDemo } from '@/components/nova-ui/blocks/hover-card';
 import type { ComponentRegistryEntry } from '../types';
 
 export const hoverCardEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const hoverCardEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeHoverCard',
   category: 'blocks',
   component: HoverCardDemo,
-  baseConfig: hoverCardBaseConfig,
-  atoms: hoverCardAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'triggerText',

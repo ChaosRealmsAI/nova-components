@@ -2,7 +2,7 @@
  * Switch Component Entry
  */
 
-import { Switch, switchBaseConfig } from '@/components/nova-ui/atmos/switch';
+import { Switch } from '@/components/nova-ui/atmos/switch';
 import type { ComponentRegistryEntry } from '../types';
 
 export const switchEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const switchEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSwitch',
   category: 'atoms',
   component: Switch,
-  baseConfig: switchBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'checked',

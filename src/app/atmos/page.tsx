@@ -283,7 +283,7 @@ function AtmosContent() {
           <ShowcaseComponent title="Spinner">
             <div className="flex gap-4">
               <Spinner size="sm" />
-              <Spinner size="md" />
+              <Spinner size="default" />
               <Spinner size="lg" />
             </div>
           </ShowcaseComponent>

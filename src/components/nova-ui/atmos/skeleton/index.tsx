@@ -5,6 +5,33 @@ import { tv } from 'tailwind-variants';
 import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
 
+/**
+ * Nova Skeleton
+ *
+ * Architecture Notes:
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
+ */
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type SkeletonClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
 // ============================================================================
 // L1: Static Functional Styles
 // ============================================================================
@@ -20,9 +47,7 @@ const skeletonBase = tv({
 // ============================================================================
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  classNames?: {
-    base?: string;
-  };
+  classNames?: SkeletonClassNames;
   variant?: 'default' | 'circular' | 'text';
 }
 
@@ -31,26 +56,20 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Skeleton;
 
-    // L1
+    // L1: Functional Layer
     const base = skeletonBase();
 
-    // L2: Theme Styles
+    // L2: Theme Layer
     const themeStyles = React.useMemo(() => {
-      if (!themeConfig) return { base: '' };
+      const baseSlot = toClassString(themeConfig?.slots?.base);
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
 
-      try {
-        const themeTv = tv(themeConfig as any);
-        const slots = themeTv({ variant } as any) as any;
-        return {
-          base: slots.base ? slots.base() : '',
-        };
-      } catch (e) {
-        console.warn('Error applying theme styles for Skeleton:', e);
-        return { base: '' };
-      }
+      return {
+        base: twMerge(baseSlot, variantStyle),
+      };
     }, [themeConfig, variant]);
 
-    // L3: Merge
+    // Merge: L1 + L2 + L3
     const baseClass = twMerge(base.base(), themeStyles.base, classNames?.base, className);
 
     return (

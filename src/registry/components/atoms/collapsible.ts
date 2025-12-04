@@ -2,7 +2,7 @@
  * Collapsible Component Entry
  */
 
-import { CollapsibleDemo, collapsibleBaseConfig } from '@/components/nova-ui/atmos/collapsible';
+import { CollapsibleDemo } from '@/components/nova-ui/atmos/collapsible';
 import type { ComponentRegistryEntry } from '../types';
 
 export const collapsibleEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const collapsibleEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeCollapsible',
   category: 'atoms',
   component: CollapsibleDemo,
-  baseConfig: collapsibleBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

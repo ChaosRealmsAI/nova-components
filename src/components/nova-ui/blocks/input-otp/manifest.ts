@@ -17,7 +17,6 @@ export const manifest: ComponentManifest = {
   // 导出配置
   files: {
     component: 'index.tsx',
-    config: 'input-otp.config.ts',
   },
 
   themeConfigs: [

@@ -2,7 +2,7 @@
  * Accordion Component Entry
  */
 
-import { AccordionDemo, accordionBaseConfig, accordionAtoms } from '@/components/nova-ui/blocks/accordion';
+import { AccordionDemo, accordionAtoms } from '@/components/nova-ui/blocks/accordion';
 import type { ComponentRegistryEntry } from '../types';
 
 export const accordionEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const accordionEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeAccordion',
   category: 'blocks',
   component: AccordionDemo,
-  baseConfig: accordionBaseConfig,
+  baseConfig: null,
   atoms: accordionAtoms,
   props: [
     {

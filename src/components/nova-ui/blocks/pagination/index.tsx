@@ -13,11 +13,10 @@
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes/use-theme';
 import { Button } from '@/components/nova-ui/atmos/button';
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { paginationBaseConfig } from './pagination.config';
 
 // ============================================================================
 // 依赖声明（用于导出时收集）
@@ -25,20 +24,62 @@ import { paginationBaseConfig } from './pagination.config';
 
 export const paginationAtoms = ['button'] as const;
 
-export { paginationBaseConfig };
-
 // ============================================================================
-// Styles
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-const pagination = tv(paginationBaseConfig);
+const paginationBase = tv({
+  slots: {
+    root: 'mx-auto flex w-full justify-center',
+    content: 'flex flex-row items-center gap-1',
+    item: '',
+    link: 'inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+    ellipsis: 'flex size-9 items-center justify-center',
+  },
+  variants: {
+    variant: {
+      default: {},
+      outline: {
+        link: 'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
+      },
+    },
+    size: {
+      default: {
+        link: 'h-9 px-3',
+      },
+      sm: {
+        link: 'h-8 px-2 text-xs',
+      },
+      lg: {
+        link: 'h-10 px-4',
+      },
+      icon: {
+        link: 'size-9',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'icon',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type PaginationVariants = VariantProps<typeof pagination>;
-export type PaginationSlots = keyof typeof paginationBaseConfig.slots;
+export type PaginationVariants = VariantProps<typeof paginationBase>;
+export type PaginationSlots = keyof typeof paginationBase.slots;
 export type PaginationClassNames = Partial<Record<PaginationSlots, string>>;
 
 export interface PaginationProps extends React.ComponentProps<'nav'>, PaginationVariants {
@@ -80,16 +121,25 @@ function Pagination({
 }: PaginationProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Pagination;
-  const styles = pagination({ variant });
+  
+  // L1
+  const base = paginationBase({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.root);
+    return { slot: slotStyle };
+  }, [themeConfig]);
 
   return (
     <nav
       role="navigation"
       aria-label="pagination"
       data-slot="pagination"
-      className={cn(
-        classNames?.root || styles.root(),
-        themeConfig?.slots?.root,
+      className={twMerge(
+        base.root(),
+        themeStyles.slot,
+        classNames?.root,
         className
       )}
       {...props}
@@ -108,14 +158,23 @@ function PaginationContent({
 }: PaginationContentProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Pagination;
-  const styles = pagination({ variant: 'default' });
+  
+  // L1
+  const base = paginationBase({ variant: 'default' });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.content);
+    return { slot: slotStyle };
+  }, [themeConfig]);
 
   return (
     <ul
       data-slot="pagination-content"
-      className={cn(
-        classNames?.content || styles.content(),
-        themeConfig?.slots?.content,
+      className={twMerge(
+        base.content(),
+        themeStyles.slot,
+        classNames?.content,
         className
       )}
       {...props}
@@ -145,7 +204,15 @@ function PaginationLink({
 }: PaginationLinkProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Pagination;
-  const styles = pagination({ variant, size });
+  
+  // L1
+  const base = paginationBase({ variant, size });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.link);
+    return { slot: slotStyle };
+  }, [themeConfig]);
 
   return (
     <Button
@@ -154,9 +221,10 @@ function PaginationLink({
       data-active={isActive}
       variant={isActive ? 'outline' : 'ghost'}
       size={size}
-      className={cn(
-        classNames?.link || styles.link(),
-        themeConfig?.slots?.link,
+      className={twMerge(
+        base.link(),
+        themeStyles.slot,
+        classNames?.link,
         className
       )}
       {...props}
@@ -178,7 +246,7 @@ function PaginationPrevious({
     <PaginationLink
       aria-label="Go to previous page"
       size="default"
-      className={cn('gap-1 pl-2.5', className)}
+      className={twMerge('gap-1 pl-2.5', className)}
       classNames={classNames}
       {...props}
     >
@@ -202,7 +270,7 @@ function PaginationNext({
     <PaginationLink
       aria-label="Go to next page"
       size="default"
-      className={cn('gap-1 pr-2.5', className)}
+      className={twMerge('gap-1 pr-2.5', className)}
       classNames={classNames}
       {...props}
     >
@@ -221,13 +289,28 @@ function PaginationEllipsis({
   classNames,
   ...props
 }: PaginationEllipsisProps) {
-  const styles = pagination({ variant: 'default' });
+  const { currentTheme } = useTheme();
+  const themeConfig = currentTheme?.components?.Pagination;
+  
+  // L1
+  const base = paginationBase({ variant: 'default' });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.ellipsis);
+    return { slot: slotStyle };
+  }, [themeConfig]);
 
   return (
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn(classNames?.ellipsis || styles.ellipsis(), className)}
+      className={twMerge(
+        base.ellipsis(),
+        themeStyles.slot,
+        classNames?.ellipsis,
+        className
+      )}
       {...props}
     >
       <MoreHorizontal className="size-4" />

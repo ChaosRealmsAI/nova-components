@@ -145,6 +145,24 @@ export const themesMessages: MessageModule = {
     "ja": "ネオ・ブルータリズム",
     "ko": "네오 브루탈리즘"
   },
+  themeNameRetro80s: {
+    "en": "Retro 80s",
+    "zh-Hans": "80年代复古",
+    "zh-Hant": "80年代復古",
+    "zh": "80年代复古",
+    "hi": "रेट्रो 80s",
+    "es": "Retro 80s",
+    "fr": "Rétro 80s",
+    "ar": "ريترو 80s",
+    "bn": "রেট্রো 80s",
+    "pt": "Retro 80s",
+    "ru": "Ретро 80-х",
+    "ur": "ریٹرو 80s",
+    "id": "Retro 80s",
+    "de": "Retro 80er",
+    "ja": "レトロ80年代",
+    "ko": "레트로 80년대"
+  },
   themeNameZenGarden: {
     "en": "Zen Garden",
     "zh-Hans": "禅意花园",

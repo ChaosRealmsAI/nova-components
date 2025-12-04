@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'calendar.config.ts',
   },
 
   themeConfigs: [

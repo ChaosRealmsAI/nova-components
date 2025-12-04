@@ -2,7 +2,7 @@
  * DropdownMenu Component Entry
  */
 
-import { DropdownMenuDemo, dropdownMenuBaseConfig, dropdownMenuAtoms } from '@/components/nova-ui/blocks/dropdown-menu';
+import { DropdownMenuDemo } from '@/components/nova-ui/blocks/dropdown-menu';
 import type { ComponentRegistryEntry } from '../types';
 
 export const dropdownMenuEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const dropdownMenuEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeDropdownMenu',
   category: 'blocks',
   component: DropdownMenuDemo,
-  baseConfig: dropdownMenuBaseConfig,
-  atoms: dropdownMenuAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

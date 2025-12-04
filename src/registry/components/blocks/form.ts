@@ -2,7 +2,7 @@
  * Form Component Entry
  */
 
-import { FormDemo, formBaseConfig, formAtoms } from '@/components/nova-ui/blocks/form';
+import { FormDemo, formAtoms } from '@/components/nova-ui/blocks/form';
 import type { ComponentRegistryEntry } from '../types';
 
 export const formEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const formEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeForm',
   category: 'blocks',
   component: FormDemo,
-  baseConfig: formBaseConfig,
+  baseConfig: null,
   atoms: formAtoms,
   props: [
     {

@@ -2,7 +2,7 @@
  * ContextMenu Component Entry
  */
 
-import { ContextMenuDemo, contextMenuBaseConfig, contextMenuAtoms } from '@/components/nova-ui/blocks/context-menu';
+import { ContextMenuDemo, contextMenuAtoms } from '@/components/nova-ui/blocks/context-menu';
 import type { ComponentRegistryEntry } from '../types';
 
 export const contextMenuEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const contextMenuEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeContextMenu',
   category: 'blocks',
   component: ContextMenuDemo,
-  baseConfig: contextMenuBaseConfig,
+  baseConfig: null,
   atoms: contextMenuAtoms,
   props: [],
   defaultProps: {},

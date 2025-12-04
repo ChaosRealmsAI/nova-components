@@ -9,36 +9,72 @@
  * - Block 组件，依赖 Atoms: input, button
  * - 不支持用户可配特效（通过内部 Atoms 获得）
  * - 支持前缀/后缀附加内容
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes/use-theme';
+import { useI18n } from '@/lib/i18n/use-i18n';
 import { Input } from '@/components/nova-ui/atmos/input';
 import { Button } from '@/components/nova-ui/atmos/button';
-import { inputGroupBaseConfig } from './input-group.config';
 
 // ============================================================================
-// 依赖声明（用于导出时收集）
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-export const inputGroupAtoms = ['input', 'button'] as const;
-
-export { inputGroupBaseConfig };
+const inputGroupBase = tv({
+  slots: {
+    root: 'flex w-full items-center',
+    input: 'flex-1',
+    button: '',
+    addon: 'inline-flex items-center justify-center',
+  },
+  variants: {
+    variant: {
+      default: {
+        root: 'gap-2',
+      },
+      attached: {
+        root: 'gap-0',
+        input: 'focus:z-10',
+      },
+    },
+    size: {
+      default: {},
+      sm: {},
+      lg: {},
+    },
+  },
+  defaultVariants: {
+    variant: 'attached',
+    size: 'default',
+  },
+});
 
 // ============================================================================
-// Styles
+// Utils
 // ============================================================================
 
-const inputGroup = tv(inputGroupBaseConfig);
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type InputGroupVariants = VariantProps<typeof inputGroup>;
-export type InputGroupSlots = keyof typeof inputGroupBaseConfig.slots;
+export type InputGroupVariants = VariantProps<typeof inputGroupBase>;
+export type InputGroupSlots = keyof typeof inputGroupBase.slots;
 export type InputGroupClassNames = Partial<Record<InputGroupSlots, string>>;
 
 export interface InputGroupProps
@@ -81,14 +117,50 @@ function InputGroup({
 }: InputGroupProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.InputGroup;
-  const styles = inputGroup({ variant, size });
+  
+  // L1
+  const base = inputGroupBase({ variant, size });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const rootSlot = toClassString(themeConfig?.slots?.root);
+    const inputSlot = toClassString(themeConfig?.slots?.input);
+    const addonSlot = toClassString(themeConfig?.slots?.addon);
+    const buttonSlot = toClassString(themeConfig?.slots?.button);
+    
+    // @ts-ignore
+    const variantRoot = toClassString(themeConfig?.variants?.variant?.[variant]?.root);
+    // @ts-ignore
+    const variantInput = toClassString(themeConfig?.variants?.variant?.[variant]?.input);
+    // @ts-ignore
+    const variantAddon = toClassString(themeConfig?.variants?.variant?.[variant]?.addon);
+    // @ts-ignore
+    const variantButton = toClassString(themeConfig?.variants?.variant?.[variant]?.button);
+
+    // @ts-ignore
+    const sizeRoot = toClassString(themeConfig?.variants?.size?.[size]?.root);
+    // @ts-ignore
+    const sizeInput = toClassString(themeConfig?.variants?.size?.[size]?.input);
+    // @ts-ignore
+    const sizeAddon = toClassString(themeConfig?.variants?.size?.[size]?.addon);
+    // @ts-ignore
+    const sizeButton = toClassString(themeConfig?.variants?.size?.[size]?.button);
+
+    return { 
+      root: twMerge(rootSlot, variantRoot, sizeRoot),
+      input: twMerge(inputSlot, variantInput, sizeInput),
+      addon: twMerge(addonSlot, variantAddon, sizeAddon),
+      button: twMerge(buttonSlot, variantButton, sizeButton),
+    };
+  }, [themeConfig, variant, size]);
 
   return (
     <div
       data-slot="input-group"
-      className={cn(
-        classNames?.root || styles.root(),
-        themeConfig?.slots?.root,
+      className={twMerge(
+        base.root(),
+        themeStyles.root,
+        classNames?.root,
         className
       )}
       {...props}
@@ -96,9 +168,10 @@ function InputGroup({
       {prefix && (
         <span
           data-slot="input-group-addon"
-          className={cn(
-            classNames?.addon || styles.addon(),
-            themeConfig?.slots?.addon
+          className={twMerge(
+            base.addon(),
+            themeStyles.addon,
+            classNames?.addon
           )}
         >
           {prefix}
@@ -109,18 +182,19 @@ function InputGroup({
         type={inputType}
         placeholder={placeholder}
         disabled={disabled}
-        className={cn(
-          classNames?.input || styles.input(),
-          themeConfig?.slots?.input
+        className={twMerge(
+          base.input(),
+          themeStyles.input,
+          classNames?.input
         )}
       />
       {suffix && (
         <span
           data-slot="input-group-addon"
-          className={cn(
-            classNames?.addon || styles.addon(),
-            themeConfig?.slots?.addon,
-            variant === 'attached' && 'rounded-r-md border-l-0'
+          className={twMerge(
+            base.addon(),
+            themeStyles.addon,
+            classNames?.addon
           )}
         >
           {suffix}
@@ -132,9 +206,10 @@ function InputGroup({
           onClick={onButtonClick}
           disabled={disabled}
           size={size}
-          className={cn(
-            classNames?.button || styles.button(),
-            themeConfig?.slots?.button
+          className={twMerge(
+            base.button(),
+            themeStyles.button,
+            classNames?.button
           )}
         >
           {buttonLabel}
@@ -157,17 +232,19 @@ export interface InputGroupDemoProps extends InputGroupVariants {
 function InputGroupDemo({
   variant = 'attached',
   size = 'default',
-  placeholder = 'Enter text...',
-  buttonLabel = 'Search',
+  placeholder,
+  buttonLabel,
   prefix,
 }: InputGroupDemoProps) {
+  const { t } = useI18n();
+
   return (
     <div className="flex items-center justify-center w-full h-full p-4">
       <InputGroup
         variant={variant}
         size={size}
-        placeholder={placeholder}
-        buttonLabel={buttonLabel}
+        placeholder={placeholder || t('inputGroupPlaceholder', 'Enter text...')}
+        buttonLabel={buttonLabel || t('inputGroupButtonLabel', 'Search')}
         prefix={prefix}
       />
     </div>

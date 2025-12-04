@@ -8,36 +8,84 @@
  * Architecture Notes:
  * - Block 组件，依赖 Atoms: separator
  * - 不支持用户可配特效（通过内部 Atoms 获得）
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { ChevronRight, MoreHorizontal } from 'lucide-react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes/use-theme';
-import { breadcrumbBaseConfig } from './breadcrumb.config';
-
-// ============================================================================
-// 依赖声明（用于导出时收集）
-// ============================================================================
-
-export const breadcrumbAtoms = ['separator'] as const;
-
-export { breadcrumbBaseConfig };
+import { useI18n } from '@/lib/i18n/use-i18n';
 
 // ============================================================================
 // Styles
 // ============================================================================
 
-const breadcrumb = tv(breadcrumbBaseConfig);
+const breadcrumbConfig = {
+  slots: {
+    root: '',
+    list: 'flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5 text-muted-foreground',
+    item: 'inline-flex items-center gap-1.5',
+    link: 'hover:text-foreground transition-colors',
+    page: 'text-foreground font-normal',
+    separator: '[&>svg]:size-3.5',
+    ellipsis: 'flex size-9 items-center justify-center',
+  },
+  variants: {
+    variant: {
+      default: {
+        root: '',
+        list: '',
+        item: '',
+        link: '',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default' as const,
+  },
+} as const;
+
+const breadcrumb = tv(breadcrumbConfig);
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// Context
+// ============================================================================
+
+interface BreadcrumbContextValue {
+  variant: BreadcrumbVariants['variant'];
+}
+
+const BreadcrumbContext = React.createContext<BreadcrumbContextValue>({
+  variant: 'default',
+});
+
+const useBreadcrumbContext = () => React.useContext(BreadcrumbContext);
 
 // ============================================================================
 // Types
 // ============================================================================
 
 export type BreadcrumbVariants = VariantProps<typeof breadcrumb>;
-export type BreadcrumbSlots = keyof typeof breadcrumbBaseConfig.slots;
+export type BreadcrumbSlots = keyof typeof breadcrumbConfig.slots;
 export type BreadcrumbClassNames = Partial<Record<BreadcrumbSlots, string>>;
 
 export interface BreadcrumbProps
@@ -94,19 +142,33 @@ function Breadcrumb({
 }: BreadcrumbProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
+  
+  // L1
   const styles = breadcrumb({ variant });
 
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.root);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.root);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
+
   return (
-    <nav
-      aria-label="breadcrumb"
-      data-slot="breadcrumb"
-      className={cn(
-        classNames?.root || styles.root(),
-        themeConfig?.slots?.root,
-        className
-      )}
-      {...props}
-    />
+    <BreadcrumbContext.Provider value={{ variant }}>
+      <nav
+        aria-label="breadcrumb"
+        data-slot="breadcrumb"
+        className={twMerge(
+          styles.root(),
+          themeStyles.slot,
+          themeStyles.variant,
+          classNames?.root,
+          className
+        )}
+        {...props}
+      />
+    </BreadcrumbContext.Provider>
   );
 }
 
@@ -119,16 +181,29 @@ function BreadcrumbList({
   classNames,
   ...props
 }: BreadcrumbListProps) {
+  const { variant } = useBreadcrumbContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
-  const styles = breadcrumb({ variant: 'default' });
+  
+  // L1
+  const styles = breadcrumb({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.list);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.list);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <ol
       data-slot="breadcrumb-list"
-      className={cn(
-        classNames?.list || styles.list(),
-        themeConfig?.slots?.list,
+      className={twMerge(
+        styles.list(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.list,
         className
       )}
       {...props}
@@ -145,16 +220,29 @@ function BreadcrumbItem({
   classNames,
   ...props
 }: BreadcrumbItemProps) {
+  const { variant } = useBreadcrumbContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
-  const styles = breadcrumb({ variant: 'default' });
+  
+  // L1
+  const styles = breadcrumb({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.item);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.item);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn(
-        classNames?.item || styles.item(),
-        themeConfig?.slots?.item,
+      className={twMerge(
+        styles.item(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.item,
         className
       )}
       {...props}
@@ -172,18 +260,31 @@ function BreadcrumbLink({
   classNames,
   ...props
 }: BreadcrumbLinkProps) {
+  const { variant } = useBreadcrumbContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
-  const styles = breadcrumb({ variant: 'default' });
+  
+  // L1
+  const styles = breadcrumb({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.link);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.link);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   const Comp = asChild ? Slot : 'a';
 
   return (
     <Comp
       data-slot="breadcrumb-link"
-      className={cn(
-        classNames?.link || styles.link(),
-        themeConfig?.slots?.link,
+      className={twMerge(
+        styles.link(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.link,
         className
       )}
       {...props}
@@ -200,9 +301,20 @@ function BreadcrumbPage({
   classNames,
   ...props
 }: BreadcrumbPageProps) {
+  const { variant } = useBreadcrumbContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
-  const styles = breadcrumb({ variant: 'default' });
+  
+  // L1
+  const styles = breadcrumb({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.page);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.page);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <span
@@ -210,9 +322,11 @@ function BreadcrumbPage({
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn(
-        classNames?.page || styles.page(),
-        themeConfig?.slots?.page,
+      className={twMerge(
+        styles.page(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.page,
         className
       )}
       {...props}
@@ -230,18 +344,31 @@ function BreadcrumbSeparator({
   classNames,
   ...props
 }: BreadcrumbSeparatorProps) {
+  const { variant } = useBreadcrumbContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
-  const styles = breadcrumb({ variant: 'default' });
+  
+  // L1
+  const styles = breadcrumb({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.separator);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.separator);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <li
       data-slot="breadcrumb-separator"
       role="presentation"
       aria-hidden="true"
-      className={cn(
-        classNames?.separator || styles.separator(),
-        themeConfig?.slots?.separator,
+      className={twMerge(
+        styles.separator(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.separator,
         className
       )}
       {...props}
@@ -260,18 +387,31 @@ function BreadcrumbEllipsis({
   classNames,
   ...props
 }: BreadcrumbEllipsisProps) {
+  const { variant } = useBreadcrumbContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Breadcrumb;
-  const styles = breadcrumb({ variant: 'default' });
+  
+  // L1
+  const styles = breadcrumb({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.ellipsis);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.ellipsis);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <span
       data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn(
-        classNames?.ellipsis || styles.ellipsis(),
-        themeConfig?.slots?.ellipsis,
+      className={twMerge(
+        styles.ellipsis(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.ellipsis,
         className
       )}
       {...props}
@@ -296,22 +436,27 @@ function BreadcrumbDemo({
   variant = 'default',
   items = defaultItems,
 }: BreadcrumbDemoProps) {
+  const { t } = useI18n();
+
   return (
     <div className="flex items-center justify-center w-full h-full p-4">
       <Breadcrumb variant={variant}>
         <BreadcrumbList>
-          {items.map((item, index) => (
-            <React.Fragment key={item.label}>
-              <BreadcrumbItem>
-                {item.isCurrentPage ? (
-                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-              {index < items.length - 1 && <BreadcrumbSeparator />}
-            </React.Fragment>
-          ))}
+          {items.map((item, index) => {
+            const label = item.labelKey ? t(item.labelKey, item.label) : item.label;
+            return (
+              <React.Fragment key={item.label}>
+                <BreadcrumbItem>
+                  {item.isCurrentPage ? (
+                    <BreadcrumbPage>{label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink href={item.href}>{label}</BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {index < items.length - 1 && <BreadcrumbSeparator />}
+              </React.Fragment>
+            );
+          })}
         </BreadcrumbList>
       </Breadcrumb>
     </div>

@@ -2,7 +2,7 @@
  * ToggleGroup Component Entry
  */
 
-import { ToggleGroupDemo, toggleGroupBaseConfig, toggleGroupAtoms } from '@/components/nova-ui/blocks/toggle-group';
+import { ToggleGroupDemo, toggleGroupAtoms } from '@/components/nova-ui/blocks/toggle-group';
 import type { ComponentRegistryEntry } from '../types';
 
 export const toggleGroupEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const toggleGroupEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeToggleGroup',
   category: 'blocks',
   component: ToggleGroupDemo,
-  baseConfig: toggleGroupBaseConfig,
+  baseConfig: null,
   atoms: toggleGroupAtoms,
   props: [
     {

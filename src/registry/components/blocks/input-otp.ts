@@ -2,7 +2,7 @@
  * InputOTP Component Entry
  */
 
-import { InputOTPDemo, inputOtpBaseConfig, inputOtpAtoms } from '@/components/nova-ui/blocks/input-otp';
+import { InputOTPDemo, inputOtpAtoms } from '@/components/nova-ui/blocks/input-otp';
 import type { ComponentRegistryEntry } from '../types';
 
 export const inputOtpEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const inputOtpEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeInputOTP',
   category: 'blocks',
   component: InputOTPDemo,
-  baseConfig: inputOtpBaseConfig,
+  baseConfig: null,
   atoms: inputOtpAtoms,
   props: [
     {

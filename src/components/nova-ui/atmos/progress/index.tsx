@@ -2,49 +2,100 @@
 
 import * as React from 'react';
 import * as ProgressPrimitive from '@radix-ui/react-progress';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { progressBaseConfig } from './progress.config';
 
 /**
  * Nova Progress
  *
  * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `progressBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
  */
 
-export { progressBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type ProgressVariants = VariantProps<ReturnType<typeof tv>>;
-export type ProgressSlots = keyof typeof progressBaseConfig.slots;
-export type ProgressClassNames = Partial<Record<ProgressSlots, string>>;
+export type ProgressClassNames = Partial<{
+  base: string;
+  indicator: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Static Styles (Functional Layer)
+// ============================================================================
+
+const progressBase = tv({
+  slots: {
+    base: 'relative w-full overflow-hidden', // Functional: positioning + overflow
+    indicator: 'h-full w-full flex-1 transition-all', // Functional: layout + transition
+  },
+});
+
+// ============================================================================
+// Component
+// ============================================================================
 
 export interface ProgressProps
-  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>,
-    ProgressVariants {
+  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
   classNames?: ProgressClassNames;
+  variant?: 'default';
+  size?: 'default' | 'sm' | 'lg' | 'xl';
 }
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   ProgressProps
->(({ className, classNames, variant, size, value, max = 100, ...props }, ref) => {
-  // ADR-006: 从主题上下文获取 Progress 的样式配置
+>(({ className, classNames, variant = 'default', size = 'default', value, max = 100, ...props }, ref) => {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Progress;
 
-  // 合并基础配置和主题配置
-  const { base, indicator } = tv({
-    extend: progressBaseConfig,
-    ...(themeConfig || {}),
-  })({ variant, size });
+  // L1: Functional Layer
+  const base = progressBase();
 
-  const baseClass = classNames?.base ? classNames.base : base();
-  const indicatorClass = classNames?.indicator ? classNames.indicator : indicator();
+  // L2: Theme Layer
+  const themeStyles = React.useMemo(() => {
+    const baseStyle = toClassString(themeConfig?.slots?.base);
+    const indicatorStyle = toClassString(themeConfig?.slots?.indicator);
+    
+    const variantBase = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+    const variantIndicator = toClassString(themeConfig?.variants?.variant?.[variant]?.indicator);
+    
+    const sizeBase = toClassString(themeConfig?.variants?.size?.[size]?.base);
+    const sizeIndicator = toClassString(themeConfig?.variants?.size?.[size]?.indicator);
+
+    return {
+      base: twMerge(baseStyle, variantBase, sizeBase),
+      indicator: twMerge(indicatorStyle, variantIndicator, sizeIndicator),
+    };
+  }, [themeConfig, variant, size]);
+
+  // Merge: L1 + L2 + L3
+  const rootClass = twMerge(
+    base.base(),
+    themeStyles.base,
+    classNames?.base,
+    className
+  );
+
+  const indicatorClass = twMerge(
+    base.indicator(),
+    themeStyles.indicator,
+    classNames?.indicator
+  );
 
   // Calculate percentage based on value and max
   const percentage = React.useMemo(() => {
@@ -57,7 +108,7 @@ const Progress = React.forwardRef<
   return (
     <ProgressPrimitive.Root
       ref={ref}
-      className={cn(baseClass, className)}
+      className={rootClass}
       value={value}
       max={max}
       {...props}

@@ -2,7 +2,7 @@
  * Input Component Entry
  */
 
-import { Input, inputBaseConfig } from '@/components/nova-ui/atmos/input';
+import { Input } from '@/components/nova-ui/atmos/input';
 import type { ComponentRegistryEntry } from '../types';
 
 export const inputEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const inputEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeInput',
   category: 'atoms',
   component: Input,
-  baseConfig: inputBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'placeholder',

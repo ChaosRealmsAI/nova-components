@@ -2,31 +2,59 @@
 
 import * as React from 'react';
 import * as SeparatorPrimitive from '@radix-ui/react-separator';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { separatorBaseConfig } from './separator.config';
 
 /**
  * Nova Separator
  *
  * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `separatorBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition via `tv`, handles layout.
+ * - L2 (Theme): Dynamic from `useTheme`, handles visual styles.
+ * - L3 (Instance): User overrides via `className`/`classNames`.
  */
 
-export { separatorBaseConfig };
+// ============================================================================
+// Utils
+// ============================================================================
 
-export type SeparatorVariants = VariantProps<ReturnType<typeof tv>>;
-export type SeparatorSlots = keyof typeof separatorBaseConfig.slots;
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Functional Layer (Static)
+// ============================================================================
+
+const separatorBase = tv({
+  slots: {
+    base: 'shrink-0',
+  },
+  variants: {
+    orientation: {
+      horizontal: { base: 'h-[1px] w-full' },
+      vertical: { base: 'h-full w-[1px]' },
+    },
+  },
+  defaultVariants: {
+    orientation: 'horizontal',
+  },
+});
+
+// ============================================================================
+// Component
+// ============================================================================
+
+export type SeparatorSlots = keyof typeof separatorBase.slots;
 export type SeparatorClassNames = Partial<Record<SeparatorSlots, string>>;
 
 export interface SeparatorProps
-  extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>,
-    SeparatorVariants {
+  extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> {
   classNames?: SeparatorClassNames;
+  orientation?: 'horizontal' | 'vertical';
 }
 
 const Separator = React.forwardRef<
@@ -34,33 +62,33 @@ const Separator = React.forwardRef<
   SeparatorProps
 >(
   (
-    { className, classNames, style, orientation = 'horizontal', decorative = true, ...props },
+    { className, classNames, orientation = 'horizontal', decorative = true, ...props },
     ref
   ) => {
-    // ADR-006: 从主题上下文获取 Separator 的样式配置
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Separator;
 
-    // 合并基础配置和主题配置
-    const styles = tv({
-      extend: separatorBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1: Functional Layer
+    const base = separatorBase({ orientation });
 
-    const baseClass = classNames?.base
-      ? classNames.base
-      : styles({ orientation }).base();
+    // L2: Theme Layer
+    const themeStyles = React.useMemo(() => {
+       const baseL2 = [
+         toClassString(themeConfig?.slots?.base),
+         toClassString(themeConfig?.variants?.orientation?.[orientation]?.base)
+       ].join(' ');
+       return { base: baseL2 };
+    }, [themeConfig, orientation]);
+
+    // Merge: L1 + L2 + L3
+    const baseClass = twMerge(base.base(), themeStyles.base, classNames?.base, className);
 
     return (
       <SeparatorPrimitive.Root
         ref={ref}
         decorative={decorative}
         orientation={orientation}
-        className={cn(baseClass, className)}
-        style={{
-          backgroundColor: 'var(--border)',
-          ...style,
-        }}
+        className={baseClass}
         {...props}
       />
     );

@@ -6,6 +6,41 @@ import { tv } from 'tailwind-variants';
 import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
 
+/**
+ * Nova AspectRatio
+ *
+ * Architecture Notes:
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
+ */
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type AspectRatioClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// Ratio string to number mapping
+const RATIO_MAP: Record<string, number> = {
+  '1/1': 1,
+  '16/9': 16 / 9,
+  '4/3': 4 / 3,
+  '21/9': 21 / 9,
+};
+
 // ============================================================================
 // L1: Static Functional Styles
 // ============================================================================
@@ -20,17 +55,9 @@ const aspectRatioBase = tv({
 // Component
 // ============================================================================
 
-// Ratio string to number mapping
-const RATIO_MAP: Record<string, number> = {
-  '1/1': 1,
-  '16/9': 16 / 9,
-  '4/3': 4 / 3,
-  '21/9': 21 / 9,
-};
-
 export interface AspectRatioProps
   extends Omit<React.ComponentPropsWithoutRef<typeof AspectRatioPrimitive.Root>, 'ratio'> {
-  classNames?: { base?: string };
+  classNames?: AspectRatioClassNames;
   ratio?: '1/1' | '16/9' | '4/3' | '21/9';
 }
 
@@ -41,26 +68,20 @@ const AspectRatio = React.forwardRef<
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.AspectRatio;
 
-  // L1
+  // L1: Functional Layer
   const base = aspectRatioBase();
 
-  // L2: Theme Styles
+  // L2: Theme Layer
   const themeStyles = React.useMemo(() => {
-    if (!themeConfig) return { base: '' };
+    const baseSlot = toClassString(themeConfig?.slots?.base);
+    const ratioStyle = toClassString(themeConfig?.variants?.ratio?.[ratio]?.base);
 
-    try {
-      const themeTv = tv(themeConfig as any);
-      const slots = themeTv({ ratio } as any) as any;
-      return {
-        base: slots.base ? slots.base() : '',
-      };
-    } catch (e) {
-      console.warn('Error applying theme styles for AspectRatio:', e);
-      return { base: '' };
-    }
+    return {
+      base: twMerge(baseSlot, ratioStyle),
+    };
   }, [themeConfig, ratio]);
 
-  // L3: Merge
+  // Merge: L1 + L2 + L3
   const baseClass = twMerge(base.base(), themeStyles.base, classNames?.base, className);
 
   // Numeric ratio for Radix

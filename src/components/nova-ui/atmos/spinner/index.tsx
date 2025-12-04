@@ -1,51 +1,86 @@
 'use client';
 
 import * as React from 'react';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
-import { spinnerBaseConfig } from './spinner.config';
 
 /**
  * Nova Spinner
  *
  * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `spinnerBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - Uses inline SVG for maximum theme customization.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
  */
 
-export { spinnerBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type SpinnerVariants = VariantProps<ReturnType<typeof tv>>;
-export type SpinnerSlots = keyof typeof spinnerBaseConfig.slots;
-export type SpinnerClassNames = Partial<Record<SpinnerSlots, string>>;
+export type SpinnerClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Static Styles (Functional Layer)
+// ============================================================================
+
+const spinnerBase = tv({
+  slots: {
+    base: 'animate-spin',
+  },
+});
+
+// ============================================================================
+// Component
+// ============================================================================
 
 export interface SpinnerProps
-  extends Omit<React.SVGAttributes<SVGSVGElement>, 'children'>,
-    SpinnerVariants {
+  extends Omit<React.SVGAttributes<SVGSVGElement>, 'children'> {
   classNames?: SpinnerClassNames;
+  variant?: 'default' | 'secondary' | 'muted';
+  size?: 'default' | 'sm' | 'lg' | 'xl';
 }
 
 const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
-  ({ className, classNames, variant, size, ...props }, ref) => {
-    // ADR-006: 从主题上下文获取 Spinner 的样式配置
+  ({ className, classNames, variant = 'default', size = 'default', ...props }, ref) => {
     const { currentTheme } = useTheme();
     const { t } = useI18n();
     const themeConfig = currentTheme?.components?.Spinner;
 
-    // 合并基础配置和主题配置
-    const styles = tv({
-      extend: spinnerBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1: Functional Layer
+    const base = spinnerBase();
 
-    const baseClass = classNames?.base
-      ? classNames.base
-      : styles({ variant, size }).base();
+    // L2: Theme Layer
+    const themeStyles = React.useMemo(() => {
+      const baseStyle = toClassString(themeConfig?.slots?.base);
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+      const sizeStyle = toClassString(themeConfig?.variants?.size?.[size]?.base);
+
+      return {
+        base: twMerge(baseStyle, variantStyle, sizeStyle),
+      };
+    }, [themeConfig, variant, size]);
+
+    // Merge: L1 + L2 + L3
+    const rootClass = twMerge(
+      base.base(),
+      themeStyles.base,
+      classNames?.base,
+      className
+    );
 
     return (
       <svg
@@ -59,7 +94,7 @@ const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={cn(baseClass, className)}
+        className={rootClass}
         {...props}
       >
         <path d="M21 12a9 9 0 1 1-6.219-8.56" />

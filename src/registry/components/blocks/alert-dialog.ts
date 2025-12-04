@@ -2,7 +2,7 @@
  * AlertDialog Component Entry
  */
 
-import { AlertDialogDemo, alertDialogBaseConfig, alertDialogAtoms } from '@/components/nova-ui/blocks/alert-dialog';
+import { AlertDialogDemo, alertDialogAtoms } from '@/components/nova-ui/blocks/alert-dialog';
 import type { ComponentRegistryEntry } from '../types';
 
 export const alertDialogEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const alertDialogEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeAlertDialog',
   category: 'blocks',
   component: AlertDialogDemo,
-  baseConfig: alertDialogBaseConfig,
+  baseConfig: null,
   atoms: alertDialogAtoms,
   props: [
     {

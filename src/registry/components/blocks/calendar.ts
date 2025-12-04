@@ -2,7 +2,7 @@
  * Calendar Component Entry
  */
 
-import { CalendarDemo, calendarBaseConfig, calendarAtoms } from '@/components/nova-ui/blocks/calendar';
+import { CalendarDemo, calendarAtoms } from '@/components/nova-ui/blocks/calendar';
 import type { ComponentRegistryEntry } from '../types';
 
 export const calendarEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const calendarEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeCalendar',
   category: 'blocks',
   component: CalendarDemo,
-  baseConfig: calendarBaseConfig,
+  baseConfig: null,
   atoms: calendarAtoms,
   props: [
     {

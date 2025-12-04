@@ -2,7 +2,7 @@
  * NavigationMenu Component Entry
  */
 
-import { NavigationMenuDemo, navigationMenuBaseConfig, navigationMenuAtoms } from '@/components/nova-ui/blocks/navigation-menu';
+import { NavigationMenuDemo, navigationMenuAtoms } from '@/components/nova-ui/blocks/navigation-menu';
 import type { ComponentRegistryEntry } from '../types';
 
 export const navigationMenuEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const navigationMenuEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeNavigationMenu',
   category: 'blocks',
   component: NavigationMenuDemo,
-  baseConfig: navigationMenuBaseConfig,
+  baseConfig: null,
   atoms: navigationMenuAtoms,
   props: [
     {

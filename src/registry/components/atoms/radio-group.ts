@@ -2,7 +2,7 @@
  * RadioGroup Component Entry
  */
 
-import { RadioGroup, radioGroupBaseConfig } from '@/components/nova-ui/atmos/radio-group';
+import { RadioGroup } from '@/components/nova-ui/atmos/radio-group';
 import type { ComponentRegistryEntry } from '../types';
 
 export const radioGroupEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const radioGroupEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeRadioGroup',
   category: 'atoms',
   component: RadioGroup,
-  baseConfig: radioGroupBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'defaultValue',

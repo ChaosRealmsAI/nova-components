@@ -2,7 +2,7 @@
  * Sheet Component Entry
  */
 
-import { SheetDemo, sheetBaseConfig, sheetAtoms } from '@/components/nova-ui/blocks/sheet';
+import { SheetDemo, sheetAtoms } from '@/components/nova-ui/blocks/sheet';
 import type { ComponentRegistryEntry } from '../types';
 
 export const sheetEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const sheetEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSheet',
   category: 'blocks',
   component: SheetDemo,
-  baseConfig: sheetBaseConfig,
+  baseConfig: null,
   atoms: sheetAtoms,
   props: [
     {

@@ -9,17 +9,21 @@
  * - Block 组件，依赖 Atoms: button, separator
  * - 支持折叠/展开
  * - 支持分组菜单
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { PanelLeftIcon, HomeIcon, SettingsIcon, UsersIcon, FileTextIcon, BarChartIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/nova-ui/atmos/button';
-import { Separator } from '@/components/nova-ui/atmos/separator';
-import { useTheme } from '@/lib/themes/use-theme';
+import { useTheme } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
-import { sidebarBaseConfig } from './sidebar.config';
 
 // ============================================================================
 // 依赖声明（用于导出时收集）
@@ -27,27 +31,110 @@ import { sidebarBaseConfig } from './sidebar.config';
 
 export const sidebarAtoms = ['button', 'separator'] as const;
 
-export { sidebarBaseConfig };
-
 // ============================================================================
-// Styles
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-const sidebar = tv(sidebarBaseConfig);
+const sidebarBase = tv({
+  slots: {
+    root: [
+      'flex flex-col h-full',
+      'w-[var(--sidebar-width,280px)]',
+      'transition-[width,transform] duration-200 ease-in-out',
+    ].join(' '),
+    header: 'flex flex-col gap-2 px-4 py-4',
+    content: 'flex-1 overflow-auto px-2 py-2',
+    footer: 'flex flex-col gap-2 px-4 py-4',
+    group: 'flex flex-col gap-1 py-2',
+    groupLabel: 'px-2 py-1.5 text-xs font-medium uppercase tracking-wider',
+    menu: 'flex flex-col gap-0.5',
+    menuItem: 'relative',
+    menuButton: [
+      'flex w-full items-center gap-2 px-2 py-1.5 rounded-md',
+      'text-sm font-medium',
+      'outline-none transition-colors',
+      'disabled:pointer-events-none disabled:opacity-50',
+    ].join(' '),
+    menuBadge: 'ml-auto text-xs',
+    separator: 'my-2 h-px',
+    trigger: [
+      'fixed top-4 left-4 z-50 inline-flex items-center justify-center',
+      'w-10 h-10 rounded-md',
+      'lg:hidden',
+    ].join(' '),
+    overlay: [
+      'fixed inset-0 z-40',
+      'lg:hidden',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out',
+      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    ].join(' '),
+    mobileContainer: [
+      'fixed inset-y-0 left-0 z-50',
+      'lg:relative lg:z-0',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out',
+      'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+    ].join(' '),
+  },
+  variants: {
+    variant: {
+      default: {},
+      inset: {
+        root: 'rounded-lg m-2 border shadow-sm',
+      },
+    },
+    collapsible: {
+      none: {},
+      icon: {
+        root: 'data-[collapsed=true]:w-[var(--sidebar-width-icon,48px)]',
+      },
+      offcanvas: {
+        root: 'data-[collapsed=true]:-translate-x-full lg:translate-x-0',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    collapsible: 'none',
+  },
+});
 
 // ============================================================================
-// Types
+// Utils
 // ============================================================================
 
-export type SidebarVariants = VariantProps<typeof sidebar>;
-export type SidebarSlots = keyof typeof sidebarBaseConfig.slots;
-export type SidebarClassNames = Partial<Record<SidebarSlots, string>>;
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// Context
+// ============================================================================
 
 export interface SidebarContextValue {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   isMobile: boolean;
 }
+
+const SidebarContext = React.createContext<SidebarContextValue | undefined>(undefined);
+
+function useSidebar() {
+  const context = React.useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a SidebarProvider');
+  }
+  return context;
+}
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type SidebarVariants = VariantProps<typeof sidebarBase>;
+export type SidebarSlots = keyof (typeof sidebarBase)['slots'];
+export type SidebarClassNames = Partial<Record<SidebarSlots, string>>;
 
 export interface SidebarProviderProps {
   children: React.ReactNode;
@@ -118,20 +205,6 @@ export interface SidebarDemoProps extends SidebarVariants {
 }
 
 // ============================================================================
-// Context
-// ============================================================================
-
-const SidebarContext = React.createContext<SidebarContextValue | undefined>(undefined);
-
-function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-}
-
-// ============================================================================
 // Sidebar Provider
 // ============================================================================
 
@@ -168,19 +241,28 @@ function Sidebar({
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
+  // L1: 功能层
+  const base = sidebarBase({ variant, collapsible });
 
-  const { root } = styles({ variant, collapsible });
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.root);
+    // @ts-ignore - Theme config types might be loose
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.root);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
+
+  // L1 + L2 + L3
+  const rootClass = twMerge(
+    base.root(),
+    themeStyles.slot,
+    themeStyles.variant,
+    classNames?.root,
+    className
+  );
 
   return (
-    <aside
-      data-slot="sidebar"
-      className={cn(root(), classNames?.root, className)}
-      {...props}
-    >
+    <aside data-slot="sidebar" className={rootClass} {...props}>
       {children}
     </aside>
   );
@@ -194,20 +276,15 @@ function SidebarHeader({ className, classNames, ...props }: SidebarHeaderProps) 
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { header } = styles({});
-
-  return (
-    <div
-      data-slot="sidebar-header"
-      className={cn(header(), classNames?.header, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.header),
+    [themeConfig]
   );
+
+  const headerClass = twMerge(base.header(), themeStyles, classNames?.header, className);
+
+  return <div data-slot="sidebar-header" className={headerClass} {...props} />;
 }
 
 // ============================================================================
@@ -218,20 +295,15 @@ function SidebarContent({ className, classNames, ...props }: SidebarContentProps
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { content } = styles({});
-
-  return (
-    <div
-      data-slot="sidebar-content"
-      className={cn(content(), classNames?.content, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.content),
+    [themeConfig]
   );
+
+  const contentClass = twMerge(base.content(), themeStyles, classNames?.content, className);
+
+  return <div data-slot="sidebar-content" className={contentClass} {...props} />;
 }
 
 // ============================================================================
@@ -242,20 +314,15 @@ function SidebarFooter({ className, classNames, ...props }: SidebarFooterProps) 
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { footer } = styles({});
-
-  return (
-    <div
-      data-slot="sidebar-footer"
-      className={cn(footer(), classNames?.footer, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.footer),
+    [themeConfig]
   );
+
+  const footerClass = twMerge(base.footer(), themeStyles, classNames?.footer, className);
+
+  return <div data-slot="sidebar-footer" className={footerClass} {...props} />;
 }
 
 // ============================================================================
@@ -266,20 +333,15 @@ function SidebarGroup({ className, classNames, ...props }: SidebarGroupProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { group } = styles({});
-
-  return (
-    <div
-      data-slot="sidebar-group"
-      className={cn(group(), classNames?.group, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.group),
+    [themeConfig]
   );
+
+  const groupClass = twMerge(base.group(), themeStyles, classNames?.group, className);
+
+  return <div data-slot="sidebar-group" className={groupClass} {...props} />;
 }
 
 // ============================================================================
@@ -290,20 +352,15 @@ function SidebarGroupLabel({ className, classNames, ...props }: SidebarGroupLabe
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { groupLabel } = styles({});
-
-  return (
-    <div
-      data-slot="sidebar-group-label"
-      className={cn(groupLabel(), classNames?.groupLabel, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.groupLabel),
+    [themeConfig]
   );
+
+  const groupLabelClass = twMerge(base.groupLabel(), themeStyles, classNames?.groupLabel, className);
+
+  return <div data-slot="sidebar-group-label" className={groupLabelClass} {...props} />;
 }
 
 // ============================================================================
@@ -314,20 +371,15 @@ function SidebarMenu({ className, classNames, ...props }: SidebarMenuProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { menu } = styles({});
-
-  return (
-    <ul
-      data-slot="sidebar-menu"
-      className={cn(menu(), classNames?.menu, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.menu),
+    [themeConfig]
   );
+
+  const menuClass = twMerge(base.menu(), themeStyles, classNames?.menu, className);
+
+  return <ul data-slot="sidebar-menu" className={menuClass} {...props} />;
 }
 
 // ============================================================================
@@ -338,20 +390,15 @@ function SidebarMenuItem({ className, classNames, ...props }: SidebarMenuItemPro
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { menuItem } = styles({});
-
-  return (
-    <li
-      data-slot="sidebar-menu-item"
-      className={cn(menuItem(), classNames?.menuItem, className)}
-      {...props}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.menuItem),
+    [themeConfig]
   );
+
+  const menuItemClass = twMerge(base.menuItem(), themeStyles, classNames?.menuItem, className);
+
+  return <li data-slot="sidebar-menu-item" className={menuItemClass} {...props} />;
 }
 
 // ============================================================================
@@ -370,23 +417,25 @@ function SidebarMenuButton({
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.menuButton),
+    [themeConfig]
+  );
 
-  const { menuButton, menuBadge } = styles({});
+  const menuButtonClass = twMerge(base.menuButton(), themeStyles, classNames?.menuButton, className);
+  const menuBadgeClass = twMerge(base.menuBadge(), toClassString(themeConfig?.slots?.menuBadge), classNames?.menuBadge);
 
   return (
     <button
       data-slot="sidebar-menu-button"
       data-active={active}
-      className={cn(menuButton(), classNames?.menuButton, className)}
+      className={menuButtonClass}
       {...props}
     >
       {icon && <span className="shrink-0">{icon}</span>}
       <span className="flex-1 truncate text-left">{children}</span>
-      {badge && <span className={cn(menuBadge(), classNames?.menuBadge)}>{badge}</span>}
+      {badge && <span className={menuBadgeClass}>{badge}</span>}
     </button>
   );
 }
@@ -399,19 +448,16 @@ function SidebarTrigger({ className, classNames, ...props }: SidebarTriggerProps
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.trigger),
+    [themeConfig]
+  );
 
-  const { trigger } = styles({});
+  const triggerClass = twMerge(base.trigger(), themeStyles, classNames?.trigger, className);
 
   return (
-    <button
-      data-slot="sidebar-trigger"
-      className={cn(trigger(), classNames?.trigger, className)}
-      {...props}
-    >
+    <button data-slot="sidebar-trigger" className={triggerClass} {...props}>
       <PanelLeftIcon className="h-5 w-5" />
       <span className="sr-only">Toggle Sidebar</span>
     </button>
@@ -426,19 +472,15 @@ function SidebarSeparator({ className, classNames }: { className?: string; class
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Sidebar;
 
-  const styles = tv({
-    extend: sidebarBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { separator } = styles({});
-
-  return (
-    <div
-      data-slot="sidebar-separator"
-      className={cn(separator(), classNames?.separator, className)}
-    />
+  const base = sidebarBase({});
+  const themeStyles = React.useMemo(
+    () => toClassString(themeConfig?.slots?.separator),
+    [themeConfig]
   );
+
+  const separatorClass = twMerge(base.separator(), themeStyles, classNames?.separator, className);
+
+  return <div data-slot="sidebar-separator" className={separatorClass} />;
 }
 
 // ============================================================================

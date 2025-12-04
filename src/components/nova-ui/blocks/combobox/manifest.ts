@@ -9,7 +9,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'combobox.config.ts',
   },
 
   themeConfigs: [

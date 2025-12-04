@@ -2,7 +2,7 @@
  * Resizable Component Entry
  */
 
-import { ResizableDemo, resizableBaseConfig, resizableAtoms } from '@/components/nova-ui/blocks/resizable';
+import { ResizableDemo, resizableAtoms } from '@/components/nova-ui/blocks/resizable';
 import type { ComponentRegistryEntry } from '../types';
 
 export const resizableEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const resizableEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeResizable',
   category: 'blocks',
   component: ResizableDemo,
-  baseConfig: resizableBaseConfig,
+  baseConfig: null,
   atoms: resizableAtoms,
   props: [
     {

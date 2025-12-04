@@ -2,7 +2,7 @@
  * Carousel Component Entry
  */
 
-import { CarouselDemo, carouselBaseConfig, carouselAtoms } from '@/components/nova-ui/blocks/carousel';
+import { CarouselDemo, carouselAtoms } from '@/components/nova-ui/blocks/carousel';
 import type { ComponentRegistryEntry } from '../types';
 
 export const carouselEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const carouselEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeCarousel',
   category: 'blocks',
   component: CarouselDemo,
-  baseConfig: carouselBaseConfig,
+  baseConfig: null,
   atoms: carouselAtoms,
   props: [
     {

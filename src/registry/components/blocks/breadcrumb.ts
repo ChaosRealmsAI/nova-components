@@ -2,7 +2,7 @@
  * Breadcrumb Component Entry
  */
 
-import { BreadcrumbDemo, breadcrumbBaseConfig, breadcrumbAtoms } from '@/components/nova-ui/blocks/breadcrumb';
+import { BreadcrumbDemo } from '@/components/nova-ui/blocks/breadcrumb';
 import type { ComponentRegistryEntry } from '../types';
 
 export const breadcrumbEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const breadcrumbEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeBreadcrumb',
   category: 'blocks',
   component: BreadcrumbDemo,
-  baseConfig: breadcrumbBaseConfig,
-  atoms: breadcrumbAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'items',

@@ -2,8 +2,19 @@
 
 /**
  * DataTable Block
- * 数据表格组件
- * 依赖: @tanstack/react-table
+ *
+ * 数据表格组件，基于 @tanstack/react-table
+ *
+ * Architecture Notes:
+ * - Block 组件，依赖: button, checkbox, input, dropdown-menu, table
+ * - 不支持用户可配特效（通过内部 Atoms 获得）
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
@@ -20,10 +31,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
-import { tv, type VariantProps } from 'tailwind-variants';
-
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/lib/themes/use-theme';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import { Button } from '@/components/nova-ui/atmos/button';
 import { Checkbox } from '@/components/nova-ui/atmos/checkbox';
@@ -45,10 +55,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/nova-ui/blocks/table';
-import { dataTableBaseConfig } from './data-table.config';
 
 // ============================================================================
-// 依赖声明
+// 依赖声明（用于导出时收集）
 // ============================================================================
 
 export const dataTableAtoms = [
@@ -59,23 +68,41 @@ export const dataTableAtoms = [
   'table',
 ] as const;
 
-export { dataTableBaseConfig };
-
 // ============================================================================
-// Styles
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-const dataTable = tv(dataTableBaseConfig);
+const dataTableBase = tv({
+  slots: {
+    root: 'w-full',
+    header: 'flex items-center py-4 justify-between gap-2',
+    filterInput: 'max-w-sm',
+    columnToggle: 'ml-auto',
+    tableContainer: 'rounded-md border',
+    footer: 'flex items-center justify-end space-x-2 py-4',
+    paginationInfo: 'flex-1 text-sm',
+    paginationButtons: 'space-x-2',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type DataTableVariants = VariantProps<typeof dataTable>;
-export type DataTableSlots = keyof typeof dataTableBaseConfig.slots;
+export type DataTableSlots = keyof ReturnType<typeof dataTableBase>;
 export type DataTableClassNames = Partial<Record<DataTableSlots, string>>;
 
-export interface DataTableProps<TData, TValue> extends DataTableVariants {
+export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   classNames?: DataTableClassNames;
@@ -246,14 +273,29 @@ function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DataTable;
-  const styles = dataTable({});
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+  // L1: 功能层（静态）
+  const base = dataTableBase();
+
+  // L2: 主题层（用 useMemo 缓存）
+  const themeStyles = React.useMemo(
+    () => ({
+      root: toClassString(themeConfig?.slots?.root),
+      header: toClassString(themeConfig?.slots?.header),
+      filterInput: toClassString(themeConfig?.slots?.filterInput),
+      columnToggle: toClassString(themeConfig?.slots?.columnToggle),
+      tableContainer: toClassString(themeConfig?.slots?.tableContainer),
+      footer: toClassString(themeConfig?.slots?.footer),
+      paginationInfo: toClassString(themeConfig?.slots?.paginationInfo),
+      paginationButtons: toClassString(themeConfig?.slots?.paginationButtons),
+    }),
+    [themeConfig]
   );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+
+  // Table state
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -285,19 +327,22 @@ function DataTable<TData, TValue>({
     : `${selectedCount} of ${totalCount} row(s) selected.`;
 
   return (
-    <div className={cn(styles.root(), themeConfig?.slots?.root, classNames?.root, className)}>
-      <div className={cn(styles.header(), themeConfig?.slots?.header, classNames?.header)}>
+    <div className={twMerge(base.root(), themeStyles.root, classNames?.root, className)}>
+      <div className={twMerge(base.header(), themeStyles.header, classNames?.header)}>
         <Input
           placeholder={translations?.filterPlaceholder || 'Filter emails...'}
           value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             table.getColumn('email')?.setFilterValue(event.target.value)
           }
-          className={cn(styles.filterInput(), themeConfig?.slots?.filterInput, classNames?.filterInput)}
+          className={twMerge(base.filterInput(), themeStyles.filterInput, classNames?.filterInput)}
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className={cn(styles.columnToggle(), themeConfig?.slots?.columnToggle, classNames?.columnToggle)}>
+            <Button
+              variant="outline"
+              className={twMerge(base.columnToggle(), themeStyles.columnToggle, classNames?.columnToggle)}
+            >
               {translations?.columnsLabel || 'Columns'} <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -311,9 +356,7 @@ function DataTable<TData, TValue>({
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -322,7 +365,7 @@ function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className={cn(styles.tableContainer(), themeConfig?.slots?.tableContainer, classNames?.tableContainer)}>
+      <div className={twMerge(base.tableContainer(), themeStyles.tableContainer, classNames?.tableContainer)}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -372,11 +415,11 @@ function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className={cn(styles.footer(), themeConfig?.slots?.footer, classNames?.footer)}>
-        <div className={cn(styles.paginationInfo(), themeConfig?.slots?.paginationInfo, classNames?.paginationInfo)}>
+      <div className={twMerge(base.footer(), themeStyles.footer, classNames?.footer)}>
+        <div className={twMerge(base.paginationInfo(), themeStyles.paginationInfo, classNames?.paginationInfo)}>
           {rowsSelectedText}
         </div>
-        <div className={cn(styles.paginationButtons(), themeConfig?.slots?.paginationButtons, classNames?.paginationButtons)}>
+        <div className={twMerge(base.paginationButtons(), themeStyles.paginationButtons, classNames?.paginationButtons)}>
           <Button
             variant="outline"
             size="sm"
@@ -410,22 +453,21 @@ function DataTableDemo() {
   const localizedColumns = React.useMemo(() => createColumns(t), [t]);
 
   // Prepare translations for DataTable UI
-  const translations = React.useMemo(() => ({
-    filterPlaceholder: t('dataTableFilterEmails', 'Filter emails...'),
-    columnsLabel: t('dataTableColumns', 'Columns'),
-    noResults: t('dataTableNoResults', 'No results.'),
-    previous: t('dataTablePrevious', 'Previous'),
-    next: t('dataTableNext', 'Next'),
-    rowsSelectedTemplate: t('dataTableRowsSelected', '{selected} of {total} row(s) selected.'),
-  }), [t]);
+  const translations = React.useMemo(
+    () => ({
+      filterPlaceholder: t('dataTableFilterEmails', 'Filter emails...'),
+      columnsLabel: t('dataTableColumns', 'Columns'),
+      noResults: t('dataTableNoResults', 'No results.'),
+      previous: t('dataTablePrevious', 'Previous'),
+      next: t('dataTableNext', 'Next'),
+      rowsSelectedTemplate: t('dataTableRowsSelected', '{selected} of {total} row(s) selected.'),
+    }),
+    [t]
+  );
 
   return (
     <div className="w-full p-4">
-      <DataTable
-        columns={localizedColumns}
-        data={demoData}
-        translations={translations}
-      />
+      <DataTable columns={localizedColumns} data={demoData} translations={translations} />
     </div>
   );
 }

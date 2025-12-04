@@ -2,7 +2,7 @@
  * Combobox Component Entry
  */
 
-import { ComboboxDemo, comboboxBaseConfig, comboboxAtoms } from '@/components/nova-ui/blocks/combobox';
+import { ComboboxDemo, comboboxAtoms } from '@/components/nova-ui/blocks/combobox';
 import type { ComponentRegistryEntry } from '../types';
 
 export const comboboxEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const comboboxEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeCombobox',
   category: 'blocks',
   component: ComboboxDemo,
-  baseConfig: comboboxBaseConfig,
+  baseConfig: null,
   atoms: comboboxAtoms,
   props: [
     {

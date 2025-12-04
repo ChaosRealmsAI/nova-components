@@ -2,7 +2,7 @@
  * Alert Component Entry
  */
 
-import { AlertDemo, alertBaseConfig, alertAtoms } from '@/components/nova-ui/blocks/alert';
+import { AlertDemo } from '@/components/nova-ui/blocks/alert';
 import type { ComponentRegistryEntry } from '../types';
 
 export const alertEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const alertEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeAlert',
   category: 'blocks',
   component: AlertDemo,
-  baseConfig: alertBaseConfig,
-  atoms: alertAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

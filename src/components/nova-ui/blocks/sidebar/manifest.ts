@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'sidebar.config.ts',
   },
 
   themeConfigs: [

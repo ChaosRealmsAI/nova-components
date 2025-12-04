@@ -9,36 +9,82 @@
  * - Block 组件，依赖 Atoms: button
  * - 不支持用户可配特效（通过内部 Atoms 获得）
  * - 支持 attached 模式（按钮连接在一起）和 gap 模式
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes/use-theme';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import { Button } from '@/components/nova-ui/atmos/button';
-import { buttonGroupBaseConfig } from './button-group.config';
 
 // ============================================================================
-// 依赖声明（用于导出时收集）
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-export const buttonGroupAtoms = ['button'] as const;
-
-export { buttonGroupBaseConfig };
+const buttonGroupBase = tv({
+  slots: {
+    root: 'inline-flex items-center',
+  },
+  variants: {
+    variant: {
+      default: {
+        root: '',
+      },
+      outline: {
+        root: '',
+      },
+    },
+    size: {
+      default: {
+        root: '',
+      },
+      sm: {
+        root: '',
+      },
+      lg: {
+        root: '',
+      },
+    },
+    attached: {
+      true: {
+        root: '[&>button]:rounded-none [&>button:first-child]:rounded-l-md [&>button:last-child]:rounded-r-md [&>button:not(:first-child)]:-ml-px',
+      },
+      false: {
+        root: 'gap-2',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+    attached: true,
+  },
+});
 
 // ============================================================================
-// Styles
+// Utils
 // ============================================================================
 
-const buttonGroup = tv(buttonGroupBaseConfig);
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type ButtonGroupVariants = VariantProps<typeof buttonGroup>;
-export type ButtonGroupSlots = keyof typeof buttonGroupBaseConfig.slots;
+export type ButtonGroupVariants = VariantProps<typeof buttonGroupBase>;
+export type ButtonGroupSlots = keyof typeof buttonGroupBase.slots;
 export type ButtonGroupClassNames = Partial<Record<ButtonGroupSlots, string>>;
 
 export interface ButtonGroupProps
@@ -73,15 +119,27 @@ function ButtonGroup({
 }: ButtonGroupProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.ButtonGroup;
-  const styles = buttonGroup({ variant, size, attached });
+  
+  // L1
+  const styles = buttonGroupBase({ variant, size, attached });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.root);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.root);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <div
       role="group"
       data-slot="button-group"
-      className={cn(
-        classNames?.root || styles.root(),
-        themeConfig?.slots?.root,
+      className={twMerge(
+        styles.root(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.root,
         className
       )}
       {...props}

@@ -2,7 +2,7 @@
  * Toggle Component Entry
  */
 
-import { Toggle, toggleBaseConfig } from '@/components/nova-ui/atmos/toggle';
+import { Toggle } from '@/components/nova-ui/atmos/toggle';
 import type { ComponentRegistryEntry } from '../types';
 
 export const toggleEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const toggleEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeToggle',
   category: 'atoms',
   component: Toggle,
-  baseConfig: toggleBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'pressed',

@@ -51,53 +51,60 @@ import { CollapsibleDemo } from '@/components/nova-ui/atmos/collapsible';
 // Blocks 组件导入
 // ============================================================================
 
-import { AlertDialogDemo, alertDialogBaseConfig } from '@/components/nova-ui/blocks/alert-dialog';
-import { TabsDemo, tabsBaseConfig } from '@/components/nova-ui/blocks/tabs';
-import { DropdownMenuDemo, dropdownMenuBaseConfig } from '@/components/nova-ui/blocks/dropdown-menu';
-import { PaginationDemo, paginationBaseConfig } from '@/components/nova-ui/blocks/pagination';
-import { SelectDemo, selectBaseConfig } from '@/components/nova-ui/blocks/select';
-import { FormDemo, formBaseConfig } from '@/components/nova-ui/blocks/form';
-import { ButtonGroupDemo, buttonGroupBaseConfig } from '@/components/nova-ui/blocks/button-group';
-import { AlertDemo, alertBaseConfig } from '@/components/nova-ui/blocks/alert';
-import { ToggleGroupDemo, toggleGroupBaseConfig } from '@/components/nova-ui/blocks/toggle-group';
-import { BreadcrumbDemo, breadcrumbBaseConfig } from '@/components/nova-ui/blocks/breadcrumb';
-import { InputGroupDemo, inputGroupBaseConfig } from '@/components/nova-ui/blocks/input-group';
-import { DrawerDemo, drawerBaseConfig } from '@/components/nova-ui/blocks/drawer';
-import { SheetDemo, sheetBaseConfig } from '@/components/nova-ui/blocks/sheet';
-import { HoverCardDemo, hoverCardBaseConfig } from '@/components/nova-ui/blocks/hover-card';
-import { ContextMenuDemo, contextMenuBaseConfig } from '@/components/nova-ui/blocks/context-menu';
-import { DataTableDemo, dataTableBaseConfig } from '@/components/nova-ui/blocks/data-table';
-import { InputOTPDemo, inputOtpBaseConfig } from '@/components/nova-ui/blocks/input-otp';
-import { CalendarDemo, calendarBaseConfig } from '@/components/nova-ui/blocks/calendar';
-import { CarouselDemo, carouselBaseConfig } from '@/components/nova-ui/blocks/carousel';
-import { DatePickerDemo, datePickerBaseConfig } from '@/components/nova-ui/blocks/date-picker';
-import { ComboboxDemo, comboboxBaseConfig } from '@/components/nova-ui/blocks/combobox';
-import { NavigationMenuDemo, navigationMenuBaseConfig } from '@/components/nova-ui/blocks/navigation-menu';
-import { ResizableDemo, resizableBaseConfig } from '@/components/nova-ui/blocks/resizable';
-import { SonnerDemo, sonnerBaseConfig } from '@/components/nova-ui/blocks/sonner';
-import { AccordionDemo, accordionBaseConfig } from '@/components/nova-ui/blocks/accordion';
-import { DialogDemo, dialogBaseConfig } from '@/components/nova-ui/blocks/dialog';
-import { SidebarDemo, sidebarBaseConfig } from '@/components/nova-ui/blocks/sidebar';
+import { AlertDialogDemo } from '@/components/nova-ui/blocks/alert-dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent, type TabsProps, type TabItem } from '@/components/nova-ui/blocks/tabs';
+import { DropdownMenuDemo } from '@/components/nova-ui/blocks/dropdown-menu';
+import { PaginationDemo } from '@/components/nova-ui/blocks/pagination';
+import { SelectDemo } from '@/components/nova-ui/blocks/select';
+import { FormDemo } from '@/components/nova-ui/blocks/form';
+import { ButtonGroupDemo } from '@/components/nova-ui/blocks/button-group';
+import { AlertDemo } from '@/components/nova-ui/blocks/alert';
+import { ToggleGroupDemo } from '@/components/nova-ui/blocks/toggle-group';
+import { BreadcrumbDemo } from '@/components/nova-ui/blocks/breadcrumb';
+import { InputGroupDemo } from '@/components/nova-ui/blocks/input-group';
+import { DrawerDemo } from '@/components/nova-ui/blocks/drawer';
+import { SheetDemo } from '@/components/nova-ui/blocks/sheet';
+import { HoverCardDemo } from '@/components/nova-ui/blocks/hover-card';
+import { ContextMenuDemo } from '@/components/nova-ui/blocks/context-menu';
+import { DataTableDemo } from '@/components/nova-ui/blocks/data-table';
+import { InputOTPDemo } from '@/components/nova-ui/blocks/input-otp';
+import { CalendarDemo } from '@/components/nova-ui/blocks/calendar';
+import { CarouselDemo } from '@/components/nova-ui/blocks/carousel';
+import { DatePickerDemo } from '@/components/nova-ui/blocks/date-picker';
+import { ComboboxDemo } from '@/components/nova-ui/blocks/combobox';
+import { NavigationMenuDemo } from '@/components/nova-ui/blocks/navigation-menu';
+import { ResizableDemo } from '@/components/nova-ui/blocks/resizable';
+import { SonnerDemo } from '@/components/nova-ui/blocks/sonner';
+import { AccordionDemo } from '@/components/nova-ui/blocks/accordion';
+import { DialogDemo } from '@/components/nova-ui/blocks/dialog';
+import { SidebarDemo } from '@/components/nova-ui/blocks/sidebar';
+import { TableDemo } from '@/components/nova-ui/blocks/table';
+import { CommandDemo } from '@/components/nova-ui/blocks/command';
+import { MenubarDemo } from '@/components/nova-ui/blocks/menubar';
 
 // ============================================================================
 // Demo 组件（画布渲染用）
 // ============================================================================
 
-/** Card 演示组件 */
-const CardDemo = (props: ComponentProps<typeof Card>) => (
-  <Card {...props}>
-    <CardHeader>
-      <CardTitle>Card Title</CardTitle>
-      <CardDescription>Card description goes here.</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <p className="text-sm">Card content area.</p>
-    </CardContent>
-    <CardFooter>
-      <p className="text-xs text-muted-foreground">Footer</p>
-    </CardFooter>
-  </Card>
-);
+/** Card 演示组件（使用 i18n） */
+const CardDemo = (props: ComponentProps<typeof Card>) => {
+  const { t } = useI18n();
+
+  return (
+    <Card {...props}>
+      <CardHeader>
+        <CardTitle>{t('cardTitle' as MessageKey, 'Card Title')}</CardTitle>
+        <CardDescription>{t('cardDescription' as MessageKey, 'Card description goes here.')}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm">{t('cardContentArea' as MessageKey, 'Card content area.')}</p>
+      </CardContent>
+      <CardFooter>
+        <p className="text-xs text-muted-foreground">{t('cardFooter' as MessageKey, 'Footer')}</p>
+      </CardFooter>
+    </Card>
+  );
+};
 
 /** ScrollArea 演示组件（使用 i18n） */
 const ScrollAreaDemo = (props: ComponentProps<typeof ScrollArea>) => {
@@ -185,6 +192,57 @@ const PopoverDemo = ({ content, ...props }: PopoverDemoProps) => {
   );
 };
 
+/** Tabs 演示组件（使用 i18n） */
+interface TabsDemoProps extends TabsProps {
+  items?: TabItem[];
+}
+
+const TabsDemo = ({ variant = 'default', items: propItems, ...props }: TabsDemoProps) => {
+  const { t } = useI18n();
+
+  // 使用 i18n 构建本地化演示数据
+  const items: TabItem[] = propItems || [
+    {
+      value: 'tab1',
+      label: t('tabsTab1Label' as MessageKey),
+      content: t('tabsTab1Content' as MessageKey),
+    },
+    {
+      value: 'tab2',
+      label: t('tabsTab2Label' as MessageKey),
+      content: t('tabsTab2Content' as MessageKey),
+    },
+    {
+      value: 'tab3',
+      label: t('tabsTab3Label' as MessageKey),
+      content: t('tabsTab3Content' as MessageKey),
+    },
+  ];
+
+  return (
+    <div className="flex items-center justify-center w-full h-full p-4">
+      <Tabs defaultValue={items[0]?.value} variant={variant} className="w-full max-w-md" {...props}>
+        <TabsList>
+          {items.map((item) => (
+            <TabsTrigger
+              key={item.value}
+              value={item.value}
+              disabled={item.disabled}
+            >
+              {item.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {items.map((item) => (
+          <TabsContent key={item.value} value={item.value} className="p-4">
+            <p className="text-sm text-muted-foreground">{item.content}</p>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+};
+
 // ============================================================================
 // 组件映射
 // ============================================================================
@@ -227,31 +285,34 @@ export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   'collapsible': { component: CollapsibleDemo, baseConfig: null },
 
   // Blocks
-  'alert-dialog': { component: AlertDialogDemo, baseConfig: alertDialogBaseConfig },
-  'tabs': { component: TabsDemo, baseConfig: tabsBaseConfig },
-  'dropdown-menu': { component: DropdownMenuDemo, baseConfig: dropdownMenuBaseConfig },
-  'pagination': { component: PaginationDemo, baseConfig: paginationBaseConfig },
-  'select': { component: SelectDemo, baseConfig: selectBaseConfig },
-  'form': { component: FormDemo, baseConfig: formBaseConfig },
-  'button-group': { component: ButtonGroupDemo, baseConfig: buttonGroupBaseConfig },
-  'alert': { component: AlertDemo, baseConfig: alertBaseConfig },
-  'toggle-group': { component: ToggleGroupDemo, baseConfig: toggleGroupBaseConfig },
-  'breadcrumb': { component: BreadcrumbDemo, baseConfig: breadcrumbBaseConfig },
-  'input-group': { component: InputGroupDemo, baseConfig: inputGroupBaseConfig },
-  'drawer': { component: DrawerDemo, baseConfig: drawerBaseConfig },
-  'sheet': { component: SheetDemo, baseConfig: sheetBaseConfig },
-  'hover-card': { component: HoverCardDemo, baseConfig: hoverCardBaseConfig },
-  'context-menu': { component: ContextMenuDemo, baseConfig: contextMenuBaseConfig },
-  'data-table': { component: DataTableDemo, baseConfig: dataTableBaseConfig },
-  'input-otp': { component: InputOTPDemo, baseConfig: inputOtpBaseConfig },
-  'calendar': { component: CalendarDemo, baseConfig: calendarBaseConfig },
-  'carousel': { component: CarouselDemo, baseConfig: carouselBaseConfig },
-  'date-picker': { component: DatePickerDemo, baseConfig: datePickerBaseConfig },
-  'combobox': { component: ComboboxDemo, baseConfig: comboboxBaseConfig },
-  'navigation-menu': { component: NavigationMenuDemo, baseConfig: navigationMenuBaseConfig },
-  'resizable': { component: ResizableDemo, baseConfig: resizableBaseConfig },
-  'sonner': { component: SonnerDemo, baseConfig: sonnerBaseConfig },
-  'accordion': { component: AccordionDemo, baseConfig: accordionBaseConfig },
-  'dialog': { component: DialogDemo, baseConfig: dialogBaseConfig },
-  'sidebar': { component: SidebarDemo, baseConfig: sidebarBaseConfig },
+  'alert-dialog': { component: AlertDialogDemo, baseConfig: null },
+  'tabs': { component: TabsDemo, baseConfig: null },
+  'dropdown-menu': { component: DropdownMenuDemo, baseConfig: null },
+  'pagination': { component: PaginationDemo, baseConfig: null },
+  'select': { component: SelectDemo, baseConfig: null },
+  'form': { component: FormDemo, baseConfig: null },
+  'button-group': { component: ButtonGroupDemo, baseConfig: null },
+  'alert': { component: AlertDemo, baseConfig: null },
+  'toggle-group': { component: ToggleGroupDemo, baseConfig: null },
+  'breadcrumb': { component: BreadcrumbDemo, baseConfig: null },
+  'input-group': { component: InputGroupDemo, baseConfig: null },
+  'drawer': { component: DrawerDemo, baseConfig: null },
+  'sheet': { component: SheetDemo, baseConfig: null },
+  'hover-card': { component: HoverCardDemo, baseConfig: null },
+  'context-menu': { component: ContextMenuDemo, baseConfig: null },
+  'data-table': { component: DataTableDemo, baseConfig: null },
+  'input-otp': { component: InputOTPDemo, baseConfig: null },
+  'calendar': { component: CalendarDemo, baseConfig: null },
+  'carousel': { component: CarouselDemo, baseConfig: null },
+  'date-picker': { component: DatePickerDemo, baseConfig: null },
+  'combobox': { component: ComboboxDemo, baseConfig: null },
+  'navigation-menu': { component: NavigationMenuDemo, baseConfig: null },
+  'resizable': { component: ResizableDemo, baseConfig: null },
+  'sonner': { component: SonnerDemo, baseConfig: null },
+  'accordion': { component: AccordionDemo, baseConfig: null },
+  'dialog': { component: DialogDemo, baseConfig: null },
+  'sidebar': { component: SidebarDemo, baseConfig: null },
+  'table': { component: TableDemo, baseConfig: null },
+  'menubar': { component: MenubarDemo, baseConfig: null },
+  'command': { component: CommandDemo, baseConfig: null },
 };

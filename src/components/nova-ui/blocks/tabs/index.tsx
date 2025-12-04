@@ -9,14 +9,20 @@
  * - Block 组件，依赖 Atoms: button（TabsTrigger 在样式上类似 Button）
  * - 不支持用户可配特效（通过内部 Atoms 获得）
  * - 提供 default 和 underline 两种样式变体
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/lib/themes/use-theme';
-import { tabsBaseConfig } from './tabs.config';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
 
 // ============================================================================
 // 依赖声明（用于导出时收集）
@@ -24,20 +30,63 @@ import { tabsBaseConfig } from './tabs.config';
 
 export const tabsAtoms = ['button'] as const;
 
-export { tabsBaseConfig };
-
 // ============================================================================
-// Styles
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-const tabs = tv(tabsBaseConfig);
+const tabsBase = tv({
+  slots: {
+    root: 'flex flex-col',
+    list: 'inline-flex items-center justify-center',
+    trigger: 'inline-flex items-center justify-center whitespace-nowrap disabled:pointer-events-none disabled:opacity-50',
+    content: 'outline-none',
+  },
+  variants: {
+    variant: {
+      default: {
+        trigger: 'transition-all',
+      },
+      underline: {
+        list: 'w-full justify-start rounded-none bg-transparent p-0',
+        trigger: 'rounded-none bg-transparent shadow-none transition-none data-[state=active]:bg-transparent data-[state=active]:shadow-none',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// Context
+// ============================================================================
+
+interface TabsContextValue {
+  variant: TabsVariants['variant'];
+}
+
+const TabsContext = React.createContext<TabsContextValue>({
+  variant: 'default',
+});
+
+const useTabsContext = () => React.useContext(TabsContext);
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type TabsVariants = VariantProps<typeof tabs>;
-export type TabsSlots = keyof typeof tabsBaseConfig.slots;
+export type TabsVariants = VariantProps<typeof tabsBase>;
+export type TabsSlots = keyof typeof tabsBase.slots;
 export type TabsClassNames = Partial<Record<TabsSlots, string>>;
 
 export interface TabsProps
@@ -87,19 +136,36 @@ function Tabs({
   ...props
 }: TabsProps) {
   const { currentTheme } = useTheme();
-  const tabsThemeConfig = currentTheme?.components?.Tabs;
-  const styles = tabs({ variant });
+  const themeConfig = currentTheme?.components?.Tabs;
+  
+  // L1: 功能层
+  const base = tabsBase({ variant });
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.root);
+    // @ts-ignore - Theme config types might be loose
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.root);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
+
+  // L3: 实例层 (className, classNames)
 
   return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      className={cn(
-        classNames?.root || styles.root(),
-        tabsThemeConfig?.slots?.root,
-        className
-      )}
-      {...props}
-    />
+    <TabsContext.Provider value={{ variant }}>
+      <TabsPrimitive.Root
+        data-slot="tabs"
+        data-variant={variant}
+        className={twMerge(
+          base.root(),
+          themeStyles.slot,
+          themeStyles.variant,
+          classNames?.root,
+          className
+        )}
+        {...props}
+      />
+    </TabsContext.Provider>
   );
 }
 
@@ -110,19 +176,33 @@ function Tabs({
 function TabsList({
   className,
   classNames,
-  variant = 'default',
+  variant: propVariant,
   ...props
 }: TabsListProps) {
+  const context = useTabsContext();
+  const variant = propVariant || context.variant || 'default';
   const { currentTheme } = useTheme();
-  const tabsThemeConfig = currentTheme?.components?.Tabs;
-  const styles = tabs({ variant });
+  const themeConfig = currentTheme?.components?.Tabs;
+  
+  // L1
+  const base = tabsBase({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.list);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.list);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
-      className={cn(
-        classNames?.list || styles.list(),
-        tabsThemeConfig?.slots?.list,
+      className={twMerge(
+        base.list(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.list,
         className
       )}
       {...props}
@@ -137,19 +217,33 @@ function TabsList({
 function TabsTrigger({
   className,
   classNames,
-  variant = 'default',
+  variant: propVariant,
   ...props
 }: TabsTriggerProps) {
+  const context = useTabsContext();
+  const variant = propVariant || context.variant || 'default';
   const { currentTheme } = useTheme();
-  const tabsThemeConfig = currentTheme?.components?.Tabs;
-  const styles = tabs({ variant });
+  const themeConfig = currentTheme?.components?.Tabs;
+  
+  // L1
+  const base = tabsBase({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.trigger);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.trigger);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
-      className={cn(
-        classNames?.trigger || styles.trigger(),
-        tabsThemeConfig?.slots?.trigger,
+      className={twMerge(
+        base.trigger(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.trigger,
         className
       )}
       {...props}
@@ -166,16 +260,29 @@ function TabsContent({
   classNames,
   ...props
 }: TabsContentProps) {
+  const { variant } = useTabsContext();
   const { currentTheme } = useTheme();
-  const tabsThemeConfig = currentTheme?.components?.Tabs;
-  const styles = tabs({ variant: 'default' });
+  const themeConfig = currentTheme?.components?.Tabs;
+  
+  // L1
+  const base = tabsBase({ variant });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.content);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.content);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn(
-        classNames?.content || styles.content(),
-        tabsThemeConfig?.slots?.content,
+      className={twMerge(
+        base.content(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.content,
         className
       )}
       {...props}
@@ -212,12 +319,11 @@ function TabsDemo({
   return (
     <div className="flex items-center justify-center w-full h-full p-4">
       <Tabs defaultValue={items[0]?.value} variant={variant} className="w-full max-w-md">
-        <TabsList variant={variant}>
+        <TabsList>
           {items.map((item) => (
             <TabsTrigger
               key={item.value}
               value={item.value}
-              variant={variant}
               disabled={item.disabled}
             >
               {item.label}

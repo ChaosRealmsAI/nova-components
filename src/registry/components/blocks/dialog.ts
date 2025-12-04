@@ -2,7 +2,7 @@
  * Dialog Component Entry
  */
 
-import { DialogDemo, dialogBaseConfig, dialogAtoms } from '@/components/nova-ui/blocks/dialog';
+import { DialogDemo, dialogAtoms } from '@/components/nova-ui/blocks/dialog';
 import type { ComponentRegistryEntry } from '../types';
 
 export const dialogEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const dialogEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeDialog',
   category: 'blocks',
   component: DialogDemo,
-  baseConfig: dialogBaseConfig,
+  baseConfig: null,
   atoms: dialogAtoms,
   props: [
     {

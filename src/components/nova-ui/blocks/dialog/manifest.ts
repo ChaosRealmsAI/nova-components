@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'dialog.config.ts',
   },
 
   themeConfigs: [

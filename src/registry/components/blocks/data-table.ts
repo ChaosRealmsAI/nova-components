@@ -2,7 +2,7 @@
  * DataTable Component Entry
  */
 
-import { DataTableDemo, dataTableBaseConfig, dataTableAtoms } from '@/components/nova-ui/blocks/data-table';
+import { DataTableDemo, dataTableAtoms } from '@/components/nova-ui/blocks/data-table';
 import type { ComponentRegistryEntry } from '../types';
 
 export const dataTableEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const dataTableEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeDataTable',
   category: 'blocks',
   component: DataTableDemo,
-  baseConfig: dataTableBaseConfig,
+  baseConfig: null,
   atoms: dataTableAtoms,
   props: [],
   defaultProps: {},

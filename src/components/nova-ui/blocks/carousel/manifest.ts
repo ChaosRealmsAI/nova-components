@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'carousel.config.ts',
   },
 
   themeConfigs: [
@@ -62,7 +61,7 @@ export const manifest: ComponentManifest = {
       'CarouselPrevious',
       'CarouselNext',
     ],
-    extraImports: `import { Card, CardContent } from "@/components/ui/card"`,
+    extraImports: '',
   },
 
   canvas: {

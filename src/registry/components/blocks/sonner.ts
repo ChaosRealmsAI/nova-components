@@ -2,7 +2,7 @@
  * Sonner Component Entry
  */
 
-import { SonnerDemo, sonnerBaseConfig, sonnerAtoms } from '@/components/nova-ui/blocks/sonner';
+import { SonnerDemo, sonnerAtoms } from '@/components/nova-ui/blocks/sonner';
 import type { ComponentRegistryEntry } from '../types';
 
 export const sonnerEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const sonnerEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSonner',
   category: 'blocks',
   component: SonnerDemo,
-  baseConfig: sonnerBaseConfig,
+  baseConfig: null,
   atoms: sonnerAtoms,
   props: [],
   defaultProps: {},

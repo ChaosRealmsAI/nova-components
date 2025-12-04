@@ -2,7 +2,7 @@
  * Pagination Component Entry
  */
 
-import { PaginationDemo, paginationBaseConfig, paginationAtoms } from '@/components/nova-ui/blocks/pagination';
+import { PaginationDemo, paginationAtoms } from '@/components/nova-ui/blocks/pagination';
 import type { ComponentRegistryEntry } from '../types';
 
 export const paginationEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const paginationEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypePagination',
   category: 'blocks',
   component: PaginationDemo,
-  baseConfig: paginationBaseConfig,
+  baseConfig: null,
   atoms: paginationAtoms,
   props: [
     {

@@ -2,7 +2,7 @@
  * DatePicker Component Entry
  */
 
-import { DatePickerDemo, datePickerBaseConfig, datePickerAtoms } from '@/components/nova-ui/blocks/date-picker';
+import { DatePickerDemo, datePickerAtoms, datePickerBlocks } from '@/components/nova-ui/blocks/date-picker';
 import type { ComponentRegistryEntry } from '../types';
 
 export const datePickerEntry: ComponentRegistryEntry = {
@@ -11,8 +11,9 @@ export const datePickerEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeDatePicker',
   category: 'blocks',
   component: DatePickerDemo,
-  baseConfig: datePickerBaseConfig,
+  baseConfig: null,
   atoms: datePickerAtoms,
+  blocks: datePickerBlocks,
   props: [
     {
       name: 'placeholder',
@@ -22,8 +23,6 @@ export const datePickerEntry: ComponentRegistryEntry = {
       defaultValue: 'Pick a date',
     },
   ],
-  defaultProps: {
-    placeholder: 'Pick a date',
-  },
+  defaultProps: {},
   availableEffects: [],
 };

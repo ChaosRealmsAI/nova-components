@@ -10,14 +10,21 @@
  * - Block 组件，依赖 Atoms: button, dialog
  * - 不支持用户可配特效（通过内部 Atoms 获得）
  * - 提供 bottom, top, left, right 四种方向变体
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { tv, type VariantProps } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { Button } from '@/components/nova-ui/atmos/button';
 import { useTheme } from '@/lib/themes/use-theme';
-import { drawerBaseConfig } from './drawer.config';
 
 // ============================================================================
 // 依赖声明（用于导出时收集）
@@ -25,15 +32,76 @@ import { drawerBaseConfig } from './drawer.config';
 
 export const drawerAtoms = ['button', 'dialog'] as const;
 
-export { drawerBaseConfig };
+// ============================================================================
+// L1: 静态样式定义（功能层）
+// ============================================================================
+
+const drawer = tv({
+  slots: {
+    overlay: 'fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    content: 'group/drawer-content fixed z-50 flex h-auto flex-col',
+    header: 'flex flex-col gap-0.5 p-4 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center group-data-[vaul-drawer-direction=top]/drawer-content:text-center md:gap-1.5 md:text-left',
+    title: 'font-semibold',
+    description: '',
+    footer: 'mt-auto flex flex-col gap-2 p-4',
+    handle: 'mx-auto mt-4 h-2 w-[100px] shrink-0 rounded-full',
+  },
+  variants: {
+    direction: {
+      bottom: {
+        content: 'inset-x-0 bottom-0 mt-24 max-h-[80vh]',
+        handle: 'block',
+      },
+      top: {
+        content: 'inset-x-0 top-0 mb-24 max-h-[80vh]',
+        handle: 'hidden',
+      },
+      left: {
+        content: 'inset-y-0 left-0 w-3/4 sm:max-w-sm',
+        handle: 'hidden',
+      },
+      right: {
+        content: 'inset-y-0 right-0 w-3/4 sm:max-w-sm',
+        handle: 'hidden',
+      },
+    },
+  },
+  defaultVariants: {
+    direction: 'bottom',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// Context
+// ============================================================================
+
+interface DrawerContextValue {
+  direction: DrawerDirection;
+}
+
+const DrawerContext = React.createContext<DrawerContextValue>({
+  direction: 'bottom',
+});
+
+const useDrawerContext = () => React.useContext(DrawerContext);
 
 // ============================================================================
 // Types
 // ============================================================================
 
 export type DrawerDirection = 'top' | 'bottom' | 'left' | 'right';
-export type DrawerVariants = VariantProps<ReturnType<typeof tv>>;
-export type DrawerSlots = keyof typeof drawerBaseConfig.slots;
+export type DrawerVariants = VariantProps<typeof drawer>;
+export type DrawerSlots = keyof typeof drawer.slots;
 export type DrawerClassNames = Partial<Record<DrawerSlots, string>>;
 
 export type DrawerRootProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
@@ -60,12 +128,10 @@ export interface DrawerFooterProps extends React.HTMLAttributes<HTMLDivElement> 
 
 export interface DrawerTitleProps
   extends React.ComponentProps<typeof DrawerPrimitive.Title> {
-  direction?: DrawerDirection;
 }
 
 export interface DrawerDescriptionProps
   extends React.ComponentProps<typeof DrawerPrimitive.Description> {
-  direction?: DrawerDirection;
 }
 
 export interface DrawerDemoProps {
@@ -82,11 +148,13 @@ export interface DrawerDemoProps {
 
 function Drawer({ direction = 'bottom', ...props }: DrawerProps) {
   return (
-    <DrawerPrimitive.Root
-      data-slot="drawer"
-      direction={direction}
-      {...props}
-    />
+    <DrawerContext.Provider value={{ direction }}>
+      <DrawerPrimitive.Root
+        data-slot="drawer"
+        direction={direction}
+        {...props}
+      />
+    </DrawerContext.Provider>
   );
 }
 
@@ -126,23 +194,32 @@ function DrawerClose({
 
 function DrawerOverlay({
   className,
-  direction = 'bottom',
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Overlay> & { direction?: DrawerDirection }) {
+}: React.ComponentProps<typeof DrawerPrimitive.Overlay>) {
+  const { direction } = useDrawerContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Drawer;
+  
+  // L1
+  const styles = drawer({ direction });
 
-  const styles = tv({
-    extend: drawerBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { overlay } = styles({ direction });
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.overlay);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.direction?.[direction]?.overlay);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, direction]);
 
   return (
     <DrawerPrimitive.Overlay
       data-slot="drawer-overlay"
-      className={overlay({ className })}
+      className={twMerge(
+        styles.overlay(),
+        themeStyles.slot,
+        themeStyles.variant,
+        className
+      )}
       {...props}
     />
   );
@@ -154,31 +231,54 @@ function DrawerOverlay({
 
 function DrawerContent({
   className,
-  direction = 'bottom',
   children,
   ...props
 }: DrawerContentProps) {
+  const { direction } = useDrawerContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Drawer;
+  
+  // L1
+  const styles = drawer({ direction });
 
-  const styles = tv({
-    extend: drawerBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { content, handle } = styles({ direction });
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const contentSlot = toClassString(themeConfig?.slots?.content);
+    const handleSlot = toClassString(themeConfig?.slots?.handle);
+    // @ts-ignore
+    const variantContent = toClassString(themeConfig?.variants?.direction?.[direction]?.content);
+    // @ts-ignore
+    const variantHandle = toClassString(themeConfig?.variants?.direction?.[direction]?.handle);
+    
+    return { 
+      content: { slot: contentSlot, variant: variantContent },
+      handle: { slot: handleSlot, variant: variantHandle }
+    };
+  }, [themeConfig, direction]);
 
   return (
     <DrawerPortal>
-      <DrawerOverlay direction={direction} />
+      <DrawerOverlay />
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         data-direction={direction}
-        className={content({ className })}
+        className={twMerge(
+          styles.content(),
+          themeStyles.content.slot,
+          themeStyles.content.variant,
+          className
+        )}
         {...props}
       >
         {direction === 'bottom' && (
-          <div data-slot="drawer-handle" className={handle()} />
+          <div 
+            data-slot="drawer-handle" 
+            className={twMerge(
+              styles.handle(),
+              themeStyles.handle.slot,
+              themeStyles.handle.variant
+            )} 
+          />
         )}
         {children}
       </DrawerPrimitive.Content>
@@ -193,23 +293,33 @@ function DrawerContent({
 function DrawerHeader({
   className,
   classNames,
-  direction = 'bottom',
   ...props
-}: DrawerHeaderProps & { direction?: DrawerDirection }) {
+}: DrawerHeaderProps) {
+  const { direction } = useDrawerContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Drawer;
+  
+  // L1
+  const styles = drawer({ direction });
 
-  const styles = tv({
-    extend: drawerBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { header } = styles({ direction });
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.header);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.direction?.[direction]?.header);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, direction]);
 
   return (
     <div
       data-slot="drawer-header"
-      className={header({ className: classNames?.header || className })}
+      className={twMerge(
+        styles.header(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.header,
+        className
+      )}
       {...props}
     />
   );
@@ -222,23 +332,33 @@ function DrawerHeader({
 function DrawerFooter({
   className,
   classNames,
-  direction = 'bottom',
   ...props
-}: DrawerFooterProps & { direction?: DrawerDirection }) {
+}: DrawerFooterProps) {
+  const { direction } = useDrawerContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Drawer;
+  
+  // L1
+  const styles = drawer({ direction });
 
-  const styles = tv({
-    extend: drawerBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { footer } = styles({ direction });
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.footer);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.direction?.[direction]?.footer);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, direction]);
 
   return (
     <div
       data-slot="drawer-footer"
-      className={footer({ className: classNames?.footer || className })}
+      className={twMerge(
+        styles.footer(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.footer,
+        className
+      )}
       {...props}
     />
   );
@@ -250,23 +370,32 @@ function DrawerFooter({
 
 function DrawerTitle({
   className,
-  direction = 'bottom',
   ...props
 }: DrawerTitleProps) {
+  const { direction } = useDrawerContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Drawer;
+  
+  // L1
+  const styles = drawer({ direction });
 
-  const styles = tv({
-    extend: drawerBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { title } = styles({ direction });
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.title);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.direction?.[direction]?.title);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, direction]);
 
   return (
     <DrawerPrimitive.Title
       data-slot="drawer-title"
-      className={title({ className })}
+      className={twMerge(
+        styles.title(),
+        themeStyles.slot,
+        themeStyles.variant,
+        className
+      )}
       {...props}
     />
   );
@@ -278,23 +407,32 @@ function DrawerTitle({
 
 function DrawerDescription({
   className,
-  direction = 'bottom',
   ...props
 }: DrawerDescriptionProps) {
+  const { direction } = useDrawerContext();
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Drawer;
+  
+  // L1
+  const styles = drawer({ direction });
 
-  const styles = tv({
-    extend: drawerBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { description } = styles({ direction });
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.description);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.direction?.[direction]?.description);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, direction]);
 
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"
-      className={description({ className })}
+      className={twMerge(
+        styles.description(),
+        themeStyles.slot,
+        themeStyles.variant,
+        className
+      )}
       {...props}
     />
   );
@@ -319,14 +457,14 @@ function DrawerDemo({
         <DrawerTrigger asChild>
           <Button variant="outline">{triggerLabel}</Button>
         </DrawerTrigger>
-        <DrawerContent direction={direction}>
-          <DrawerHeader direction={direction}>
-            <DrawerTitle direction={direction}>{title}</DrawerTitle>
-            <DrawerDescription direction={direction}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{title}</DrawerTitle>
+            <DrawerDescription>
               {description}
             </DrawerDescription>
           </DrawerHeader>
-          <DrawerFooter direction={direction}>
+          <DrawerFooter>
             <DrawerClose asChild>
               <Button variant="outline">{closeLabel}</Button>
             </DrawerClose>

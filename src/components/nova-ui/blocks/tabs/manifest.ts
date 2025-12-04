@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'tabs.config.ts',
   },
 
   themeConfigs: [
@@ -30,7 +29,7 @@ export const manifest: ComponentManifest = {
   dependencies: [],
 
   exportOptions: {
-    noChildren: false,
+    noChildren: true,
     customJsx: `<Tabs defaultValue="tab1">
   <TabsList>
     <TabsTrigger value="tab1">Tab 1</TabsTrigger>
@@ -39,6 +38,7 @@ export const manifest: ComponentManifest = {
   <TabsContent value="tab1">Content 1</TabsContent>
   <TabsContent value="tab2">Content 2</TabsContent>
 </Tabs>`,
+    customImports: ['Tabs', 'TabsList', 'TabsTrigger', 'TabsContent'],
   },
 
   canvas: {

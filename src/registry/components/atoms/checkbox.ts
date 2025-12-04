@@ -2,7 +2,7 @@
  * Checkbox Component Entry
  */
 
-import { Checkbox, checkboxBaseConfig } from '@/components/nova-ui/atmos/checkbox';
+import { Checkbox } from '@/components/nova-ui/atmos/checkbox';
 import type { ComponentRegistryEntry } from '../types';
 
 export const checkboxEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const checkboxEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeCheckbox',
   category: 'atoms',
   component: Checkbox,
-  baseConfig: checkboxBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'checked',

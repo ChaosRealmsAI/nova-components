@@ -2,7 +2,7 @@
  * InputGroup Component Entry
  */
 
-import { InputGroupDemo, inputGroupBaseConfig, inputGroupAtoms } from '@/components/nova-ui/blocks/input-group';
+import { InputGroupDemo } from '@/components/nova-ui/blocks/input-group';
 import type { ComponentRegistryEntry } from '../types';
 
 export const inputGroupEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const inputGroupEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeInputGroup',
   category: 'blocks',
   component: InputGroupDemo,
-  baseConfig: inputGroupBaseConfig,
-  atoms: inputGroupAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'variant',

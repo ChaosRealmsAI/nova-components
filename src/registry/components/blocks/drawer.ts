@@ -2,7 +2,7 @@
  * Drawer Component Entry
  */
 
-import { DrawerDemo, drawerBaseConfig, drawerAtoms } from '@/components/nova-ui/blocks/drawer';
+import { DrawerDemo } from '@/components/nova-ui/blocks/drawer';
 import type { ComponentRegistryEntry } from '../types';
 
 export const drawerEntry: ComponentRegistryEntry = {
@@ -11,8 +11,7 @@ export const drawerEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeDrawer',
   category: 'blocks',
   component: DrawerDemo,
-  baseConfig: drawerBaseConfig,
-  atoms: drawerAtoms,
+  baseConfig: null,
   props: [
     {
       name: 'direction',

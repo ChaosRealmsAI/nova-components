@@ -2,7 +2,7 @@
  * Sidebar Component Entry
  */
 
-import { SidebarDemo, sidebarBaseConfig, sidebarAtoms } from '@/components/nova-ui/blocks/sidebar';
+import { SidebarDemo, sidebarAtoms } from '@/components/nova-ui/blocks/sidebar';
 import type { ComponentRegistryEntry } from '../types';
 
 export const sidebarEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const sidebarEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSidebar',
   category: 'blocks',
   component: SidebarDemo,
-  baseConfig: sidebarBaseConfig,
+  baseConfig: null,
   atoms: sidebarAtoms,
   props: [
     {

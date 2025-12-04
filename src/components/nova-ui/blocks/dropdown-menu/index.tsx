@@ -6,44 +6,67 @@
  * 下拉菜单组件，用于显示一组操作选项。
  *
  * Architecture Notes:
- * - Block 组件，依赖 Atoms: popover, button
- * - 不支持用户可配特效（通过内部 Atoms 获得）
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes/use-theme';
-import { dropdownMenuBaseConfig } from './dropdown-menu.config';
 
 // ============================================================================
-// 依赖声明（用于导出时收集）
+// Utils
 // ============================================================================
 
-export const dropdownMenuAtoms = ['popover', 'button'] as const;
-
-export { dropdownMenuBaseConfig };
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
 
 // ============================================================================
-// Styles
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-const dropdownMenu = tv(dropdownMenuBaseConfig);
+const dropdownMenuBase = tv({
+  slots: {
+    content:
+      'z-50 min-w-[8rem] overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+    item:
+      'relative flex cursor-default items-center gap-2 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+    label: '',
+    separator: '-mx-1 my-1 h-px',
+    shortcut: 'ml-auto',
+    checkboxItem:
+      'relative flex cursor-default items-center gap-2 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+    radioItem:
+      'relative flex cursor-default items-center gap-2 outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+    indicator: 'pointer-events-none absolute flex items-center justify-center',
+    subTrigger:
+      'flex cursor-default items-center gap-2 outline-hidden select-none',
+    subContent:
+      'z-50 min-w-[8rem] overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+  },
+});
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type DropdownMenuVariants = VariantProps<typeof dropdownMenu>;
-export type DropdownMenuSlots = keyof typeof dropdownMenuBaseConfig.slots;
+export type DropdownMenuVariants = VariantProps<typeof dropdownMenuBase>;
+export type DropdownMenuSlots = keyof typeof dropdownMenuBase.slots;
 export type DropdownMenuClassNames = Partial<Record<DropdownMenuSlots, string>>;
 
 export interface DropdownMenuContentProps
-  extends React.ComponentProps<typeof DropdownMenuPrimitive.Content>,
-    DropdownMenuVariants {
+  extends React.ComponentProps<typeof DropdownMenuPrimitive.Content> {
   classNames?: DropdownMenuClassNames;
+  variant?: 'default';
 }
 
 export interface DropdownMenuItemProps
@@ -90,7 +113,8 @@ export interface DropdownMenuSubContentProps
   classNames?: DropdownMenuClassNames;
 }
 
-export interface DropdownMenuDemoProps extends DropdownMenuVariants {
+export interface DropdownMenuDemoProps {
+  variant?: 'default';
   triggerLabel?: string;
   accountLabel?: string;
   profileLabel?: string;
@@ -135,16 +159,27 @@ function DropdownMenuContent({
 }: DropdownMenuContentProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.content);
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.content);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
-        className={cn(
-          classNames?.content || styles.content(),
-          themeConfig?.slots?.content,
+        className={twMerge(
+          base.content(),
+          themeStyles.slot,
+          themeStyles.variant,
+          classNames?.content,
           className
         )}
         {...props}
@@ -174,22 +209,32 @@ function DropdownMenuItem({
 }: DropdownMenuItemProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.item);
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.default?.item);
+    const destructiveStyle = variant === 'destructive'
+      ? toClassString(themeConfig?.variants?.variant?.destructive?.item)
+      : '';
+    return { slot: slotStyle, variant: variantStyle, destructive: destructiveStyle };
+  }, [themeConfig, variant]);
 
   return (
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn(
-        classNames?.item || styles.item(),
-        themeConfig?.slots?.item,
+      className={twMerge(
+        base.item(),
+        themeStyles.slot,
+        themeStyles.variant,
+        variant === 'destructive' && themeStyles.destructive,
         inset && 'pl-8',
-        variant === 'destructive' && [
-          'text-destructive focus:bg-destructive/10 focus:text-destructive',
-          'dark:focus:bg-destructive/20',
-          '*:[svg]:!text-destructive',
-        ],
+        classNames?.item,
         className
       )}
       {...props}
@@ -210,20 +255,29 @@ function DropdownMenuCheckboxItem({
 }: DropdownMenuCheckboxItemProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    checkboxItem: toClassString(themeConfig?.slots?.checkboxItem),
+    indicator: toClassString(themeConfig?.slots?.indicator),
+  }), [themeConfig]);
 
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
-      className={cn(
-        classNames?.checkboxItem || styles.checkboxItem(),
-        themeConfig?.slots?.checkboxItem,
+      className={twMerge(
+        base.checkboxItem(),
+        themeStyles.checkboxItem,
+        classNames?.checkboxItem,
         className
       )}
       checked={checked}
       {...props}
     >
-      <span className={cn(styles.indicator(), themeConfig?.slots?.indicator)}>
+      <span className={twMerge(base.indicator(), themeStyles.indicator, classNames?.indicator)}>
         <DropdownMenuPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -253,19 +307,28 @@ function DropdownMenuRadioItem({
 }: DropdownMenuRadioItemProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    radioItem: toClassString(themeConfig?.slots?.radioItem),
+    indicator: toClassString(themeConfig?.slots?.indicator),
+  }), [themeConfig]);
 
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
-      className={cn(
-        classNames?.radioItem || styles.radioItem(),
-        themeConfig?.slots?.radioItem,
+      className={twMerge(
+        base.radioItem(),
+        themeStyles.radioItem,
+        classNames?.radioItem,
         className
       )}
       {...props}
     >
-      <span className={cn(styles.indicator(), themeConfig?.slots?.indicator)}>
+      <span className={twMerge(base.indicator(), themeStyles.indicator, classNames?.indicator)}>
         <DropdownMenuPrimitive.ItemIndicator>
           <CircleIcon className="size-2 fill-current" />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -287,16 +350,24 @@ function DropdownMenuLabel({
 }: DropdownMenuLabelProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    label: toClassString(themeConfig?.slots?.label),
+  }), [themeConfig]);
 
   return (
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn(
-        classNames?.label || styles.label(),
-        themeConfig?.slots?.label,
+      className={twMerge(
+        base.label(),
+        themeStyles.label,
         inset && 'pl-8',
+        classNames?.label,
         className
       )}
       {...props}
@@ -315,14 +386,22 @@ function DropdownMenuSeparator({
 }: DropdownMenuSeparatorProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    separator: toClassString(themeConfig?.slots?.separator),
+  }), [themeConfig]);
 
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn(
-        classNames?.separator || styles.separator(),
-        themeConfig?.slots?.separator,
+      className={twMerge(
+        base.separator(),
+        themeStyles.separator,
+        classNames?.separator,
         className
       )}
       {...props}
@@ -341,14 +420,22 @@ function DropdownMenuShortcut({
 }: DropdownMenuShortcutProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    shortcut: toClassString(themeConfig?.slots?.shortcut),
+  }), [themeConfig]);
 
   return (
     <span
       data-slot="dropdown-menu-shortcut"
-      className={cn(
-        classNames?.shortcut || styles.shortcut(),
-        themeConfig?.slots?.shortcut,
+      className={twMerge(
+        base.shortcut(),
+        themeStyles.shortcut,
+        classNames?.shortcut,
         className
       )}
       {...props}
@@ -377,16 +464,24 @@ function DropdownMenuSubTrigger({
 }: DropdownMenuSubTriggerProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    subTrigger: toClassString(themeConfig?.slots?.subTrigger),
+  }), [themeConfig]);
 
   return (
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
-      className={cn(
-        classNames?.subTrigger || styles.subTrigger(),
-        themeConfig?.slots?.subTrigger,
+      className={twMerge(
+        base.subTrigger(),
+        themeStyles.subTrigger,
         inset && 'pl-8',
+        classNames?.subTrigger,
         className
       )}
       {...props}
@@ -408,14 +503,22 @@ function DropdownMenuSubContent({
 }: DropdownMenuSubContentProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.DropdownMenu;
-  const styles = dropdownMenu({ variant: 'default' });
+
+  // L1
+  const base = dropdownMenuBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => ({
+    subContent: toClassString(themeConfig?.slots?.subContent),
+  }), [themeConfig]);
 
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
-      className={cn(
-        classNames?.subContent || styles.subContent(),
-        themeConfig?.slots?.subContent,
+      className={twMerge(
+        base.subContent(),
+        themeStyles.subContent,
+        classNames?.subContent,
         className
       )}
       {...props}

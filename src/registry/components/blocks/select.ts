@@ -2,7 +2,7 @@
  * Select Component Entry
  */
 
-import { SelectDemo, selectBaseConfig, selectAtoms } from '@/components/nova-ui/blocks/select';
+import { SelectDemo, selectAtoms } from '@/components/nova-ui/blocks/select';
 import type { ComponentRegistryEntry } from '../types';
 
 export const selectEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const selectEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSelect',
   category: 'blocks',
   component: SelectDemo,
-  baseConfig: selectBaseConfig,
+  baseConfig: null,
   atoms: selectAtoms,
   props: [
     {

@@ -2,7 +2,7 @@
  * Tooltip Component Entry
  */
 
-import { TooltipDemo, tooltipBaseConfig } from '@/components/nova-ui/atmos/tooltip';
+import { TooltipDemo } from '@/components/nova-ui/atmos/tooltip';
 import type { ComponentRegistryEntry } from '../types';
 
 export const tooltipEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const tooltipEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeTooltip',
   category: 'atoms',
   component: TooltipDemo,
-  baseConfig: tooltipBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'content',

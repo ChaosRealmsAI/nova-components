@@ -2,56 +2,91 @@
 
 import * as React from 'react';
 import * as TogglePrimitive from '@radix-ui/react-toggle';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { toggleBaseConfig } from './toggle.config';
 
 /**
  * Nova Toggle
  *
  * Architecture Notes:
- * - Uses `@radix-ui/react-toggle` for accessibility.
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `toggleBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
  */
 
-export { toggleBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type ToggleVariants = VariantProps<ReturnType<typeof tv>>;
-export type ToggleSlots = keyof typeof toggleBaseConfig.slots;
-export type ToggleClassNames = Partial<Record<ToggleSlots, string>>;
+export type ToggleClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Static Styles (Functional Layer)
+// ============================================================================
+
+const toggleBase = tv({
+  slots: {
+    base: 'inline-flex items-center justify-center disabled:pointer-events-none focus-visible:outline-none',
+  },
+});
+
+// ============================================================================
+// Component
+// ============================================================================
 
 export interface ToggleProps
-  extends React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root>,
-    ToggleVariants {
+  extends React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> {
   classNames?: ToggleClassNames;
+  variant?: 'default' | 'outline';
+  size?: 'default' | 'sm' | 'lg';
 }
 
 const Toggle = React.forwardRef<
   React.ElementRef<typeof TogglePrimitive.Root>,
   ToggleProps
->(({ className, classNames, variant, size, ...props }, ref) => {
-  // ADR-006: 从主题上下文获取 Toggle 的样式配置
+>(({ className, classNames, variant = 'default', size = 'default', ...props }, ref) => {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Toggle;
 
-  // 合并基础配置和主题配置
-  const styles = tv({
-    extend: toggleBaseConfig,
-    ...(themeConfig || {}),
-  });
+  // L1: Functional Layer
+  const base = toggleBase();
 
-  const baseClass = classNames?.base
-    ? classNames.base
-    : styles({ variant, size }).base();
+  // L2: Theme Layer
+  const themeStyles = React.useMemo(() => {
+    const baseStyle = toClassString(themeConfig?.slots?.base);
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+    const sizeStyle = toClassString(themeConfig?.variants?.size?.[size]?.base);
+
+    return {
+      base: twMerge(baseStyle, variantStyle, sizeStyle),
+    };
+  }, [themeConfig, variant, size]);
+
+  // Merge: L1 + L2 + L3
+  const rootClass = twMerge(
+    base.base(),
+    themeStyles.base,
+    classNames?.base,
+    className
+  );
 
   return (
     <TogglePrimitive.Root
       ref={ref}
-      className={cn(baseClass, className)}
+      className={rootClass}
       {...props}
     />
   );

@@ -3,8 +3,8 @@
 import * as React from 'react';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
-import { toggleGroupBaseConfig } from './toggle-group.config';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes/use-theme';
 import { Bold, Italic, Underline } from 'lucide-react';
 
 /**
@@ -16,17 +16,79 @@ import { Bold, Italic, Underline } from 'lucide-react';
  * - Uses `tailwind-variants` with slots for granular theme control
  * - Supports single or multiple selection modes
  * - ADR-003: Blocks only depend on Atoms (flat dependency)
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
-export { toggleGroupBaseConfig };
+// ============================================================================
+// 依赖声明（用于导出时收集）
+// ============================================================================
 
 /** Atoms this Block depends on */
 export const toggleGroupAtoms = ['toggle'] as const;
 
-const toggleGroup = tv(toggleGroupBaseConfig);
+// ============================================================================
+// L1: 静态样式定义（功能层）
+// ============================================================================
 
-export type ToggleGroupVariants = VariantProps<typeof toggleGroup>;
-export type ToggleGroupSlots = keyof typeof toggleGroupBaseConfig.slots;
+const toggleGroupBase = tv({
+  slots: {
+    root: 'flex items-center gap-1 rounded-md',
+    item: 'inline-flex items-center justify-center rounded-md text-[length:var(--text-sm)] font-medium text-foreground transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
+  },
+  variants: {
+    variant: {
+      default: {
+        root: '',
+        item: 'bg-transparent',
+      },
+      outline: {
+        root: 'border border-border rounded-md p-1',
+        item: 'border-0 shadow-none hover:bg-accent hover:text-accent-foreground',
+      },
+    },
+    size: {
+      default: {
+        root: '',
+        item: 'h-9 px-3',
+      },
+      sm: {
+        root: '',
+        item: 'h-8 px-2',
+      },
+      lg: {
+        root: '',
+        item: 'h-10 px-4',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type ToggleGroupVariants = VariantProps<typeof toggleGroupBase>;
+export type ToggleGroupSlots = keyof typeof toggleGroupBase.slots;
 export type ToggleGroupClassNames = Partial<Record<ToggleGroupSlots, string>>;
 
 // Context to share variant/size with items
@@ -53,12 +115,30 @@ const ToggleGroup = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Root>,
   ToggleGroupProps
 >(({ className, classNames, variant, size, children, ...props }, ref) => {
-  const styles = toggleGroup({ variant, size });
+  const { currentTheme } = useTheme();
+  const themeConfig = currentTheme?.components?.ToggleGroup;
+  
+  // L1
+  const styles = toggleGroupBase({ variant, size });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.root);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.root);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, variant]);
 
   return (
     <ToggleGroupPrimitive.Root
       ref={ref}
-      className={cn(classNames?.root ?? styles.root(), className)}
+      className={twMerge(
+        styles.root(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.root,
+        className
+      )}
       {...props}
     >
       <ToggleGroupContext.Provider value={{ variant, size }}>
@@ -86,12 +166,31 @@ const ToggleGroupItem = React.forwardRef<
   const context = React.useContext(ToggleGroupContext);
   const finalVariant = variant ?? context.variant;
   const finalSize = size ?? context.size;
-  const styles = toggleGroup({ variant: finalVariant, size: finalSize });
+  
+  const { currentTheme } = useTheme();
+  const themeConfig = currentTheme?.components?.ToggleGroup;
+
+  // L1
+  const styles = toggleGroupBase({ variant: finalVariant, size: finalSize });
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const slotStyle = toClassString(themeConfig?.slots?.item);
+    // @ts-ignore
+    const variantStyle = toClassString(themeConfig?.variants?.variant?.[finalVariant]?.item);
+    return { slot: slotStyle, variant: variantStyle };
+  }, [themeConfig, finalVariant]);
 
   return (
     <ToggleGroupPrimitive.Item
       ref={ref}
-      className={cn(classNames?.item ?? styles.item(), className)}
+      className={twMerge(
+        styles.item(),
+        themeStyles.slot,
+        themeStyles.variant,
+        classNames?.item,
+        className
+      )}
       {...props}
     >
       {children}

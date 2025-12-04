@@ -127,7 +127,7 @@ export const themeTemplateTheme: ThemeDefinition = {
     Form: formConfig,
     HoverCard: hoverCardConfig,
     InputGroup: inputGroupConfig,
-    InputOtp: inputOtpConfig,
+    InputOTP: inputOtpConfig,
     Menubar: menubarConfig,
     Pagination: paginationConfig,
     Select: selectConfig,

@@ -2,7 +2,7 @@
  * Separator Component Entry
  */
 
-import { Separator, separatorBaseConfig } from '@/components/nova-ui/atmos/separator';
+import { Separator } from '@/components/nova-ui/atmos/separator';
 import type { ComponentRegistryEntry } from '../types';
 
 export const separatorEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const separatorEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeSeparator',
   category: 'atoms',
   component: Separator,
-  baseConfig: separatorBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'orientation',

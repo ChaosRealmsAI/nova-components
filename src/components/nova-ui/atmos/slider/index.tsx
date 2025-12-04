@@ -6,6 +6,36 @@ import { tv } from 'tailwind-variants';
 import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
 
+/**
+ * Nova Slider
+ *
+ * Architecture Notes:
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
+ */
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type SliderClassNames = Partial<{
+  base: string;
+  track: string;
+  range: string;
+  thumb: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
 // ============================================================================
 // L1: Static Functional Styles
 // ============================================================================
@@ -25,12 +55,7 @@ const sliderBase = tv({
 
 export interface SliderProps
   extends Omit<React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>, 'value' | 'defaultValue'> {
-  classNames?: {
-    base?: string;
-    track?: string;
-    range?: string;
-    thumb?: string;
-  };
+  classNames?: SliderClassNames;
   value?: number | number[];
   defaultValue?: number | number[];
   size?: 'default' | 'sm' | 'lg';
@@ -43,31 +68,32 @@ const Slider = React.forwardRef<
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Slider;
 
-  // L1
+  // L1: Functional Layer
   const base = sliderBase();
 
-  // L2: Theme Styles
+  // L2: Theme Layer
   const themeStyles = React.useMemo(() => {
-    if (!themeConfig) return { root: '', track: '', range: '', thumb: '' };
-    
-    try {
-      // Use tv to handle theme variants and merging within the theme config
-      const themeTv = tv(themeConfig as any);
-      const slots = themeTv({ size } as any) as any;
-      
-      return {
-        root: slots.base ? slots.base() : '',
-        track: slots.track ? slots.track() : '',
-        range: slots.range ? slots.range() : '',
-        thumb: slots.thumb ? slots.thumb() : '',
-      };
-    } catch (e) {
-      console.warn('Error applying theme styles for Slider:', e);
-      return { root: '', track: '', range: '', thumb: '' };
-    }
+    // Base slots
+    const rootSlot = toClassString(themeConfig?.slots?.base);
+    const trackSlot = toClassString(themeConfig?.slots?.track);
+    const rangeSlot = toClassString(themeConfig?.slots?.range);
+    const thumbSlot = toClassString(themeConfig?.slots?.thumb);
+
+    // Size styles
+    const sizeRoot = toClassString(themeConfig?.variants?.size?.[size]?.base);
+    const sizeTrack = toClassString(themeConfig?.variants?.size?.[size]?.track);
+    const sizeRange = toClassString(themeConfig?.variants?.size?.[size]?.range);
+    const sizeThumb = toClassString(themeConfig?.variants?.size?.[size]?.thumb);
+
+    return {
+      root: twMerge(rootSlot, sizeRoot),
+      track: twMerge(trackSlot, sizeTrack),
+      range: twMerge(rangeSlot, sizeRange),
+      thumb: twMerge(thumbSlot, sizeThumb),
+    };
   }, [themeConfig, size]);
 
-  // L3: Merge
+  // Merge: L1 + L2 + L3
   const rootClass = twMerge(base.root(), themeStyles.root, classNames?.base, className);
   const trackClass = twMerge(base.track(), themeStyles.track, classNames?.track);
   const rangeClass = twMerge(base.range(), themeStyles.range, classNames?.range);

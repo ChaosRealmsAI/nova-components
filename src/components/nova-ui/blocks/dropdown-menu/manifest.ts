@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'dropdown-menu.config.ts',
   },
 
   themeConfigs: [
@@ -31,16 +30,46 @@ export const manifest: ComponentManifest = {
   dependencies: [],
 
   exportOptions: {
-    noChildren: false,
+    customImports: [
+      'DropdownMenu',
+      'DropdownMenuTrigger',
+      'DropdownMenuContent',
+      'DropdownMenuItem',
+      'DropdownMenuCheckboxItem',
+      'DropdownMenuRadioItem',
+      'DropdownMenuLabel',
+      'DropdownMenuSeparator',
+      'DropdownMenuShortcut',
+      'DropdownMenuGroup',
+      'DropdownMenuPortal',
+      'DropdownMenuSub',
+      'DropdownMenuSubContent',
+      'DropdownMenuSubTrigger',
+      'DropdownMenuRadioGroup',
+    ],
+    extraImports: `import { Button } from '@/components/nova-ui/atmos/button'`,
     customJsx: `<DropdownMenu>
   <DropdownMenuTrigger asChild>
     <Button variant="outline">Open Menu</Button>
   </DropdownMenuTrigger>
-  <DropdownMenuContent>
+  <DropdownMenuContent className="w-56">
     <DropdownMenuLabel>My Account</DropdownMenuLabel>
     <DropdownMenuSeparator />
-    <DropdownMenuItem>Profile</DropdownMenuItem>
-    <DropdownMenuItem>Settings</DropdownMenuItem>
+    <DropdownMenuGroup>
+      <DropdownMenuItem>
+        Profile
+        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        Settings
+        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+      </DropdownMenuItem>
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem variant="destructive">
+      Log out
+      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+    </DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>`,
   },

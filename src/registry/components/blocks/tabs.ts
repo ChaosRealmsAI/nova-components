@@ -2,7 +2,7 @@
  * Tabs Component Entry
  */
 
-import { TabsDemo, tabsBaseConfig, tabsAtoms } from '@/components/nova-ui/blocks/tabs';
+import { TabsDemo, tabsAtoms } from '@/components/nova-ui/blocks/tabs';
 import type { ComponentRegistryEntry } from '../types';
 
 export const tabsEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const tabsEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeTabs',
   category: 'blocks',
   component: TabsDemo,
-  baseConfig: tabsBaseConfig,
+  baseConfig: null,
   atoms: tabsAtoms,
   props: [
     {

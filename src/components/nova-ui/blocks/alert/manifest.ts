@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'alert.config.ts',
   },
 
   themeConfigs: [
@@ -27,7 +26,15 @@ export const manifest: ComponentManifest = {
   dependencies: [],
 
   exportOptions: {
-    noChildren: false,
+    customImports: ['Alert', 'AlertDescription', 'AlertTitle'],
+    extraImports: `import { Terminal } from "lucide-react"`,
+    customJsx: `<Alert>
+  <Terminal className="h-4 w-4" />
+  <AlertTitle>Heads up!</AlertTitle>
+  <AlertDescription>
+    You can add components to your app using the CLI.
+  </AlertDescription>
+</Alert>`,
   },
 
   canvas: {

@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'command.config.ts',
   },
 
   themeConfigs: [
@@ -22,20 +21,26 @@ export const manifest: ComponentManifest = {
 
   themeFile: 'components/command.ts',
 
-  cssVars: ['--primary', '--border', '--muted-foreground'],
+  cssVars: ['--primary', '--border', '--muted-foreground', '--accent', '--accent-foreground'],
 
   dependencies: [],
 
   exportOptions: {
     noChildren: true,
-    customJsx: `<Command className="rounded-lg border shadow-md">
+    customJsx: `<Command className="rounded-lg border shadow-md max-w-md">
   <CommandInput placeholder="Type a command or search..." />
   <CommandList>
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandGroup heading="Suggestions">
-      <CommandItem>Calendar</CommandItem>
-      <CommandItem>Search Emoji</CommandItem>
-      <CommandItem>Calculator</CommandItem>
+      <CommandItem>
+        <span>Calendar</span>
+      </CommandItem>
+      <CommandItem>
+        <span>Search Emoji</span>
+      </CommandItem>
+      <CommandItem>
+        <span>Calculator</span>
+      </CommandItem>
     </CommandGroup>
   </CommandList>
 </Command>`,

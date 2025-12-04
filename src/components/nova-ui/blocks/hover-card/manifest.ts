@@ -13,7 +13,6 @@ export const manifest: ComponentManifest = {
 
   files: {
     component: 'index.tsx',
-    config: 'hover-card.config.ts',
   },
 
   themeConfigs: [
@@ -27,7 +26,13 @@ export const manifest: ComponentManifest = {
   dependencies: [],
 
   exportOptions: {
-    noChildren: false,
+    customImports: ['HoverCard', 'HoverCardTrigger', 'HoverCardContent'],
+    customJsx: `<HoverCard>
+  <HoverCardTrigger>Hover me</HoverCardTrigger>
+  <HoverCardContent>
+    The React Framework - created and maintained by @vercel.
+  </HoverCardContent>
+</HoverCard>`,
   },
 
   canvas: {

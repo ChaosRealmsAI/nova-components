@@ -2,7 +2,7 @@
  * Progress Component Entry
  */
 
-import { Progress, progressBaseConfig } from '@/components/nova-ui/atmos/progress';
+import { Progress } from '@/components/nova-ui/atmos/progress';
 import type { ComponentRegistryEntry } from '../types';
 
 export const progressEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const progressEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeProgress',
   category: 'atoms',
   component: Progress,
-  baseConfig: progressBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'value',

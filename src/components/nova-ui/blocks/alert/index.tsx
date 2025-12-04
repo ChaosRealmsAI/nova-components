@@ -9,13 +9,19 @@
  * - Block 组件，样式参考 Badge Atom
  * - 不支持用户可配特效
  * - 提供 default 和 destructive 两种语义变体
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes/use-theme';
-import { alertBaseConfig } from './alert.config';
 
 // ============================================================================
 // 依赖声明（用于导出时收集）
@@ -23,29 +29,71 @@ import { alertBaseConfig } from './alert.config';
 
 export const alertAtoms = ['badge'] as const;
 
-export { alertBaseConfig };
+// ============================================================================
+// L1: 静态样式定义（功能层）
+// ============================================================================
+
+const alertBase = tv({
+  slots: {
+    base: [
+      'relative w-full grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr]',
+      'has-[>svg]:gap-x-3 gap-y-0.5 items-start',
+      '[&>svg]:translate-y-0.5',
+    ],
+    title: 'col-start-2 min-h-4',
+    description: 'col-start-2 grid justify-items-start gap-1 [&_p]:leading-relaxed',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// Context
+// ============================================================================
+
+interface AlertContextValue {
+  variant: AlertProps['variant'];
+}
+
+const AlertContext = React.createContext<AlertContextValue>({
+  variant: 'default',
+});
+
+const useAlertContext = () => React.useContext(AlertContext);
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type AlertVariants = VariantProps<ReturnType<typeof tv>>;
-export type AlertSlots = keyof typeof alertBaseConfig.slots;
+export type AlertVariants = VariantProps<typeof alertBase>;
+export type AlertSlots = keyof typeof alertBase.slots;
 export type AlertClassNames = Partial<Record<AlertSlots, string>>;
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AlertProps extends React.HTMLAttributes<HTMLDivElement>, AlertVariants {
+  classNames?: AlertClassNames;
   variant?: 'default' | 'destructive';
+}
+
+export interface AlertTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   classNames?: AlertClassNames;
 }
 
-export interface AlertTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
-
-export interface AlertDescriptionProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface AlertDescriptionProps extends React.HTMLAttributes<HTMLDivElement> {
+  classNames?: AlertClassNames;
+}
 
 export interface AlertDemoProps {
   title?: string;
   description?: string;
-  variant?: 'default' | 'destructive';
+  variant?: AlertProps['variant'];
 }
 
 // ============================================================================
@@ -57,22 +105,34 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Alert;
 
-    const styles = tv({
-      extend: alertBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1
+    const base = alertBase();
 
-    const { base } = styles({ variant });
+    // L2
+    const themeStyles = React.useMemo(() => {
+      const slotStyle = toClassString(themeConfig?.slots?.base);
+      // @ts-ignore
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+      return { slot: slotStyle, variant: variantStyle };
+    }, [themeConfig, variant]);
 
     return (
-      <div
-        ref={ref}
-        role="alert"
-        data-slot="alert"
-        data-variant={variant}
-        className={cn(base(), classNames?.base, className)}
-        {...props}
-      />
+      <AlertContext.Provider value={{ variant }}>
+        <div
+          ref={ref}
+          role="alert"
+          data-slot="alert"
+          data-variant={variant}
+          className={twMerge(
+            base.base(),
+            themeStyles.slot,
+            themeStyles.variant,
+            classNames?.base,
+            className
+          )}
+          {...props}
+        />
+      </AlertContext.Provider>
     );
   }
 );
@@ -83,22 +143,33 @@ Alert.displayName = 'Alert';
 // ============================================================================
 
 const AlertTitle = React.forwardRef<HTMLHeadingElement, AlertTitleProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, classNames, ...props }, ref) => {
+    const { variant } = useAlertContext();
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Alert;
 
-    const styles = tv({
-      extend: alertBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1
+    const base = alertBase();
 
-    const { title } = styles({});
+    // L2
+    const themeStyles = React.useMemo(() => {
+      const slotStyle = toClassString(themeConfig?.slots?.title);
+      // @ts-ignore
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.title);
+      return { slot: slotStyle, variant: variantStyle };
+    }, [themeConfig, variant]);
 
     return (
       <h5
         ref={ref}
         data-slot="alert-title"
-        className={cn(title(), className)}
+        className={twMerge(
+          base.title(),
+          themeStyles.slot,
+          themeStyles.variant,
+          classNames?.title,
+          className
+        )}
         {...props}
       />
     );
@@ -111,22 +182,33 @@ AlertTitle.displayName = 'AlertTitle';
 // ============================================================================
 
 const AlertDescription = React.forwardRef<HTMLDivElement, AlertDescriptionProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, classNames, ...props }, ref) => {
+    const { variant } = useAlertContext();
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Alert;
 
-    const styles = tv({
-      extend: alertBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1
+    const base = alertBase();
 
-    const { description } = styles({});
+    // L2
+    const themeStyles = React.useMemo(() => {
+      const slotStyle = toClassString(themeConfig?.slots?.description);
+      // @ts-ignore
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.description);
+      return { slot: slotStyle, variant: variantStyle };
+    }, [themeConfig, variant]);
 
     return (
       <div
         ref={ref}
         data-slot="alert-description"
-        className={cn(description(), className)}
+        className={twMerge(
+          base.description(),
+          themeStyles.slot,
+          themeStyles.variant,
+          classNames?.description,
+          className
+        )}
         {...props}
       />
     );

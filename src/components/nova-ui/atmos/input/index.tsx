@@ -2,47 +2,87 @@
 
 import * as React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { inputBaseConfig } from './input.config';
 
 /**
  * Nova Input
  *
  * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `inputBaseConfig` for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
  */
 
-export { inputBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type InputVariants = VariantProps<ReturnType<typeof tv>>;
-export type InputSlots = keyof typeof inputBaseConfig.slots;
-export type InputClassNames = Partial<Record<InputSlots, string>>;
+export type InputClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Static Styles (Functional Layer)
+// ============================================================================
+
+const inputBase = tv({
+  slots: {
+    base: 'flex w-full file:border-0 file:bg-transparent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+  },
+});
+
+// ============================================================================
+// Component
+// ============================================================================
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
-    InputVariants {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   classNames?: InputClassNames;
+  variant?: 'default' | 'filled';
+  inputSize?: 'default' | 'sm' | 'lg';
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, classNames, variant, inputSize, type, ...props }, ref) => {
-    // ADR-006: 从主题上下文获取 Input 的样式配置
+  ({ className, classNames, variant = 'default', inputSize = 'default', type, ...props }, ref) => {
     const { currentTheme } = useTheme();
     const themeConfig = currentTheme?.components?.Input;
 
-    // 合并基础配置和主题配置
-    const styles = tv({
-      extend: inputBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1: Functional Layer
+    const base = inputBase();
 
-    const baseClass = classNames?.base
-      ? classNames.base
-      : styles({ variant, inputSize }).base();
+    // L2: Theme Layer
+    const themeStyles = React.useMemo(() => {
+      const baseStyle = toClassString(themeConfig?.slots?.base);
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+      const sizeStyle = toClassString(themeConfig?.variants?.inputSize?.[inputSize]?.base);
+      
+      return { 
+        base: baseStyle, 
+        variant: variantStyle,
+        size: sizeStyle
+      };
+    }, [themeConfig, variant, inputSize]);
+
+    // Merge: L1 + L2 (Base + Variant + Size) + L3
+    const rootClass = twMerge(
+      base.base(), 
+      themeStyles.base, 
+      themeStyles.variant,
+      themeStyles.size,
+      classNames?.base, 
+      className
+    );
 
     // Filter out children to prevent "void element with children" error
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,7 +91,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         type={type}
-        className={cn(baseClass, className)}
+        className={rootClass}
         ref={ref}
         {...rest}
       />

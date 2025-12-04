@@ -31,3 +31,6 @@ export { sonnerEntry } from './sonner';
 export { accordionEntry } from './accordion';
 export { dialogEntry } from './dialog';
 export { sidebarEntry } from './sidebar';
+export { tableEntry } from './table';
+export { menubarEntry } from './menubar';
+export { commandEntry } from './command';

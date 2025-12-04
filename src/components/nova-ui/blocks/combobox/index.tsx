@@ -8,19 +8,25 @@
  * Architecture Notes:
  * - Block 组件，依赖 Atoms: popover, button
  * - 内部使用 cmdk 实现命令面板功能
+ *
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
+ *
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
 import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Check, ChevronsUpDown, Search } from 'lucide-react';
 import { tv, type VariantProps } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/lib/themes/use-theme';
+import { useTheme } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/nova-ui/atmos/popover';
 import { Button } from '@/components/nova-ui/atmos/button';
-import { comboboxBaseConfig } from './combobox.config';
 
 // ============================================================================
 // 依赖声明
@@ -28,20 +34,43 @@ import { comboboxBaseConfig } from './combobox.config';
 
 export const comboboxAtoms = ['popover', 'button'] as const;
 
-export { comboboxBaseConfig };
-
 // ============================================================================
-// Styles
+// L1: 静态样式定义（功能层）
 // ============================================================================
 
-const combobox = tv(comboboxBaseConfig);
+const comboboxBase = tv({
+  slots: {
+    trigger: 'justify-between',
+    content: 'p-0',
+    command: 'flex h-full w-full flex-col overflow-hidden rounded-[inherit]',
+    inputWrapper: 'flex items-center px-3 border-b',
+    searchIcon: 'mr-2 h-4 w-4 shrink-0 opacity-50',
+    input: 'flex h-10 w-full bg-transparent py-3 text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none ring-0 outline-none shadow-none focus:ring-0 focus:outline-none focus:shadow-none focus:border-none focus-visible:ring-0 focus-visible:outline-none focus-visible:shadow-none focus-visible:border-none',
+    list: 'max-h-[300px] overflow-y-auto overflow-x-hidden',
+    empty: 'py-6 text-center text-sm',
+    group: 'overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium',
+    item: 'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+    separator: '-mx-1 h-px',
+    icon: 'ml-2 h-4 w-4 shrink-0 opacity-50',
+  },
+});
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type ComboboxVariants = VariantProps<typeof combobox>;
-export type ComboboxSlots = keyof typeof comboboxBaseConfig.slots;
+export type ComboboxVariants = VariantProps<typeof comboboxBase>;
+export type ComboboxSlots = 'trigger' | 'content' | 'command' | 'inputWrapper' | 'searchIcon' | 'input' | 'list' | 'empty' | 'group' | 'item' | 'separator' | 'icon';
 export type ComboboxClassNames = Partial<Record<ComboboxSlots, string>>;
 
 export interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
@@ -85,23 +114,30 @@ function Combobox(props: ComboboxProps) {
 function ComboboxTrigger({ className, classNames, children, ...props }: ComboboxTriggerProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    trigger: toClassString(themeConfig?.slots?.trigger),
+    icon: toClassString(themeConfig?.slots?.icon),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const triggerClass = twMerge(base.trigger(), themeStyles.trigger, classNames?.trigger, className);
+  const iconClass = twMerge(base.icon(), themeStyles.icon, classNames?.icon);
 
   return (
     <PopoverTrigger asChild>
       <Button
         variant="outline"
         role="combobox"
-        className={cn(
-          styles.trigger(),
-          themeConfig?.slots?.trigger,
-          classNames?.trigger,
-          className
-        )}
+        className={triggerClass}
         {...props}
       >
         {children}
-        <ChevronsUpDown className={cn(styles.icon(), themeConfig?.slots?.icon)} />
+        <ChevronsUpDown className={iconClass} />
       </Button>
     </PopoverTrigger>
   );
@@ -110,16 +146,26 @@ function ComboboxTrigger({ className, classNames, children, ...props }: Combobox
 function ComboboxContent({ className, classNames, children, ...props }: ComboboxContentProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    content: toClassString(themeConfig?.slots?.content),
+    command: toClassString(themeConfig?.slots?.command),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const contentClass = twMerge(base.content(), themeStyles.content, classNames?.content, className);
+  const commandClass = twMerge(base.command(), themeStyles.command, classNames?.command);
 
   return (
     <PopoverContent
-      className={cn(styles.content(), themeConfig?.slots?.content, classNames?.content, className)}
+      className={contentClass}
       {...props}
     >
-      <CommandPrimitive
-        className={cn(styles.command(), themeConfig?.slots?.command, classNames?.command)}
-      >
+      <CommandPrimitive className={commandClass}>
         {children}
       </CommandPrimitive>
     </PopoverContent>
@@ -129,27 +175,26 @@ function ComboboxContent({ className, classNames, children, ...props }: Combobox
 function ComboboxInput({ className, classNames, ...props }: ComboboxInputProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    inputWrapper: toClassString(themeConfig?.slots?.inputWrapper),
+    searchIcon: toClassString(themeConfig?.slots?.searchIcon),
+    input: toClassString(themeConfig?.slots?.input),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const inputWrapperClass = twMerge(base.inputWrapper(), themeStyles.inputWrapper, classNames?.inputWrapper);
+  const searchIconClass = twMerge(base.searchIcon(), themeStyles.searchIcon, classNames?.searchIcon);
+  const inputClass = twMerge(base.input(), themeStyles.input, classNames?.input, className);
 
   return (
-    <div
-      className={cn(
-        styles.inputWrapper(),
-        themeConfig?.slots?.inputWrapper,
-        classNames?.inputWrapper
-      )}
-      data-slot="combobox-input-wrapper"
-    >
-      <Search className={cn(styles.searchIcon(), themeConfig?.slots?.searchIcon)} />
-      <CommandPrimitive.Input
-        className={cn(
-          styles.input(),
-          themeConfig?.slots?.input,
-          classNames?.input,
-          className
-        )}
-        {...props}
-      />
+    <div className={inputWrapperClass} data-slot="combobox-input-wrapper">
+      <Search className={searchIconClass} />
+      <CommandPrimitive.Input className={inputClass} {...props} />
     </div>
   );
 }
@@ -157,52 +202,80 @@ function ComboboxInput({ className, classNames, ...props }: ComboboxInputProps) 
 function ComboboxList({ className, classNames, ...props }: ComboboxListProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    list: toClassString(themeConfig?.slots?.list),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const listClass = twMerge(base.list(), themeStyles.list, classNames?.list, className);
 
   return (
-    <CommandPrimitive.List
-      className={cn(styles.list(), themeConfig?.slots?.list, classNames?.list, className)}
-      {...props}
-    />
+    <CommandPrimitive.List className={listClass} {...props} />
   );
 }
 
 function ComboboxEmpty({ className, classNames, ...props }: ComboboxEmptyProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    empty: toClassString(themeConfig?.slots?.empty),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const emptyClass = twMerge(base.empty(), themeStyles.empty, classNames?.empty, className);
 
   return (
-    <CommandPrimitive.Empty
-      className={cn(styles.empty(), themeConfig?.slots?.empty, classNames?.empty, className)}
-      {...props}
-    />
+    <CommandPrimitive.Empty className={emptyClass} {...props} />
   );
 }
 
 function ComboboxGroup({ className, classNames, ...props }: ComboboxGroupProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    group: toClassString(themeConfig?.slots?.group),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const groupClass = twMerge(base.group(), themeStyles.group, classNames?.group, className);
 
   return (
-    <CommandPrimitive.Group
-      className={cn(styles.group(), themeConfig?.slots?.group, classNames?.group, className)}
-      {...props}
-    />
+    <CommandPrimitive.Group className={groupClass} {...props} />
   );
 }
 
 function ComboboxItem({ className, classNames, children, ...props }: ComboboxItemProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Combobox;
-  const styles = combobox({});
+
+  // L1: 功能层
+  const base = comboboxBase();
+
+  // L2: 主题层
+  const themeStyles = React.useMemo(() => ({
+    item: toClassString(themeConfig?.slots?.item),
+  }), [themeConfig]);
+
+  // 合并: L1 + L2 + L3
+  const itemClass = twMerge(base.item(), themeStyles.item, classNames?.item, className);
 
   return (
-    <CommandPrimitive.Item
-      className={cn(styles.item(), themeConfig?.slots?.item, classNames?.item, className)}
-      {...props}
-    >
+    <CommandPrimitive.Item className={itemClass} {...props}>
       {children}
     </CommandPrimitive.Item>
   );
@@ -261,9 +334,9 @@ function ComboboxDemo({
                     setOpen(false);
                   }}
                 >
-                  <span className={cn("mr-2 flex h-4 w-4 items-center justify-center")}>
+                  <span className={twMerge("mr-2 flex h-4 w-4 items-center justify-center")}>
                     <Check
-                      className={cn(
+                      className={twMerge(
                         "h-4 w-4",
                         value === option.value ? "opacity-100" : "opacity-0"
                       )}

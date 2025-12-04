@@ -1,42 +1,74 @@
 'use client';
 
-/**
- * Tooltip Component
- *
- * 基于 Radix UI Tooltip 的提示框组件。
- * 支持主题定制和特效扩展。
- */
-
 import * as React from 'react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { useTheme } from '@/lib/themes/use-theme';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
-import { tooltipBaseConfig } from './tooltip.config';
+
+/**
+ * Nova Tooltip
+ *
+ * Architecture Notes:
+ * - L1 (Functional): Position, animations, z-index.
+ * - L2 (Thematic): Colors, spacing, typography, border.
+ * - L3 (Instance): User className.
+ */
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: Functional Styles
+// ============================================================================
+
+const tooltipBase = tv({
+  slots: {
+    content: [
+      'z-50 w-fit overflow-hidden', // structure
+      'animate-in fade-in-0 zoom-in-95', // animation
+      'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+      'data-[side=bottom]:slide-in-from-top-2',
+      'data-[side=left]:slide-in-from-right-2',
+      'data-[side=right]:slide-in-from-left-2',
+      'data-[side=top]:slide-in-from-bottom-2',
+    ],
+    arrow: [
+      'z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]',
+    ],
+  },
+});
 
 // ============================================================================
 // Types
 // ============================================================================
-
-export type TooltipVariant = 'default';
 
 export interface TooltipProviderProps extends React.ComponentProps<typeof TooltipPrimitive.Provider> {}
 
 export interface TooltipProps extends React.ComponentProps<typeof TooltipPrimitive.Root> {}
 
 export interface TooltipContentProps
-  extends React.ComponentProps<typeof TooltipPrimitive.Content>,
-    VariantProps<ReturnType<typeof tv>> {
-  variant?: TooltipVariant;
+  extends React.ComponentProps<typeof TooltipPrimitive.Content> {
+  classNames?: {
+    content?: string;
+    arrow?: string;
+  };
 }
 
 export interface TooltipDemoProps {
   content?: string;
-  variant?: TooltipVariant;
 }
 
 // ============================================================================
-// Tooltip Provider
+// Components
 // ============================================================================
 
 function TooltipProvider({
@@ -52,10 +84,6 @@ function TooltipProvider({
   );
 }
 
-// ============================================================================
-// Tooltip Root
-// ============================================================================
-
 function Tooltip({ ...props }: TooltipProps) {
   return (
     <TooltipProvider>
@@ -64,71 +92,54 @@ function Tooltip({ ...props }: TooltipProps) {
   );
 }
 
-// ============================================================================
-// Tooltip Trigger
-// ============================================================================
-
 function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
-// ============================================================================
-// Tooltip Content
-// ============================================================================
-
 function TooltipContent({
   className,
+  classNames,
   sideOffset = 4,
-  variant = 'default',
   children,
   ...props
 }: TooltipContentProps) {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Tooltip;
 
-  const styles = tv({
-    extend: tooltipBaseConfig,
-    ...(themeConfig || {}),
-  });
+  // L1: Functional
+  const base = tooltipBase();
 
-  const { content, arrow } = styles({ variant });
+  // L2: Theme
+  const themeContent = toClassString(themeConfig?.slots?.content);
+  const themeArrow = toClassString(themeConfig?.slots?.arrow);
+
+  // Merge
+  const contentClass = twMerge(base.content(), themeContent, classNames?.content, className);
+  const arrowClass = twMerge(base.arrow(), themeArrow, classNames?.arrow);
 
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
-        className={content({ className })}
+        className={contentClass}
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow className={arrow()} />
+        <TooltipPrimitive.Arrow className={arrowClass} />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
 }
 
 // ============================================================================
-// Tooltip Demo (for Canvas display) - Interactive Version
+// Demo (Interactive)
 // ============================================================================
 
-function TooltipDemo({
-  content,
-  variant = 'default',
-}: TooltipDemoProps) {
-  const { currentTheme } = useTheme();
+function TooltipDemo({ content }: TooltipDemoProps) {
   const { t } = useI18n();
-  const themeConfig = currentTheme?.components?.Tooltip;
-
-  const styles = tv({
-    extend: tooltipBaseConfig,
-    ...(themeConfig || {}),
-  });
-
-  const { content: contentClass, arrow } = styles({ variant });
   const displayContent = content || t('tooltipContentDefault', 'Tooltip content');
 
-  // 交互式 Demo：使用真正的 Radix Tooltip，不使用 Portal
   return (
     <TooltipProvider delayDuration={0}>
       <TooltipPrimitive.Root>
@@ -137,23 +148,13 @@ function TooltipDemo({
             {t('tooltipHoverMe', 'Hover me')}
           </button>
         </TooltipPrimitive.Trigger>
-        {/* 不使用 Portal，直接渲染在 trigger 旁边 */}
-        <TooltipPrimitive.Content
-          data-slot="tooltip-content"
-          sideOffset={4}
-          className={contentClass()}
-        >
+        <TooltipContent>
           {displayContent}
-          <TooltipPrimitive.Arrow className={arrow()} />
-        </TooltipPrimitive.Content>
+        </TooltipContent>
       </TooltipPrimitive.Root>
     </TooltipProvider>
   );
 }
-
-// ============================================================================
-// Exports
-// ============================================================================
 
 export {
   TooltipProvider,
@@ -161,5 +162,4 @@ export {
   TooltipTrigger,
   TooltipContent,
   TooltipDemo,
-  tooltipBaseConfig,
 };

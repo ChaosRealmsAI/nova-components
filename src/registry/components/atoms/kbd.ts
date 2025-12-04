@@ -2,7 +2,7 @@
  * Kbd Component Entry
  */
 
-import { Kbd, kbdBaseConfig } from '@/components/nova-ui/atmos/kbd';
+import { Kbd } from '@/components/nova-ui/atmos/kbd';
 import type { ComponentRegistryEntry } from '../types';
 
 export const kbdEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const kbdEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeKbd',
   category: 'atoms',
   component: Kbd,
-  baseConfig: kbdBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'children',
