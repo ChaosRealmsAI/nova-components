@@ -2,163 +2,207 @@
 
 import * as React from 'react';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
-import { tv } from 'tailwind-variants';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
 import { useTheme } from '@/lib/themes';
-import { useI18n } from '@/lib/i18n/use-i18n';
-import {
-  avatarBaseConfig,
-  avatarImageBaseConfig,
-  avatarFallbackBaseConfig,
-} from './avatar.config';
 
 /**
  * Nova Avatar
  *
  * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports base configs for themes to extend.
- * - Supports `classNames` prop for slot-specific overrides.
- * - ADR-006: 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * - L1 (Functional): Static definition, functional requirements only.
+ * - L2 (Theme): Dynamic from useTheme(), visual styles.
+ * - L3 (Instance): User provided className/classNames.
  */
 
-export { avatarBaseConfig, avatarImageBaseConfig, avatarFallbackBaseConfig };
-
 // ============================================================================
-// Avatar Root
+// Types
 // ============================================================================
 
-type AvatarVariantProps = {
-  size?: keyof typeof avatarBaseConfig.variants.size;
+export type AvatarClassNames = Partial<{
+  base: string;
+}>;
+
+export type AvatarImageClassNames = Partial<{
+  base: string;
+}>;
+
+export type AvatarFallbackClassNames = Partial<{
+  base: string;
+}>;
+
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
 };
 
-interface AvatarProps
-  extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>,
-    AvatarVariantProps {
-  classNames?: { base?: string };
+// ============================================================================
+// L1: Static Styles (Functional Layer)
+// ============================================================================
+
+const avatarBase = tv({
+  slots: {
+    base: 'relative flex shrink-0 overflow-hidden',
+  },
+});
+
+const avatarImageBase = tv({
+  slots: {
+    base: 'aspect-square size-full',
+  },
+});
+
+const avatarFallbackBase = tv({
+  slots: {
+    base: 'flex size-full items-center justify-center',
+  },
+});
+
+// ============================================================================
+// Components
+// ============================================================================
+
+// --- Avatar Root ---
+
+export interface AvatarProps
+  extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> {
+  classNames?: AvatarClassNames;
+  size?: 'default' | 'sm' | 'lg' | 'xl';
 }
 
 const Avatar = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Root>,
   AvatarProps
->(({ className, classNames, size, ...props }, ref) => {
-  // ADR-006: 从主题上下文获取 Avatar 的样式配置
+>(({ className, classNames, size = 'default', ...props }, ref) => {
   const { currentTheme } = useTheme();
   const themeConfig = currentTheme?.components?.Avatar;
 
-  const styles = tv({
-    extend: avatarBaseConfig,
-    ...(themeConfig || {}),
-  })({ size });
+  // L1
+  const base = avatarBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const baseStyle = toClassString(themeConfig?.slots?.base);
+    const sizeStyle = toClassString(themeConfig?.variants?.size?.[size]?.base);
+
+    return {
+      base: baseStyle,
+      size: sizeStyle,
+    };
+  }, [themeConfig, size]);
+
+  // Merge
+  const rootClass = twMerge(
+    base.base(),
+    themeStyles.base,
+    themeStyles.size,
+    classNames?.base,
+    className
+  );
 
   return (
     <AvatarPrimitive.Root
       ref={ref}
-      className={classNames?.base ?? styles.base({ className })}
+      className={rootClass}
       {...props}
     />
   );
 });
-Avatar.displayName = 'Avatar';
+Avatar.displayName = AvatarPrimitive.Root.displayName;
 
-// ============================================================================
-// Avatar Image
-// ============================================================================
+// --- Avatar Image ---
 
-const avatarImageStyles = tv(avatarImageBaseConfig);
-
-interface AvatarImageProps
+export interface AvatarImageProps
   extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image> {
-  classNames?: { base?: string };
+  classNames?: AvatarImageClassNames;
 }
 
 const AvatarImage = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Image>,
   AvatarImageProps
 >(({ className, classNames, ...props }, ref) => {
-  const styles = avatarImageStyles();
+  // L1
+  const base = avatarImageBase();
+  // AvatarImage usually doesn't rely on theme variants directly, 
+  // but we can allow global theme override if needed.
+  // For now, simple L1 is often enough, but following pattern:
+  
+  const { currentTheme } = useTheme();
+  const themeConfig = currentTheme?.components?.AvatarImage;
+
+  const themeStyles = React.useMemo(() => {
+     return {
+       base: toClassString(themeConfig?.slots?.base)
+     };
+  }, [themeConfig]);
+
+  const rootClass = twMerge(
+    base.base(),
+    themeStyles.base,
+    classNames?.base,
+    className
+  );
 
   return (
     <AvatarPrimitive.Image
       ref={ref}
-      className={classNames?.base ?? styles.base({ className })}
+      className={rootClass}
       {...props}
     />
   );
 });
-AvatarImage.displayName = 'AvatarImage';
+AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
-// ============================================================================
-// Avatar Fallback
-// ============================================================================
+// --- Avatar Fallback ---
 
-const avatarFallbackStyles = tv(avatarFallbackBaseConfig);
-
-type AvatarFallbackVariantProps = {
-  size?: keyof typeof avatarFallbackBaseConfig.variants.size;
-};
-
-interface AvatarFallbackProps
-  extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>,
-    AvatarFallbackVariantProps {
-  classNames?: { base?: string };
+export interface AvatarFallbackProps
+  extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback> {
+  classNames?: AvatarFallbackClassNames;
+  size?: 'default' | 'sm' | 'lg' | 'xl';
 }
 
 const AvatarFallback = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Fallback>,
   AvatarFallbackProps
->(({ className, classNames, size, ...props }, ref) => {
-  const styles = avatarFallbackStyles({ size });
+>(({ className, classNames, size = 'default', ...props }, ref) => {
+  const { currentTheme } = useTheme();
+  const themeConfig = currentTheme?.components?.AvatarFallback;
+
+  // L1
+  const base = avatarFallbackBase();
+
+  // L2
+  const themeStyles = React.useMemo(() => {
+    const baseStyle = toClassString(themeConfig?.slots?.base);
+    const sizeStyle = toClassString(themeConfig?.variants?.size?.[size]?.base);
+
+    return {
+      base: baseStyle,
+      size: sizeStyle,
+    };
+  }, [themeConfig, size]);
+
+  const rootClass = twMerge(
+    base.base(),
+    themeStyles.base,
+    themeStyles.size,
+    classNames?.base,
+    className
+  );
 
   return (
     <AvatarPrimitive.Fallback
       ref={ref}
-      className={classNames?.base ?? styles.base({ className })}
+      className={rootClass}
       {...props}
     />
   );
 });
-AvatarFallback.displayName = 'AvatarFallback';
+AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
 export { Avatar, AvatarImage, AvatarFallback };
-
-// ============================================================================
-// Avatar Demo (for canvas/registry use)
-// ============================================================================
-
-export interface AvatarDemoProps extends AvatarVariantProps {
-  src?: string;
-  alt?: string;
-  fallback?: string;
-  classNames?: {
-    base?: string;
-    image?: string;
-    fallback?: string;
-  };
-}
-
-/**
- * AvatarDemo - 组合版 Avatar，用于 Canvas 和注册表展示
- */
-const AvatarDemo = React.forwardRef<HTMLSpanElement, AvatarDemoProps>(
-  ({ size, src, alt, fallback, classNames, ...props }, ref) => {
-    const { t } = useI18n();
-    const displayFallback = fallback || t('avatarFallbackDefault', 'CN');
-    return (
-      <Avatar ref={ref} size={size} classNames={{ base: classNames?.base }} {...props}>
-        {src && (
-          <AvatarImage
-            src={src}
-            alt={alt}
-            classNames={{ base: classNames?.image }}
-          />
-        )}
-        <AvatarFallback size={size} classNames={{ base: classNames?.fallback }}>
-          {displayFallback}
-        </AvatarFallback>
-      </Avatar>
-    );
-  }
-);
-AvatarDemo.displayName = 'AvatarDemo';
-
-export { AvatarDemo };

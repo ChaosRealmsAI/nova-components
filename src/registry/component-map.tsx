@@ -26,13 +26,13 @@ import { Switch } from '@/components/nova-ui/atmos/switch';
 import { Slider } from '@/components/nova-ui/atmos/slider';
 import { Progress } from '@/components/nova-ui/atmos/progress';
 import { RadioGroup } from '@/components/nova-ui/atmos/radio-group';
-import { Separator, separatorBaseConfig } from '@/components/nova-ui/atmos/separator';
+import { Separator } from '@/components/nova-ui/atmos/separator';
 import { Skeleton } from '@/components/nova-ui/atmos/skeleton';
-import { Spinner, spinnerBaseConfig } from '@/components/nova-ui/atmos/spinner';
+import { Spinner } from '@/components/nova-ui/atmos/spinner';
 import { Textarea } from '@/components/nova-ui/atmos/textarea';
 import { Toggle } from '@/components/nova-ui/atmos/toggle';
-import { AvatarDemo, avatarBaseConfig } from '@/components/nova-ui/atmos/avatar';
-import { Kbd, kbdBaseConfig } from '@/components/nova-ui/atmos/kbd';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/nova-ui/atmos/avatar';
+import { Kbd } from '@/components/nova-ui/atmos/kbd';
 import { AspectRatio, aspectRatioBaseConfig } from '@/components/nova-ui/atmos/aspect-ratio';
 import { ScrollArea } from '@/components/nova-ui/atmos/scroll-area';
 import { PopoverDemo, popoverBaseConfig } from '@/components/nova-ui/atmos/popover';
@@ -124,6 +124,39 @@ const ScrollAreaDemo = (props: ComponentProps<typeof ScrollArea>) => {
   return <ScrollArea {...props} items={items} header={header} />;
 };
 
+// Avatar Demo
+interface AvatarDemoProps extends ComponentProps<typeof Avatar> {
+  src?: string;
+  alt?: string;
+  fallback?: string;
+  classNames?: {
+    base?: string;
+    image?: string;
+    fallback?: string;
+  };
+}
+
+const AvatarDemo = (props: AvatarDemoProps) => {
+  const { t } = useI18n();
+  const { src, alt, fallback, classNames, ...rest } = props;
+  const displayFallback = fallback || t('avatarFallbackDefault' as MessageKey, 'CN');
+  
+  return (
+    <Avatar {...rest} classNames={{ base: classNames?.base }}>
+      {src && (
+        <AvatarImage
+          src={src}
+          alt={alt}
+          classNames={{ base: classNames?.image }}
+        />
+      )}
+      <AvatarFallback classNames={{ base: classNames?.fallback }}>
+        {displayFallback}
+      </AvatarFallback>
+    </Avatar>
+  );
+};
+
 // ============================================================================
 // 组件映射
 // ============================================================================
@@ -151,13 +184,13 @@ export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   'slider': { component: Slider, baseConfig: null },
   'progress': { component: Progress, baseConfig: null },
   'radio-group': { component: RadioGroup, baseConfig: null },
-  'separator': { component: Separator, baseConfig: separatorBaseConfig },
+  'separator': { component: Separator, baseConfig: null },
   'skeleton': { component: Skeleton, baseConfig: null },
-  'spinner': { component: Spinner, baseConfig: spinnerBaseConfig },
+  'spinner': { component: Spinner, baseConfig: null },
   'textarea': { component: Textarea, baseConfig: null },
   'toggle': { component: Toggle, baseConfig: null },
-  'avatar': { component: AvatarDemo, baseConfig: avatarBaseConfig },
-  'kbd': { component: Kbd, baseConfig: kbdBaseConfig },
+  'avatar': { component: AvatarDemo, baseConfig: null },
+  'kbd': { component: Kbd, baseConfig: null },
   'aspect-ratio': { component: AspectRatio, baseConfig: aspectRatioBaseConfig },
   'scroll-area': { component: ScrollAreaDemo, baseConfig: null }, // 纯槽位模式，使用 i18n Demo
   'popover': { component: PopoverDemo, baseConfig: popoverBaseConfig },

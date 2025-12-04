@@ -191,7 +191,7 @@ export type { SkeletonProps } from '@/components/nova-ui/atmos/skeleton';
 export type { SpinnerProps } from '@/components/nova-ui/atmos/spinner';
 export type { TextareaProps } from '@/components/nova-ui/atmos/textarea';
 export type { ToggleProps } from '@/components/nova-ui/atmos/toggle';
-export type { AvatarDemoProps } from '@/components/nova-ui/atmos/avatar';
+export type { AvatarProps } from '@/components/nova-ui/atmos/avatar';
 export type { KbdProps } from '@/components/nova-ui/atmos/kbd';
 export type { AspectRatioProps } from '@/components/nova-ui/atmos/aspect-ratio';
 export type { ScrollAreaProps } from '@/components/nova-ui/atmos/scroll-area';

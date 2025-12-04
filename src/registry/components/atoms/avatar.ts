@@ -2,7 +2,7 @@
  * Avatar Component Entry
  */
 
-import { AvatarDemo, avatarBaseConfig } from '@/components/nova-ui/atmos/avatar';
+import { Avatar } from '@/components/nova-ui/atmos/avatar';
 import type { ComponentRegistryEntry } from '../types';
 
 export const avatarEntry: ComponentRegistryEntry = {
@@ -10,8 +10,8 @@ export const avatarEntry: ComponentRegistryEntry = {
   label: 'Avatar',
   labelKey: 'componentTypeAvatar',
   category: 'atoms',
-  component: AvatarDemo,
-  baseConfig: avatarBaseConfig,
+  component: Avatar,
+  baseConfig: null,
   props: [
     {
       name: 'size',

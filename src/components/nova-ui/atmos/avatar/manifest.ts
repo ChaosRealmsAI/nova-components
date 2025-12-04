@@ -18,7 +18,6 @@ export const manifest: ComponentManifest = {
   // 源码文件（相对于组件目录）
   files: {
     component: 'index.tsx',
-    config: 'avatar.config.ts',
   },
 
   // 需要导出的主题配置（组件名 → 配置名）

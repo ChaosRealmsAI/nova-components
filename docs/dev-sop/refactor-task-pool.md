@@ -43,6 +43,7 @@ docs/dev-sop/component-architecture-pattern.ts
 | 7 | label | ✅ | |
 | 10 | slider | ✅ | 含 track/range/thumb |
 | 14 | skeleton | ✅ | |
+| 16 | avatar | ✅ | 含 fallback |
 | 11 | toggle | ✅ | |
 
 ### 待重构
@@ -55,11 +56,10 @@ docs/dev-sop/component-architecture-pattern.ts
 | 12 | radio-group | ✅ | 中 | 含 item/indicator |
 | 13 | progress | ✅ | 低 | 含 indicator |
 
-| 15 | spinner | 🔄 | 低 | |
-| 16 | avatar | ⏳ | 中 | 含 fallback |
-| 17 | kbd | ⏳ | 低 | |
-| 18 | separator | 🔄 | 低 | |
-| 19 | aspect-ratio | ⏳ | 低 | |
+| 16 | avatar | ✅ | 含 fallback |
+| 17 | kbd | ✅ | 低 | |
+| 18 | separator | ✅ | 低 | |
+| 19 | aspect-ratio | 🔄 | 低 | |
 | 20 | popover | ⏳ | 中 | 弹出类，需 Demo |
 | 21 | tooltip | ⏳ | 中 | 弹出类，需 Demo |
 | 22 | collapsible | ⏳ | 中 | 含 trigger/content |
@@ -156,10 +156,10 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 | radio-group | radio-group.config.ts | ✅ 已删除 |
 | progress | progress.config.ts | ✅ 已删除 |
 | skeleton | skeleton.config.ts | ✅ 已删除 |
-| spinner | spinner.config.ts | ⏳ |
-| avatar | avatar.config.ts | ⏳ |
-| kbd | kbd.config.ts | ⏳ |
-| separator | separator.config.ts | ⏳ |
+| spinner | spinner.config.ts | ✅ 已删除 |
+| avatar | avatar.config.ts | ✅ |
+| kbd | kbd.config.ts | ✅ 已删除 |
+| separator | separator.config.ts | ✅ 已删除 |
 | aspect-ratio | aspect-ratio.config.ts | ⏳ |
 | popover | popover.config.ts | ⏳ |
 | tooltip | tooltip.config.ts | ⏳ |
@@ -217,7 +217,7 @@ src/components/nova-ui/atmos/{component}/{component}.config.ts
 ## 进度追踪
 
 - 总数: 22
-- 已完成: 9
+- 已完成: 10
 - 进行中: 4
-- 待开始: 9
-- 完成率: 36%
+- 待开始: 8
+- 完成率: 45%
