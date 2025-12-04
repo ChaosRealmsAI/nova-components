@@ -2,7 +2,7 @@
  * Button Component Entry
  */
 
-import { Button, buttonBaseConfig } from '@/components/nova-ui/atmos/button';
+import { Button } from '@/components/nova-ui/atmos/button';
 import type { ComponentRegistryEntry } from '../types';
 
 export const buttonEntry: ComponentRegistryEntry = {
@@ -11,7 +11,7 @@ export const buttonEntry: ComponentRegistryEntry = {
   labelKey: 'componentTypeButton',
   category: 'atoms',
   component: Button,
-  baseConfig: buttonBaseConfig,
+  baseConfig: null,
   props: [
     {
       name: 'variant',
@@ -26,7 +26,7 @@ export const buttonEntry: ComponentRegistryEntry = {
         { value: 'ghost', label: 'Ghost', labelKey: 'valGhost' },
         { value: 'link', label: 'Link', labelKey: 'valLink' },
       ],
-      defaultValue: buttonBaseConfig.defaultVariants.variant,
+      defaultValue: 'default',
     },
     {
       name: 'size',
@@ -39,7 +39,7 @@ export const buttonEntry: ComponentRegistryEntry = {
         { value: 'lg', label: 'Large', labelKey: 'valLarge' },
         { value: 'icon', label: 'Icon', labelKey: 'valIcon' },
       ],
-      defaultValue: buttonBaseConfig.defaultVariants.size,
+      defaultValue: 'default',
     },
     {
       name: 'children',

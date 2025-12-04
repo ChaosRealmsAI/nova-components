@@ -1,6 +1,6 @@
 import type { ThemeDefinition } from '@/types';
 import { tokens, meta } from './tokens';
-import { buttonBaseConfig } from '@/components/nova-ui/atmos/button/button.config';
+import { buttonConfig } from './components/button';
 import { badgeConfig } from './components/badge';
 import { inputBaseConfig } from '@/components/nova-ui/atmos/input/input.config';
 import { labelBaseConfig } from '@/components/nova-ui/atmos/label/label.config';
@@ -29,9 +29,7 @@ export const shadcnDefaultTheme: ThemeDefinition = {
   cssVars: tokens,
 
   components: {
-    Button: {
-      extend: buttonBaseConfig,
-    },
+    Button: buttonConfig,
     Badge: badgeConfig,
     Input: {
       extend: inputBaseConfig,

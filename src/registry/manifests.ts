@@ -77,6 +77,7 @@ export const MANIFESTS: ManifestRegistry = {
   'avatar': avatarManifest,
   'badge': badgeManifest,
   'button': buttonManifest,
+  // Atmos (Others)
   'checkbox': checkboxManifest,
   'input': inputManifest,
   'kbd': kbdManifest,

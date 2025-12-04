@@ -2,69 +2,100 @@
 
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/lib/themes/use-theme';
-import { buttonBaseConfig } from './button.config';
+import { tv } from 'tailwind-variants';
+import { twMerge } from 'tailwind-merge';
+import { useTheme } from '@/lib/themes';
 
 /**
  * Nova Button
  *
- * Architecture Notes:
- * - Uses `tailwind-variants` with slots for granular theme control.
- * - Exports `buttonBaseConfig` for themes to extend.
+ * 纯净组件，只依赖外部库，不依赖项目内部文件。
  *
- * ADR-002 v2: 物理同源性
- * - Canvas 和导出代码走完全相同的代码路径
- * - 组件内部调用 useTheme() 获取主题配置，自己计算样式
- * - classNames prop 仅用于用户自定义覆盖，不用于 Canvas 注入
+ * 架构：
+ * - L1 (功能层): 静态定义，保证组件功能正常
+ * - L2 (主题层): 从 useTheme 获取，控制视觉风格
+ * - L3 (实例层): 用户传入的 className/classNames
  *
- * ADR-006 v2: 源码即导出
- * - 通过 useTheme() 获取主题配置，支持运行时主题切换
+ * 优先级: L3 > L2 > L1 (通过 twMerge 解决冲突)
  */
 
-export { buttonBaseConfig };
+// ============================================================================
+// Types
+// ============================================================================
 
-export type ButtonVariants = VariantProps<ReturnType<typeof tv>>;
-export type ButtonSlots = keyof typeof buttonBaseConfig.slots;
-export type ButtonClassNames = Partial<Record<ButtonSlots, string>>;
+export type ButtonClassNames = Partial<{
+  base: string;
+}>;
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    ButtonVariants {
+// ============================================================================
+// Utils
+// ============================================================================
+
+const toClassString = (value: string | string[] | undefined): string => {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.join(' ');
+  return value;
+};
+
+// ============================================================================
+// L1: 静态样式定义（功能层）- 在组件外部定义
+// ============================================================================
+
+/** Button 功能层样式 - 只保留功能必需的样式 */
+const buttonBase = tv({
+  slots: {
+    // 功能必需：flex/grid 布局, 交互状态(disabled), 内部元素(svg) 行为
+    base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap disabled:pointer-events-none shrink-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+  },
+});
+
+// ============================================================================
+// Button Component
+// ============================================================================
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
-  /** 用户自定义样式覆盖（ADR-002 v2: 不用于 Canvas 注入） */
   classNames?: ButtonClassNames;
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, classNames, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, classNames, variant = 'default', size = 'default', asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
 
-    // ADR-002 v2 + ADR-006 v2: 从主题上下文获取样式配置
-    // Canvas 和导出代码都走这条路径，保证物理同源
-    //
-    // 核心卖点：运行时主题切换
-    // - 有 ThemeProvider 时：使用主题配置
-    // - 无 ThemeProvider 时：使用 baseConfig（fallback，保证组件可用）
-    const themeContext = useTheme();
-    const themeConfig = themeContext?.currentTheme?.components?.Button;
+    const { currentTheme } = useTheme();
+    const themeConfig = currentTheme?.components?.Button;
 
-    // ADR-008: 组件内部负责 extend，主题配置只覆盖 slots/variants
-    const styles = tv({
-      extend: buttonBaseConfig,
-      ...(themeConfig || {}),
-    });
+    // L1: 功能层（静态）
+    const base = buttonBase();
 
-    // ADR-002 v2: 统一计算样式，classNames 仅用于用户额外覆盖
-    const baseClass = cn(styles({ variant, size }).base(), classNames?.base);
+    // L2: 主题层（用 useMemo 缓存）
+    const themeStyles = React.useMemo(() => {
+      const baseStyle = toClassString(themeConfig?.slots?.base);
+      const variantStyle = toClassString(themeConfig?.variants?.variant?.[variant]?.base);
+      const sizeStyle = toClassString(themeConfig?.variants?.size?.[size]?.base);
+      return { base: baseStyle, variant: variantStyle, size: sizeStyle };
+    }, [themeConfig, variant, size]);
+
+    // 合并: L1 + L2(base) + L2(variant) + L2(size) + L3
+    const rootClass = twMerge(
+      base.base(),
+      themeStyles.base,
+      themeStyles.variant,
+      themeStyles.size,
+      classNames?.base,
+      className
+    );
 
     return (
       <Comp
-        className={cn(baseClass, className)}
+        className={rootClass}
         ref={ref}
         {...props}
-      />
+      >
+        {children}
+      </Comp>
     );
   }
 );

@@ -157,5 +157,12 @@ export const buttonConfig = {
         ],
       },
     },
+
+    size: {
+      default: { base: [] },
+      sm: { base: [] },
+      lg: { base: [] },
+      icon: { base: [] },
+    },
   },
 };

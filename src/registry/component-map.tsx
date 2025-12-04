@@ -17,7 +17,7 @@ import type { MessageKey } from '@/lib/i18n/messages';
 // Atmos 组件导入
 // ============================================================================
 
-import { Button, buttonBaseConfig } from '@/components/nova-ui/atmos/button';
+import { Button } from '@/components/nova-ui/atmos/button';
 import { Badge } from '@/components/nova-ui/atmos/badge';
 import { Input, inputBaseConfig } from '@/components/nova-ui/atmos/input';
 import { Label, labelBaseConfig } from '@/components/nova-ui/atmos/label';
@@ -142,7 +142,7 @@ export interface ComponentMapEntry {
  */
 export const COMPONENT_MAP: Record<string, ComponentMapEntry> = {
   // Atmos
-  'button': { component: Button, baseConfig: buttonBaseConfig },
+  'button': { component: Button, baseConfig: null },
   'badge': { component: Badge, baseConfig: null }, // 纯槽位模式，无 baseConfig
   'input': { component: Input, baseConfig: inputBaseConfig },
   'label': { component: Label, baseConfig: labelBaseConfig },

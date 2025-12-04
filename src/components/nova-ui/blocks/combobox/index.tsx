@@ -46,7 +46,7 @@ export type ComboboxClassNames = Partial<Record<ComboboxSlots, string>>;
 
 export interface ComboboxProps extends React.ComponentProps<typeof Popover> {}
 
-export interface ComboboxTriggerProps extends React.ComponentProps<typeof Button> {
+export interface ComboboxTriggerProps extends Omit<React.ComponentProps<typeof Button>, 'classNames'> {
   classNames?: ComboboxClassNames;
 }
 

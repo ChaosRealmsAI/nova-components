@@ -1,9 +1,6 @@
-/**
- * Button Base Config - ADR-001 标准 Tailwind 类
- */
-export const buttonBaseConfig = {
+export const buttonConfig = {
   slots: {
-    base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+    base: 'rounded-md text-sm font-medium transition-colors disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
   },
   variants: {
     variant: {
@@ -37,4 +34,4 @@ export const buttonBaseConfig = {
     variant: 'default',
     size: 'default',
   },
-} as const;
+};
