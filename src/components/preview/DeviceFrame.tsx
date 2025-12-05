@@ -57,6 +57,8 @@ interface DeviceFrameProps {
   children: ReactNode;
   /** 初始设备，默认 desktop */
   defaultDevice?: DeviceId;
+  /** 受控模式：当前设备 */
+  device?: DeviceId;
   /** 是否显示设备切换器 */
   showDeviceSwitcher?: boolean;
   /** 是否显示设备外框（手机/平板壳） */
@@ -72,13 +74,15 @@ interface DeviceFrameProps {
 export function DeviceFrame({
   children,
   defaultDevice = 'desktop',
+  device: controlledDevice,
   showDeviceSwitcher = true,
   showFrame = true,
   className = '',
   backgroundColor = 'var(--background)',
   onDeviceChange,
 }: DeviceFrameProps) {
-  const [activeDevice, setActiveDevice] = useState<DeviceId>(defaultDevice);
+  const [internalDevice, setInternalDevice] = useState<DeviceId>(defaultDevice);
+  const activeDevice = controlledDevice ?? internalDevice;
   const [orientation, setOrientation] = useState<Orientation>('portrait');
   const { t } = useI18n();
 
@@ -130,7 +134,10 @@ export function DeviceFrame({
   }, [activeDevice, device.width, device.height, onDeviceChange]);
 
   const handleDeviceChange = (deviceId: DeviceId) => {
-    setActiveDevice(deviceId);
+    if (controlledDevice === undefined) {
+      setInternalDevice(deviceId);
+    }
+    // Always call onDeviceChange if provided (works for both controlled and uncontrolled)
   };
 
   const shouldShowFrame = showFrame && device.hasFrame;

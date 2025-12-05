@@ -80,23 +80,21 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+      <div className="relative flex h-16 items-center justify-between px-6 md:px-8 lg:px-12">
         {/* Left: Brand */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-6 h-6 rounded-md bg-gradient-to-tr from-[var(--primary)] to-[var(--secondary)]"
-              style={{
-                '--primary': activeColors['--primary'],
-                '--secondary': activeColors['--secondary']
-              } as React.CSSProperties}
-            />
-            <span className="text-lg font-bold tracking-tight">Nova Components</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <div
+            className="w-6 h-6 rounded-md bg-gradient-to-tr from-[var(--primary)] to-[var(--secondary)]"
+            style={{
+              '--primary': activeColors['--primary'],
+              '--secondary': activeColors['--secondary']
+            } as React.CSSProperties}
+          />
+          <span className="text-lg font-bold tracking-tight">Nova Components</span>
         </div>
 
-        {/* Center: Filter Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-muted/50 rounded-lg p-1">
+        {/* Center: Filter Tabs (absolute for true center) */}
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-1 bg-muted/50 rounded-lg p-1">
           {FILTER_OPTIONS.map((option) => {
             const count = option.id === 'all'
               ? useGalleryStore.getState().components.length

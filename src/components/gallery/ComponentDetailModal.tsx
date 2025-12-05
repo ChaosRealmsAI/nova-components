@@ -1,29 +1,31 @@
 'use client';
 
-import { createElement, useState, useEffect } from 'react';
+import { createElement, useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/shadcn_ui/dialog';
 import { useGalleryStore } from '@/stores/gallery-store';
+import { useThemeStore } from '@/stores/theme-store';
 import { getComponentEntry } from '@/registry/component-registry';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import { getLocalizedPropValue } from '@/lib/i18n/utils';
 import type { MessageKey } from '@/lib/i18n/messages';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { X, Monitor, Tablet, Smartphone, Copy, Check } from 'lucide-react';
-
-type DeviceType = 'desktop' | 'tablet' | 'mobile';
-
-const DEVICE_SIZES: Record<DeviceType, { width: string; label: string }> = {
-  desktop: { width: '100%', label: 'Desktop' },
-  tablet: { width: '768px', label: 'Tablet' },
-  mobile: { width: '375px', label: 'Mobile' },
-};
+import { X, Copy, Check, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { DeviceFrame, type DeviceId, devices } from '@/components/preview/DeviceFrame';
 
 export function ComponentDetailModal() {
   const { showDetailModal, closeDetailModal, getSelectedComponent } = useGalleryStore();
+  const { getMergedCssVars } = useThemeStore();
   const { t } = useI18n();
-  const [device, setDevice] = useState<DeviceType>('desktop');
   const [copied, setCopied] = useState(false);
   const [componentProps, setComponentProps] = useState<Record<string, any>>({});
+  const [device, setDevice] = useState<DeviceId>('desktop');
+
+  const cssVars = getMergedCssVars();
+  const cssVarsStyle = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(cssVars).map(([key, value]) => [key, value])
+    );
+  }, [cssVars]);
 
   const selectedComponent = getSelectedComponent();
   const entry = selectedComponent ? getComponentEntry(selectedComponent.type) : null;
@@ -109,41 +111,48 @@ export function ComponentDetailModal() {
         </VisuallyHidden>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl font-semibold">{label}</h2>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-border">
+          {/* Left: Title & Category */}
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold">{label}</h2>
             <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-muted text-muted-foreground capitalize">
               {selectedComponent.category}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Device Switcher */}
-            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-              {(Object.keys(DEVICE_SIZES) as DeviceType[]).map((d) => {
-                const Icon = d === 'desktop' ? Monitor : d === 'tablet' ? Tablet : Smartphone;
-                return (
-                  <button
-                    key={d}
-                    onClick={() => setDevice(d)}
-                    className={`p-2 rounded-md transition-colors ${
-                      device === d ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                    title={DEVICE_SIZES[d].label}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </button>
-                );
-              })}
-            </div>
+          {/* Center: Device Switcher */}
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+            {(Object.keys(devices) as DeviceId[]).map((deviceId) => {
+              const d = devices[deviceId];
+              const Icon = deviceId === 'desktop' ? Monitor : deviceId === 'tablet' ? Tablet : Smartphone;
+              const isActive = device === deviceId;
+              return (
+                <button
+                  key={deviceId}
+                  onClick={() => setDevice(deviceId)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    isActive
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title={d.name}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{d.name}</span>
+                </button>
+              );
+            })}
+          </div>
 
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2">
             {/* Copy Button */}
             <button
               onClick={handleCopyCode}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              <span className="text-sm font-medium">{copied ? 'Copied!' : 'Copy Code'}</span>
+              <span className="font-medium">{copied ? 'Copied!' : 'Copy'}</span>
             </button>
 
             {/* Close Button */}
@@ -158,31 +167,27 @@ export function ComponentDetailModal() {
 
         {/* Content */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Preview Area */}
-          <div className="flex-1 flex flex-col overflow-hidden border-r border-border">
-            <div className="flex-1 flex items-center justify-center p-8 bg-muted/30 overflow-auto">
+          {/* Preview Area with DeviceFrame */}
+          <div
+            className="flex-1 flex flex-col overflow-hidden border-r border-border"
+            style={{
+              ...cssVarsStyle,
+              '--background': cssVars['--background'] || '#09090b',
+            } as React.CSSProperties}
+          >
+            <DeviceFrame
+              device={device}
+              showDeviceSwitcher={false}
+              showFrame={true}
+              backgroundColor="var(--background)"
+            >
               <div
-                className="flex items-center justify-center min-h-[200px] rounded-xl border border-border bg-background p-8 transition-all"
-                style={{
-                  width: DEVICE_SIZES[device].width,
-                  maxWidth: '100%',
-                }}
+                className="min-h-full flex items-center justify-center p-8"
+                style={cssVarsStyle as React.CSSProperties}
               >
-                {/* Grid Background */}
-                <div
-                  className="absolute inset-0 rounded-xl opacity-30"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 1px)`,
-                    backgroundSize: '16px 16px',
-                  }}
-                />
-
-                {/* Component */}
-                <div className="relative z-10">
-                  {createElement(entry.component, prepareProps())}
-                </div>
+                {createElement(entry.component, prepareProps())}
               </div>
-            </div>
+            </DeviceFrame>
           </div>
 
           {/* Props Panel */}

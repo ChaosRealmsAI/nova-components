@@ -8,8 +8,8 @@ export function ComponentGrid() {
   const components = getFilteredComponents();
 
   return (
-    <div className="container px-4 md:px-6 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="w-full px-6 md:px-8 lg:px-12 py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {components.map((component) => (
           <ComponentCard key={component.id} component={component} />
         ))}
