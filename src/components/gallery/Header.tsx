@@ -8,15 +8,10 @@ import { useI18n } from '@/lib/i18n/use-i18n';
 import { ChevronDown, Shuffle } from 'lucide-react';
 import { LANGUAGES } from '@/lib/i18n/languages';
 import type { ComponentCategory } from '@/types';
+import type { MessageKey } from '@/lib/i18n/messages';
 
 // Filter options
 type FilterOption = 'all' | ComponentCategory;
-
-const FILTER_OPTIONS: { id: FilterOption; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'atoms', label: 'Atoms' },
-  { id: 'blocks', label: 'Blocks' },
-];
 
 // Theme palette preview
 const ThemePalettePreview = ({ colors }: { colors?: Record<string, string | undefined> }) => {
@@ -95,24 +90,27 @@ export function Header() {
 
         {/* Center: Filter Tabs (absolute for true center) */}
         <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-1 bg-muted/50 rounded-lg p-1">
-          {FILTER_OPTIONS.map((option) => {
-            const count = option.id === 'all'
+          {(['all', 'atoms', 'blocks'] as FilterOption[]).map((optionId) => {
+            const count = optionId === 'all'
               ? useGalleryStore.getState().components.length
-              : useGalleryStore.getState().components.filter(c => c.category === option.id).length;
+              : useGalleryStore.getState().components.filter(c => c.category === optionId).length;
+
+            const labelKey: MessageKey = optionId === 'all' ? 'filterAll' : optionId === 'atoms' ? 'filterAtoms' : 'filterBlocks';
+            const label = t(labelKey);
 
             return (
               <button
-                key={option.id}
-                onClick={() => setFilter(option.id)}
+                key={optionId}
+                onClick={() => setFilter(optionId)}
                 className={`
                   px-4 py-1.5 rounded-md text-sm font-medium transition-all
-                  ${filter === option.id
+                  ${filter === optionId
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                   }
                 `}
               >
-                {option.label}
+                {label}
                 <span className="ml-1.5 text-xs opacity-60">({count})</span>
               </button>
             );

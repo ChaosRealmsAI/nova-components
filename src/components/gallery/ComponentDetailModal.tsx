@@ -198,7 +198,11 @@ export function ComponentDetailModal() {
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold">{label}</h2>
             <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-muted text-muted-foreground capitalize">
-              {selectedComponent.category}
+              {selectedComponent.category === 'atoms' 
+                ? t('categoryAtoms' as MessageKey, 'Atoms')
+                : selectedComponent.category === 'blocks'
+                ? t('categoryBlocks' as MessageKey, 'Blocks')
+                : selectedComponent.category}
             </span>
           </div>
 
