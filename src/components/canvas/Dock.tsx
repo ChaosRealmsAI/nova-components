@@ -1,18 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { useLayoutStore } from '@/stores/layout-store';
 import type { ComponentCategory } from '@/types';
-import { useEditor } from 'tldraw';
-import { 
-  MousePointer2, 
-  Hand, 
-  BookOpen, 
-  LayoutGrid, 
-  Atom, 
-  Box, 
-  Columns, 
+import {
+  BookOpen,
+  LayoutGrid,
+  Atom,
+  Box,
+  Columns,
   LayoutPanelTop,
   type LucideIcon
 } from 'lucide-react';
@@ -121,25 +118,8 @@ function DockItem({ icon: Icon, label, isActive, isDisabled, onClick, mouseX, sh
 export function Dock() {
   const { filter, setFilter, components, showAboutModal, toggleAboutModal } = useCanvasStore();
   const { showBottomPanel, bottomPanelHeight } = useLayoutStore();
-  const editor = useEditor();
   const { t } = useI18n();
-  const [activeTool, setActiveTool] = useState('select');
   const mouseX = useMotionValue(Infinity);
-
-  // Sync active tool from editor
-  useEffect(() => {
-    if (!editor) return;
-    const initialTool = editor.getCurrentToolId();
-    
-    const handleChange = () => {
-      setActiveTool(editor.getCurrentToolId());
-    };
-
-    const cleanup = editor.store.listen(handleChange);
-    
-    queueMicrotask(() => setActiveTool(initialTool));
-    return () => cleanup();
-  }, [editor]);
 
   const getCategoryCount = (category: FilterOption) => {
     if (category === 'all') return components.length;
@@ -150,8 +130,8 @@ export function Dock() {
     <motion.nav
       role="navigation"
       initial={{ bottom: 32 }}
-      animate={{ 
-        bottom: showBottomPanel ? bottomPanelHeight + 32 : 32 
+      animate={{
+        bottom: showBottomPanel ? bottomPanelHeight + 32 : 32
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       onMouseMove={(e) => mouseX.set(e.pageX)}
@@ -159,36 +139,13 @@ export function Dock() {
       className="absolute left-1/2 -translate-x-1/2 z-40 flex items-end gap-4"
     >
       <div className="h-[58px] flex items-end gap-2 px-4 pb-2 rounded-3xl border border-border/50 bg-surface-1 backdrop-blur-xl shadow-2xl">
-        
-        {/* Tools Group */}
-        <div className="flex items-center gap-2 pb-0.5">
-          <DockItem
-            icon={MousePointer2}
-            label={t('canvasSelectTool')}
-            isActive={activeTool === 'select'}
-            onClick={() => editor?.setCurrentTool('select')}
-            mouseX={mouseX}
-            showDot={activeTool === 'select'}
-          />
-          <DockItem
-            icon={Hand}
-            label={t('canvasHandTool')}
-            isActive={activeTool === 'hand'}
-            onClick={() => editor?.setCurrentTool('hand')}
-            mouseX={mouseX}
-            showDot={activeTool === 'hand'}
-          />
-        </div>
-
-        {/* Divider */}
-        <div className="w-px h-8 bg-border mx-1 mb-2.5" />
 
         {/* Filters Group */}
         <div className="flex items-center gap-2 pb-0.5">
           {FILTER_OPTIONS.map((option) => {
             const count = getCategoryCount(option.id);
             const isDisabled = count === 0 && option.id !== 'all';
-            
+
             return (
               <DockItem
                 key={option.id}

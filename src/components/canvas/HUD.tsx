@@ -7,7 +7,7 @@ import { getAllThemes } from '@/lib/themes';
 import { useI18n } from '@/lib/i18n/use-i18n';
 import { ChevronDown, Shuffle, Minus, Plus } from 'lucide-react';
 import { LANGUAGES } from '@/lib/i18n/languages';
-import { useEditor } from 'tldraw';
+import { useCanvasContext } from './Canvas';
 
 // Helper to render the 5-color palette preview
 const ThemePalettePreview = ({ colors }: { colors?: Record<string, string | undefined> }) => {
@@ -33,42 +33,38 @@ const ThemePalettePreview = ({ colors }: { colors?: Record<string, string | unde
 };
 
 const ZoomControl = () => {
-  const editor = useEditor();
-  const [zoom, setZoom] = useState(1);
+  const { transformRef, scale } = useCanvasContext();
 
-  useEffect(() => {
-    if (!editor) return;
+  const handleZoomIn = () => {
+    transformRef.current?.zoomIn();
+  };
 
-    setZoom(editor.getZoomLevel());
+  const handleZoomOut = () => {
+    transformRef.current?.zoomOut();
+  };
 
-    const handleChange = () => {
-      setZoom(editor.getZoomLevel());
-    };
-
-    const cleanup = editor.store.listen(handleChange);
-    return cleanup;
-  }, [editor]);
-
-  if (!editor) return null;
+  const handleReset = () => {
+    transformRef.current?.resetTransform();
+  };
 
   return (
     <div className="playground-hud-container border rounded-lg p-1 shadow-xl flex items-center gap-1">
       <button
-        onClick={() => editor.zoomOut()}
+        onClick={handleZoomOut}
         className="playground-hud-btn w-8 h-8 flex items-center justify-center rounded-md transition-colors active:scale-95"
         title="Zoom Out"
       >
         <Minus className="w-4 h-4" />
       </button>
       <button
-        onClick={() => editor.resetZoom()}
+        onClick={handleReset}
         className="playground-hud-btn min-w-[3.5rem] px-2 h-8 flex items-center justify-center rounded-md text-[length:var(--text-sm)] font-medium transition-colors"
         title="Reset Zoom (100%)"
       >
-        {Math.round(zoom * 100)}%
+        {Math.round(scale * 100)}%
       </button>
       <button
-        onClick={() => editor.zoomIn()}
+        onClick={handleZoomIn}
         className="playground-hud-btn w-8 h-8 flex items-center justify-center rounded-md transition-colors active:scale-95"
         title="Zoom In"
       >
@@ -104,7 +100,6 @@ export function HUD() {
   }, []);
 
   const handleShuffle = () => {
-    // 随机切换主题（排除当前主题）
     const candidates = allThemes.filter((t) => t.id !== theme.id);
     if (candidates.length === 0) return;
 
@@ -115,9 +110,7 @@ export function HUD() {
 
   const currentThemeLabel = theme?.nameKey ? t(theme.nameKey, theme.name) : (theme?.name || 'Default');
 
-  // Active theme colors (merged with user customization for real-time preview)
   const activeColors = getMergedCssVars();
-  // For logo gradient
   const primaryColor = activeColors['--primary'] || theme?.cssVars?.['--primary'];
   const secondaryColor = activeColors['--secondary'] || theme?.cssVars?.['--secondary'];
 
@@ -126,7 +119,7 @@ export function HUD() {
       {/* Top Left Group: Brand & Theme Tools */}
       <header
         role="banner"
-        aria-label="Nova Components Toolbar - Theme selection and global settings"
+        aria-label="Nova Components Toolbar"
         data-testid="hud-toolbar"
         className="absolute top-6 left-6 flex items-center gap-3 z-50"
       >
@@ -134,7 +127,6 @@ export function HUD() {
         <button
           onClick={toggleAboutModal}
           aria-label="Nova Components - Click to open About dialog"
-          aria-description="Opens a modal showing project information, version, and development log"
           data-testid="hud-brand-button"
           className="playground-hud-container px-3 py-2 border rounded-lg flex items-center gap-2 shadow-xl select-none cursor-pointer hover:bg-[var(--surface-2)] transition-colors"
         >
@@ -153,7 +145,7 @@ export function HUD() {
         {/* Global Tools Group */}
         <nav
           role="toolbar"
-          aria-label="Theme Tools - Switch themes and randomize"
+          aria-label="Theme Tools"
           data-testid="hud-theme-toolbar"
           className="playground-hud-container flex items-center gap-2 border rounded-lg p-1 shadow-xl"
         >
@@ -163,7 +155,6 @@ export function HUD() {
             <button
               onClick={() => setIsThemeOpen(!isThemeOpen)}
               aria-label={`Current theme: ${currentThemeLabel}. Click to switch theme`}
-              aria-description="Opens a dropdown menu with all available themes. Select a theme to change the visual appearance of all components"
               aria-expanded={isThemeOpen}
               aria-haspopup="listbox"
               data-testid="hud-theme-switcher"
@@ -197,7 +188,6 @@ export function HUD() {
                       role="option"
                       aria-selected={isActive}
                       aria-label={`Theme: ${label}${isActive ? ' (currently active)' : ''}`}
-                      aria-description={`Click to apply the ${label} theme to all components`}
                       data-testid={`hud-theme-option-${item.id}`}
                       onClick={() => {
                         setTheme(item.id);
@@ -227,7 +217,6 @@ export function HUD() {
           <button
             onClick={handleShuffle}
             aria-label="Random Theme"
-            aria-description="Randomly switch to a different theme. Click multiple times to cycle through all available themes"
             data-testid="hud-shuffle-theme"
             className="playground-hud-btn flex items-center justify-center px-3 py-1.5 rounded-md transition-colors active:scale-95 h-full"
             title={t('shuffleTheme')}
@@ -257,7 +246,6 @@ export function HUD() {
                 <button
                   onClick={() => setIsLangOpen(!isLangOpen)}
                   aria-label={`Language: ${currentLang.name}. Click to change language`}
-                  aria-description="Opens a dropdown to switch the interface language. All UI text will change to the selected language"
                   aria-expanded={isLangOpen}
                   aria-haspopup="listbox"
                   data-testid="hud-language-switcher"
