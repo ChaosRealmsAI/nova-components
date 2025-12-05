@@ -9,7 +9,7 @@ import { useI18n } from '@/lib/i18n/use-i18n';
 import { getLocalizedPropValue } from '@/lib/i18n/utils';
 import type { MessageKey } from '@/lib/i18n/messages';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { X, Copy, Check, Monitor, Tablet, Smartphone, ChevronDown, ChevronUp, Code2 } from 'lucide-react';
+import { X, Copy, Check, Monitor, Tablet, Smartphone, Code2 } from 'lucide-react';
 import { DeviceFrame, type DeviceId, devices } from '@/components/preview/DeviceFrame';
 import { FileTree } from '@/components/devmode/FileTree';
 import { CodeDisplay } from '@/components/devmode/CodeDisplay';
@@ -32,7 +32,7 @@ export function ComponentDetailModal() {
   const [copied, setCopied] = useState(false);
   const [componentProps, setComponentProps] = useState<Record<string, any>>({});
   const [device, setDevice] = useState<DeviceId>('desktop');
-  const [showCode, setShowCode] = useState(true);
+  const [showCode, setShowCode] = useState(false);
   const [activeFile, setActiveFile] = useState<string>('');
   const [generatedResult, setGeneratedResult] = useState<GeneratedResult | null>(null);
 
@@ -229,8 +229,19 @@ export function ComponentDetailModal() {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowCode(!showCode)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                showCode
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Code2 className="w-4 h-4" />
+              <span className="font-medium">Code</span>
+            </button>
+            <button
               onClick={handleCopyAll}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               <span className="font-medium">{copied ? 'Copied!' : 'Copy All'}</span>
@@ -325,26 +336,8 @@ export function ComponentDetailModal() {
           </div>
 
           {/* Bottom: Code Panel */}
-          <div className={`flex flex-col border-t border-border ${showCode ? 'h-1/2' : 'h-10'}`}>
-            {/* Code Panel Header */}
-            <button
-              onClick={() => setShowCode(!showCode)}
-              className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors shrink-0"
-            >
-              <div className="flex items-center gap-2">
-                <Code2 className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Code</span>
-                <span className="text-xs text-muted-foreground">({files.length} files)</span>
-              </div>
-              {showCode ? (
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              ) : (
-                <ChevronUp className="w-4 h-4 text-muted-foreground" />
-              )}
-            </button>
-
-            {/* Code Content */}
-            {showCode && (
+          {showCode && (
+            <div className="flex flex-col border-t border-border h-1/2">
               <div className="flex-1 flex overflow-hidden min-h-0">
                 {/* File Tree */}
                 <FileTree
@@ -365,8 +358,8 @@ export function ComponentDetailModal() {
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
