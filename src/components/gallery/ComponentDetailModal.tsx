@@ -153,11 +153,26 @@ ${t('promptHtmlCssDesc' as MessageKey)}
 
 ${allCode}`;
 
+    const htmlTailwindPrompt = `# ${t('promptInstruction' as MessageKey)}
+
+${t('promptHtmlTailwindDesc' as MessageKey)}
+
+---
+
+# Component Code
+
+${allCode}`;
+
     return [
       {
         id: '/html-css-replica',
         name: t('promptHtmlCss' as MessageKey),
         content: htmlCssPrompt,
+      },
+      {
+        id: '/html-tailwind-replica',
+        name: t('promptHtmlTailwind' as MessageKey),
+        content: htmlTailwindPrompt,
       },
     ];
   }, [generatedResult, files, t]);
