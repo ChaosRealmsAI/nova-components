@@ -9,16 +9,32 @@ import { useI18n } from '@/lib/i18n/use-i18n';
 import { getLocalizedPropValue } from '@/lib/i18n/utils';
 import type { MessageKey } from '@/lib/i18n/messages';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { X, Copy, Check, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { X, Copy, Check, Monitor, Tablet, Smartphone, ChevronDown, ChevronUp, Code2 } from 'lucide-react';
 import { DeviceFrame, type DeviceId, devices } from '@/components/preview/DeviceFrame';
+import { FileTree } from '@/components/devmode/FileTree';
+import { CodeDisplay } from '@/components/devmode/CodeDisplay';
+import { generateExportPackage, copyToClipboard, type VirtualFile } from '@/generator/codegen';
+import { getAllThemes } from '@/lib/themes';
+import type { ComponentInstance } from '@/types';
+
+interface GeneratedResult {
+  files: VirtualFile[];
+  fileMap: Record<string, string>;
+  filePaths: string[];
+  defaultFile: string;
+}
 
 export function ComponentDetailModal() {
   const { showDetailModal, closeDetailModal, getSelectedComponent } = useGalleryStore();
-  const { getMergedCssVars } = useThemeStore();
-  const { t } = useI18n();
+  const { theme, customTokens, getMergedCssVars } = useThemeStore();
+  const { t, locale } = useI18n();
+
   const [copied, setCopied] = useState(false);
   const [componentProps, setComponentProps] = useState<Record<string, any>>({});
   const [device, setDevice] = useState<DeviceId>('desktop');
+  const [showCode, setShowCode] = useState(true);
+  const [activeFile, setActiveFile] = useState<string>('');
+  const [generatedResult, setGeneratedResult] = useState<GeneratedResult | null>(null);
 
   const cssVars = getMergedCssVars();
   const cssVarsStyle = useMemo(() => {
@@ -40,11 +56,86 @@ export function ComponentDetailModal() {
     }
   }, [selectedComponent?.id]);
 
+  // Generate code when component or theme changes
+  useEffect(() => {
+    if (!selectedComponent || !entry) {
+      setGeneratedResult(null);
+      return;
+    }
+
+    let isMounted = true;
+
+    const runGeneration = async () => {
+      try {
+        // Create a ComponentInstance compatible object
+        const componentInstance: ComponentInstance = {
+          id: selectedComponent.id,
+          type: selectedComponent.type,
+          category: selectedComponent.category,
+          label: selectedComponent.label,
+          labelKey: selectedComponent.labelKey,
+          props: componentProps,
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 50,
+        };
+
+        const allThemes = getAllThemes();
+        const result = await generateExportPackage(
+          componentInstance,
+          allThemes,
+          theme.id,
+          t,
+          customTokens
+        );
+
+        if (!isMounted) return;
+
+        const fileMap = Object.fromEntries(
+          result.files.map((f) => ['/' + f.path, f.content])
+        );
+        const filePaths = result.files.map((f) => '/' + f.path);
+        const instanceFile = filePaths.find((f) => f.startsWith('/My')) || filePaths[0];
+
+        setGeneratedResult({
+          files: result.files,
+          fileMap,
+          filePaths,
+          defaultFile: instanceFile,
+        });
+      } catch (error) {
+        console.error('Failed to generate export package:', error);
+      }
+    };
+
+    runGeneration();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedComponent?.id, componentProps, theme.id, customTokens, t, locale]);
+
+  // Reset activeFile when defaultFile changes
+  useEffect(() => {
+    if (generatedResult?.defaultFile) {
+      setActiveFile(generatedResult.defaultFile);
+    }
+  }, [generatedResult?.defaultFile]);
+
   if (!selectedComponent || !entry) return null;
 
   const label = selectedComponent.labelKey
     ? t(selectedComponent.labelKey as MessageKey, selectedComponent.label)
     : selectedComponent.label;
+
+  const { files, fileMap, filePaths } = generatedResult || {
+    files: [] as VirtualFile[],
+    fileMap: {} as Record<string, string>,
+    filePaths: [] as string[],
+  };
+
+  const currentCode = fileMap[activeFile] || (generatedResult ? '// Select a file to view code' : '// Loading...');
 
   // Prepare props with localization
   const prepareProps = () => {
@@ -79,39 +170,30 @@ export function ComponentDetailModal() {
     }));
   };
 
-  const generateCode = () => {
-    const propsString = Object.entries(componentProps)
-      .filter(([_, value]) => value !== undefined && value !== '')
-      .map(([key, value]) => {
-        if (typeof value === 'boolean') {
-          return value ? key : `${key}={false}`;
-        }
-        if (typeof value === 'string') {
-          return `${key}="${value}"`;
-        }
-        return `${key}={${JSON.stringify(value)}}`;
+  const handleCopyAll = async () => {
+    const allCode = files
+      .map((file) => {
+        const separator = '='.repeat(60);
+        return `// ${separator}\n// ${file.path}\n// ${separator}\n\n${file.content}`;
       })
-      .join(' ');
+      .join('\n\n');
 
-    const componentName = entry.label.replace(/\s+/g, '');
-    return `<${componentName}${propsString ? ' ' + propsString : ''} />`;
-  };
-
-  const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(generateCode());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const success = await copyToClipboard(allCode);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
     <Dialog open={showDetailModal} onOpenChange={(open) => !open && closeDetailModal()}>
-      <DialogContent className="!max-w-[90vw] !w-[1200px] !h-[80vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border">
+      <DialogContent className="!max-w-[95vw] !w-[1400px] !h-[90vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border">
         <VisuallyHidden>
           <DialogTitle>{label}</DialogTitle>
         </VisuallyHidden>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-border">
+        <div className="flex items-center justify-between px-6 py-3 border-b border-border shrink-0">
           {/* Left: Title & Category */}
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold">{label}</h2>
@@ -146,16 +228,13 @@ export function ComponentDetailModal() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            {/* Copy Button */}
             <button
-              onClick={handleCopyCode}
+              onClick={handleCopyAll}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              <span className="font-medium">{copied ? 'Copied!' : 'Copy'}</span>
+              <span className="font-medium">{copied ? 'Copied!' : 'Copy All'}</span>
             </button>
-
-            {/* Close Button */}
             <button
               onClick={closeDetailModal}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -165,85 +244,128 @@ export function ComponentDetailModal() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Preview Area with DeviceFrame */}
-          <div
-            className="flex-1 flex flex-col overflow-hidden border-r border-border"
-            style={{
-              ...cssVarsStyle,
-              '--background': cssVars['--background'] || '#09090b',
-            } as React.CSSProperties}
-          >
-            <DeviceFrame
-              device={device}
-              showDeviceSwitcher={false}
-              showFrame={true}
-              backgroundColor="var(--background)"
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+          {/* Top: Preview + Props */}
+          <div className={`flex overflow-hidden ${showCode ? 'h-1/2' : 'flex-1'}`}>
+            {/* Preview Area */}
+            <div
+              className="flex-1 flex flex-col overflow-hidden border-r border-border"
+              style={{
+                ...cssVarsStyle,
+                '--background': cssVars['--background'] || '#09090b',
+              } as React.CSSProperties}
             >
-              <div
-                className="min-h-full flex items-center justify-center p-8"
-                style={cssVarsStyle as React.CSSProperties}
+              <DeviceFrame
+                device={device}
+                showDeviceSwitcher={false}
+                showFrame={true}
+                backgroundColor="var(--background)"
               >
-                {createElement(entry.component, prepareProps())}
+                <div
+                  className="min-h-full flex items-center justify-center p-8"
+                  style={cssVarsStyle as React.CSSProperties}
+                >
+                  {createElement(entry.component, prepareProps())}
+                </div>
+              </DeviceFrame>
+            </div>
+
+            {/* Props Panel */}
+            <div className="w-[280px] flex flex-col overflow-hidden shrink-0">
+              <div className="px-4 py-2 border-b border-border shrink-0">
+                <h3 className="text-sm font-semibold">Properties</h3>
               </div>
-            </DeviceFrame>
+              <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                {entry.props.map((propMeta) => (
+                  <div key={propMeta.name} className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">
+                      {propMeta.name}
+                    </label>
+                    {propMeta.type === 'boolean' ? (
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={componentProps[propMeta.name] ?? false}
+                          onChange={(e) => handlePropChange(propMeta.name, e.target.checked)}
+                          className="w-4 h-4 rounded border-border"
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {componentProps[propMeta.name] ? 'true' : 'false'}
+                        </span>
+                      </label>
+                    ) : propMeta.options ? (
+                      <select
+                        value={componentProps[propMeta.name] ?? ''}
+                        onChange={(e) => handlePropChange(propMeta.name, e.target.value)}
+                        className="w-full px-2 py-1.5 text-xs rounded-md border border-border bg-background"
+                      >
+                        {propMeta.options.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={componentProps[propMeta.name] ?? ''}
+                        onChange={(e) => handlePropChange(propMeta.name, e.target.value)}
+                        className="w-full px-2 py-1.5 text-xs rounded-md border border-border bg-background"
+                        placeholder={propMeta.name}
+                      />
+                    )}
+                  </div>
+                ))}
+                {entry.props.length === 0 && (
+                  <p className="text-xs text-muted-foreground">No configurable properties</p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Props Panel */}
-          <div className="w-[320px] flex flex-col overflow-hidden">
-            <div className="px-4 py-3 border-b border-border">
-              <h3 className="text-sm font-semibold">Properties</h3>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {entry.props.map((propMeta) => (
-                <div key={propMeta.name} className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground">
-                    {propMeta.name}
-                  </label>
-
-                  {propMeta.type === 'boolean' ? (
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={componentProps[propMeta.name] ?? false}
-                        onChange={(e) => handlePropChange(propMeta.name, e.target.checked)}
-                        className="w-4 h-4 rounded border-border"
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {componentProps[propMeta.name] ? 'true' : 'false'}
-                      </span>
-                    </label>
-                  ) : propMeta.options ? (
-                    <select
-                      value={componentProps[propMeta.name] ?? ''}
-                      onChange={(e) => handlePropChange(propMeta.name, e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      {propMeta.options.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      value={componentProps[propMeta.name] ?? ''}
-                      onChange={(e) => handlePropChange(propMeta.name, e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      placeholder={`Enter ${propMeta.name}`}
-                    />
-                  )}
-
-                </div>
-              ))}
-
-              {entry.props.length === 0 && (
-                <p className="text-sm text-muted-foreground">No configurable properties</p>
+          {/* Bottom: Code Panel */}
+          <div className={`flex flex-col border-t border-border ${showCode ? 'h-1/2' : 'h-10'}`}>
+            {/* Code Panel Header */}
+            <button
+              onClick={() => setShowCode(!showCode)}
+              className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors shrink-0"
+            >
+              <div className="flex items-center gap-2">
+                <Code2 className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Code</span>
+                <span className="text-xs text-muted-foreground">({files.length} files)</span>
+              </div>
+              {showCode ? (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronUp className="w-4 h-4 text-muted-foreground" />
               )}
-            </div>
+            </button>
+
+            {/* Code Content */}
+            {showCode && (
+              <div className="flex-1 flex overflow-hidden min-h-0">
+                {/* File Tree */}
+                <FileTree
+                  files={filePaths}
+                  activeFile={activeFile}
+                  onSelect={setActiveFile}
+                />
+
+                {/* Code Display */}
+                <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+                  <div className="h-8 border-b border-border flex items-center px-4 shrink-0 bg-muted/30">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {activeFile ? activeFile.split('/').pop() : 'Select a file'}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-hidden">
+                    <CodeDisplay code={currentCode} filename={activeFile} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>
