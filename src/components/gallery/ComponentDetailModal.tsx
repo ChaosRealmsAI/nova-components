@@ -288,7 +288,7 @@ export function ComponentDetailModal() {
                 <h3 className="text-sm font-semibold">Properties</h3>
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                {entry.props.map((propMeta) => (
+                {entry.props.filter((p) => p.type !== 'json').map((propMeta) => (
                   <div key={propMeta.name} className="space-y-1">
                     <label className="text-xs font-medium text-foreground">
                       {propMeta.name}
@@ -328,7 +328,7 @@ export function ComponentDetailModal() {
                     )}
                   </div>
                 ))}
-                {entry.props.length === 0 && (
+                {entry.props.filter((p) => p.type !== 'json').length === 0 && (
                   <p className="text-xs text-muted-foreground">No configurable properties</p>
                 )}
               </div>
