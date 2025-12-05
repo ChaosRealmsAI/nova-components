@@ -187,7 +187,7 @@ export function ComponentDetailModal() {
 
   return (
     <Dialog open={showDetailModal} onOpenChange={(open) => !open && closeDetailModal()}>
-      <DialogContent className="!max-w-[95vw] !w-[1400px] !h-[90vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border">
+      <DialogContent className="!max-w-[95vw] !w-[1400px] !h-[90vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border" showCloseButton={false}>
         <VisuallyHidden>
           <DialogTitle>{label}</DialogTitle>
         </VisuallyHidden>
