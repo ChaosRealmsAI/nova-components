@@ -126,17 +126,49 @@ export function ComponentDetailModal() {
     }
   }, [generatedResult?.defaultFile]);
 
-  if (!selectedComponent || !entry) return null;
-
-  const label = selectedComponent.labelKey
-    ? t(selectedComponent.labelKey as MessageKey, selectedComponent.label)
-    : selectedComponent.label;
-
   const { files, fileMap, filePaths } = generatedResult || {
     files: [] as VirtualFile[],
     fileMap: {} as Record<string, string>,
     filePaths: [] as string[],
   };
+
+  // Generate prompt templates - must be before early return
+  const promptTemplates = useMemo(() => {
+    if (!generatedResult || files.length === 0) return [];
+
+    const allCode = files
+      .map((file) => {
+        const separator = '='.repeat(60);
+        return `// ${separator}\n// ${file.path}\n// ${separator}\n\n${file.content}`;
+      })
+      .join('\n\n');
+
+    const htmlCssPrompt = `# ${t('promptInstruction' as MessageKey)}
+
+${t('promptHtmlCssDesc' as MessageKey)}
+
+---
+
+# Component Code
+
+${allCode}`;
+
+    return [
+      {
+        id: '/html-css-replica',
+        name: t('promptHtmlCss' as MessageKey),
+        content: htmlCssPrompt,
+      },
+    ];
+  }, [generatedResult, files, t]);
+
+  const currentPromptContent = promptTemplates.find(p => p.id === activePrompt)?.content || '';
+
+  if (!selectedComponent || !entry) return null;
+
+  const label = selectedComponent.labelKey
+    ? t(selectedComponent.labelKey as MessageKey, selectedComponent.label)
+    : selectedComponent.label;
 
   const currentCode = fileMap[activeFile] || (generatedResult ? t('selectFileToViewCode') : t('codeLoading'));
 
@@ -187,38 +219,6 @@ export function ComponentDetailModal() {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-  // Generate prompt templates
-  const promptTemplates = useMemo(() => {
-    if (!generatedResult || files.length === 0) return [];
-
-    const allCode = files
-      .map((file) => {
-        const separator = '='.repeat(60);
-        return `// ${separator}\n// ${file.path}\n// ${separator}\n\n${file.content}`;
-      })
-      .join('\n\n');
-
-    const htmlCssPrompt = `# ${t('promptInstruction' as MessageKey)}
-
-${t('promptHtmlCssDesc' as MessageKey)}
-
----
-
-# Component Code
-
-${allCode}`;
-
-    return [
-      {
-        id: '/html-css-replica',
-        name: t('promptHtmlCss' as MessageKey),
-        content: htmlCssPrompt,
-      },
-    ];
-  }, [generatedResult, files, t]);
-
-  const currentPromptContent = promptTemplates.find(p => p.id === activePrompt)?.content || '';
 
   const handleCopyPrompt = async () => {
     const success = await copyToClipboard(currentPromptContent);
