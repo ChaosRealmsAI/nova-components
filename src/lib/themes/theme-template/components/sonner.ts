@@ -55,4 +55,27 @@ export const sonnerConfig = {
      */
     icon: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认 Toast
+       */
+      default: {
+        root: [],
+        title: [],
+        description: [],
+        actionButton: [],
+        cancelButton: [],
+        closeButton: [],
+        success: [],
+        error: [],
+        warning: [],
+        info: [],
+        icon: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

@@ -58,10 +58,20 @@
  */
 export const scrollAreaConfig = {
   slots: {
+    /**
+     * base: 滚动区域基础样式
+     * ⚠️ 必须包含高度，否则滚动条不会显示
+     */
     base: [
       'relative overflow-hidden',
+      // 尺寸 - 必需
+      'h-64 w-full',
+      // 形状 - 野兽派无圆角
       'rounded-none',
+      // 边框 - 粗黑边框
       'border-2 border-black',
+      // 背景
+      'bg-white',
     ],
 
     viewport: [
@@ -94,6 +104,22 @@ export const scrollAreaConfig = {
       'text-foreground',
     ],
   },
+  variants: {
+    variant: {
+      default: {
+        base: [],
+        viewport: [],
+        content: [],
+        header: [],
+        item: [],
+        itemIndex: [],
+        itemText: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };
 
 export const scrollBarConfig = {
@@ -101,6 +127,10 @@ export const scrollBarConfig = {
     base: [
       'flex touch-none select-none transition-colors',
       'hover:bg-black/10',
+      // 垂直方向
+      'data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2.5',
+      // 水平方向
+      'data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:flex-col',
     ],
 
     thumb: [
@@ -110,5 +140,16 @@ export const scrollBarConfig = {
       'before:-translate-x-1/2 before:-translate-y-1/2',
       'before:h-full before:min-h-[44px] before:w-full before:min-w-[44px]',
     ],
+  },
+  variants: {
+    variant: {
+      default: {
+        base: [],
+        thumb: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

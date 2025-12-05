@@ -60,4 +60,28 @@ export const comboboxConfig = {
      */
     separator: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认组合框
+       */
+      default: {
+        trigger: [],
+        content: [],
+        command: [],
+        inputWrapper: [],
+        input: [],
+        list: [],
+        empty: [],
+        group: [],
+        item: [],
+        searchIcon: [],
+        icon: [],
+        separator: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

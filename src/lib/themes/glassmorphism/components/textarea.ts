@@ -63,4 +63,4 @@ export const textareaConfig = {
       },
     },
   },
-} as const;
+};

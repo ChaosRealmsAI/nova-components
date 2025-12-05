@@ -55,4 +55,4 @@ export const labelConfig = {
     variant: 'default',
     size: 'default',
   },
-} as const;
+};

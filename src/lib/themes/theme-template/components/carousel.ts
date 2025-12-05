@@ -25,4 +25,21 @@ export const carouselConfig = {
      */
     next: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认轮播
+       */
+      default: {
+        root: [],
+        content: [],
+        item: [],
+        previous: [],
+        next: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

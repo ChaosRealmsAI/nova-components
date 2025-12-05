@@ -25,7 +25,15 @@ export const resizableConfig = {
       /**
        * default: 默认样式
        */
-      default: {},
+      default: {
+        panelGroup: [],
+        panel: [],
+        handle: [],
+        handleIcon: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };

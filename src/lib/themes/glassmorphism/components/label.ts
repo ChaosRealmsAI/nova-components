@@ -41,4 +41,4 @@ export const labelConfig = {
       },
     },
   },
-} as const;
+};

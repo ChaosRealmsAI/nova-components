@@ -5,4 +5,17 @@ export const popoverConfig = {
      */
     content: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认弹出框
+       */
+      default: {
+        content: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

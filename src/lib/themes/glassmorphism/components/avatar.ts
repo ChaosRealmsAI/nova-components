@@ -25,7 +25,7 @@ export const avatarConfig = {
       xl: { base: 'size-20' },
     },
   },
-} as const;
+};
 
 export const avatarFallbackConfig = {
   slots: {
@@ -48,4 +48,4 @@ export const avatarFallbackConfig = {
       xl: { base: 'text-[length:var(--text-xl)]' },
     },
   },
-} as const;
+};

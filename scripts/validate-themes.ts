@@ -212,6 +212,136 @@ function validateSlotsAgainstTemplate(
   return result;
 }
 
+// ============================================================================
+// 必需样式配置 - 功能性验证规则
+// ============================================================================
+//
+// 📌 这是防止"组件不工作"问题的核心机制
+//
+// 某些样式是"功能性必需"的，没有它们组件就无法正常工作。
+// 在这里配置这些规则，验证脚本会自动检查所有主题。
+//
+// 添加新规则的步骤：
+// 1. 在 REQUIRED_STYLES 中添加配置
+// 2. 运行 pnpm validate:themes 确认生效
+// ============================================================================
+
+interface RequiredStyleRule {
+  slot: string;                    // 要检查的 slot 名称
+  patterns: RegExp[];              // 必需样式的正则模式（满足任一即可）
+  allRequired?: boolean;           // true = 所有模式都必须匹配
+  description: string;             // 样式描述（用于错误信息）
+  reason: string;                  // 为什么必需（用于错误信息）
+}
+
+/**
+ * 必需样式配置表
+ *
+ * 格式: { 组件名: [规则1, 规则2, ...] }
+ *
+ * 💡 发现新的必需样式？在这里添加规则即可！
+ */
+const REQUIRED_STYLES: Record<string, RequiredStyleRule[]> = {
+  // ScrollArea 必须有高度，否则滚动条不会显示
+  'ScrollArea': [
+    {
+      slot: 'base',
+      patterns: [
+        /\bh-\d+/,           // h-64, h-48 等
+        /\bh-\[.+\]/,        // h-[200px] 等任意值
+        /\bmin-h-/,          // min-h-*
+        /\bmax-h-/,          // max-h-*
+        /\bh-full/,          // h-full
+        /\bh-screen/,        // h-screen
+      ],
+      description: '高度定义 (如 h-64)',
+      reason: '没有高度限制，内容不会溢出，滚动条不会显示',
+    },
+  ],
+
+  // ScrollBar 必须有方向尺寸样式
+  'ScrollBar': [
+    {
+      slot: 'base',
+      patterns: [
+        /data-\[orientation=vertical\]/,
+        /data-\[orientation=horizontal\]/,
+      ],
+      allRequired: true,  // 两个方向都必须有
+      description: '方向尺寸样式 (data-[orientation=vertical/horizontal])',
+      reason: '没有方向样式，滚动条没有尺寸',
+    },
+  ],
+
+  // 💡 添加更多组件规则示例：
+  // 'Dialog': [
+  //   {
+  //     slot: 'overlay',
+  //     patterns: [/\bfixed\b/, /\binset-0\b/],
+  //     allRequired: true,
+  //     description: '定位样式 (fixed inset-0)',
+  //     reason: '没有定位，遮罩层不会覆盖全屏',
+  //   },
+  // ],
+};
+
+/**
+ * 通用的必需样式验证函数
+ * 根据 REQUIRED_STYLES 配置自动检查所有主题
+ */
+function validateRequiredStyles(
+  themes: Record<string, ThemeDefinition>
+): ValidationResult {
+  const result: ValidationResult = { passed: true, errors: [], warnings: [] };
+  const checkedComponents = new Set<string>();
+
+  for (const [componentName, rules] of Object.entries(REQUIRED_STYLES)) {
+    checkedComponents.add(componentName);
+
+    for (const rule of rules) {
+      for (const [themeId, theme] of Object.entries(themes)) {
+        const componentConfig = theme.components?.[componentName];
+        if (!componentConfig) continue;
+
+        const slotValue = componentConfig.slots?.[rule.slot];
+        const slotStr = Array.isArray(slotValue)
+          ? slotValue.join(' ')
+          : (slotValue || '');
+
+        let isValid: boolean;
+        let missingPatterns: string[] = [];
+
+        if (rule.allRequired) {
+          // 所有模式都必须匹配
+          missingPatterns = rule.patterns
+            .filter(p => !p.test(slotStr))
+            .map(p => p.source);
+          isValid = missingPatterns.length === 0;
+        } else {
+          // 满足任一模式即可
+          isValid = rule.patterns.some(p => p.test(slotStr));
+        }
+
+        if (!isValid) {
+          result.passed = false;
+          result.errors.push(
+            `主题 [${themeId}] 的 ${componentName}.slots.${rule.slot} 缺少${rule.description}` +
+            `\n     原因: ${rule.reason}` +
+            (missingPatterns.length > 0 ? `\n     缺少: ${missingPatterns.join(', ')}` : '')
+          );
+        }
+      }
+    }
+  }
+
+  if (result.passed) {
+    const componentList = Array.from(checkedComponents).join(', ');
+    result.warnings.push(`所有主题的必需样式检查通过 (${componentList})`);
+  }
+
+  return result;
+}
+
 /**
  * 检查 slot 值是否为空（未自定义）
  */
@@ -249,13 +379,22 @@ function validateSlotsCustomization(
       }
 
       // 也检查 variants 里的 slots
+      // 注意：'default' variant 为空是合理设计（继承 slots 基础样式），不计入空值统计
       const variants = compConfig?.variants || {};
       for (const [variantType, variantOptions] of Object.entries(variants)) {
         if (typeof variantOptions === 'object' && variantOptions !== null) {
           for (const [variantName, variantConfig] of Object.entries(variantOptions as Record<string, unknown>)) {
+            // 跳过 'default' variant 的空值检查
+            const isDefaultVariant = variantName === 'default';
+
             if (typeof variantConfig === 'object' && variantConfig !== null) {
               const variantSlots = (variantConfig as Record<string, unknown>);
               for (const [slotName, slotValue] of Object.entries(variantSlots)) {
+                // default variant 的空值不计入统计（因为会继承 slots 基础样式）
+                if (isDefaultVariant && isSlotEmpty(slotValue)) {
+                  continue;
+                }
+
                 totalSlots++;
                 if (isSlotEmpty(slotValue)) {
                   emptySlots++;
@@ -372,6 +511,19 @@ ${colors.bright}${colors.magenta}╔══════════════�
     }
   }
   for (const warn of slotsResult.warnings) {
+    log.success(warn);
+  }
+
+  // 5.1 检查必需样式（功能性验证）
+  log.title('必需样式检查（功能性验证）');
+  const requiredStylesResult = validateRequiredStyles(themes);
+  if (requiredStylesResult.errors.length > 0) {
+    hasErrors = true;
+    for (const err of requiredStylesResult.errors) {
+      log.error(err);
+    }
+  }
+  for (const warn of requiredStylesResult.warnings) {
     log.success(warn);
   }
 

@@ -34,4 +34,4 @@ export const labelConfig = {
       lg: { base: ['text-base'] },
     },
   },
-} as const;
+};

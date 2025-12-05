@@ -63,6 +63,22 @@ export const scrollAreaConfig = {
       'font-mono',
     ],
   },
+  variants: {
+    variant: {
+      default: {
+        base: [],
+        viewport: [],
+        content: [],
+        header: [],
+        item: [],
+        itemIndex: [],
+        itemText: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };
 
 export const scrollBarConfig = {

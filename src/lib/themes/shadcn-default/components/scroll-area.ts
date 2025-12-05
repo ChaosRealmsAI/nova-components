@@ -3,14 +3,29 @@
  */
 export const scrollAreaConfig = {
   slots: {
-    // 纯视觉层（功能层由组件提供）
     base: 'h-64 w-full rounded-md border border-border',
-    viewport: 'rounded-[inherit]',  // 功能层由组件提供
+    viewport: 'rounded-[inherit]',
     content: 'p-4 space-y-2',
     header: 'text-xs text-muted-foreground mb-4 border-b border-border pb-2',
     item: 'flex items-center gap-3 py-2 px-3 rounded bg-muted/50 transition-all',
     itemIndex: 'text-xs text-muted-foreground/50',
     itemText: 'text-sm text-muted-foreground',
+  },
+  variants: {
+    variant: {
+      default: {
+        base: [],
+        viewport: [],
+        content: [],
+        header: [],
+        item: [],
+        itemIndex: [],
+        itemText: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
   },
 };
 

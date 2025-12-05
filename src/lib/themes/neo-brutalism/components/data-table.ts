@@ -92,13 +92,14 @@ export const dataTableConfig = {
       'text-sm text-muted-foreground',
       'font-bold uppercase tracking-wide',
     ],
-    paginationInfo: '',  // TODO
 
     /**
      * paginationButtons: 分页按钮
      * ─────────────────────────────────────────────────────────────────────
      * 分页导航按钮
      */
-    paginationButtons: '',  // TODO
+    paginationButtons: [
+      'flex items-center space-x-2',
+    ]
   },
 };

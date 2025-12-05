@@ -48,4 +48,4 @@ export const inputConfig = {
     variant: 'default',
     inputSize: 'default',
   },
-} as const;
+};

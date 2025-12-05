@@ -15,4 +15,19 @@ export const datePickerConfig = {
      */
     icon: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认日期选择器
+       */
+      default: {
+        trigger: [],
+        content: [],
+        icon: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

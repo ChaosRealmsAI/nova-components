@@ -100,4 +100,36 @@ export const calendarConfig = {
      */
     dayHidden: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认日历
+       */
+      default: {
+        root: [],
+        months: [],
+        month: [],
+        caption: [],
+        captionLabel: [],
+        nav: [],
+        navButton: [],
+        navButtonPrevious: [],
+        navButtonNext: [],
+        table: [],
+        headRow: [],
+        headCell: [],
+        row: [],
+        cell: [],
+        day: [],
+        daySelected: [],
+        dayToday: [],
+        dayOutside: [],
+        dayDisabled: [],
+        dayHidden: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

@@ -60,4 +60,28 @@ export const menubarConfig = {
      */
     subContent: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认菜单栏
+       */
+      default: {
+        root: [],
+        trigger: [],
+        content: [],
+        item: [],
+        label: [],
+        separator: [],
+        shortcut: [],
+        checkboxItem: [],
+        radioItem: [],
+        indicator: [],
+        subTrigger: [],
+        subContent: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

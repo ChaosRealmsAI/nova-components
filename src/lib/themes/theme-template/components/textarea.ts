@@ -48,4 +48,4 @@ export const textareaConfig = {
     variant: 'default',
     textareaSize: 'default',
   },
-} as const;
+};

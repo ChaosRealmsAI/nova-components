@@ -16,29 +16,48 @@ export const toggleGroupConfig = {
       /**
        * default: 默认切换组
        */
-      default: {},
+      default: {
+        root: [],
+        item: [],
+      },
 
       /**
        * outline: 轮廓切换组
        */
-      outline: {},
+      outline: {
+        root: [],
+        item: [],
+      },
     },
 
     size: {
       /**
        * default: 默认尺寸
        */
-      default: {},
+      default: {
+        root: [],
+        item: [],
+      },
 
       /**
        * sm: 小尺寸
        */
-      sm: {},
+      sm: {
+        root: [],
+        item: [],
+      },
 
       /**
        * lg: 大尺寸
        */
-      lg: {},
+      lg: {
+        root: [],
+        item: [],
+      },
     },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
   },
 };

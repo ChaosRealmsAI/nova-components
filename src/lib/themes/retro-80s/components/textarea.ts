@@ -40,4 +40,4 @@ export const textareaConfig = {
       lg: { base: ['min-h-[120px]', 'text-base'] },
     },
   },
-} as const;
+};

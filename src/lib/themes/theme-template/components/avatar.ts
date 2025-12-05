@@ -39,7 +39,7 @@ export const avatarConfig = {
   defaultVariants: {
     size: 'default',
   },
-} as const;
+};
 
 export const avatarFallbackConfig = {
   slots: {
@@ -82,4 +82,4 @@ export const avatarFallbackConfig = {
   defaultVariants: {
     size: 'default',
   },
-} as const;
+};

@@ -40,4 +40,24 @@ export const dataTableConfig = {
      */
     paginationButtons: [],
   },
+  variants: {
+    variant: {
+      /**
+       * default: 默认数据表格
+       */
+      default: {
+        root: [],
+        header: [],
+        filterInput: [],
+        columnToggle: [],
+        tableContainer: [],
+        footer: [],
+        paginationInfo: [],
+        paginationButtons: [],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 };

@@ -59,7 +59,7 @@ import { comboboxConfig } from './components/combobox';
 
 export const shadcnDefaultTheme: ThemeDefinition = {
   id: 'shadcn-default',
-  name: 'Shadcn Default',
+  name: 'shadcn',
 
   isDark: meta.isDark,
   cssVars: tokens,
