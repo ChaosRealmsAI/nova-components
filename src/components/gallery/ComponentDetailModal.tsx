@@ -348,10 +348,16 @@ export function ComponentDetailModal() {
 
                 {/* Code Display */}
                 <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-                  <div className="h-8 border-b border-border flex items-center px-4 shrink-0 bg-muted/30">
+                  <div className="h-8 border-b border-border flex items-center justify-between px-4 shrink-0 bg-muted/30">
                     <span className="text-xs font-medium text-muted-foreground">
                       {activeFile ? activeFile.split('/').pop() : 'Select a file'}
                     </span>
+                    <button
+                      onClick={() => setShowCode(false)}
+                      className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                   <div className="flex-1 min-h-0 overflow-hidden">
                     <CodeDisplay code={currentCode} filename={activeFile} />
