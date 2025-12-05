@@ -1,5 +1,9 @@
 /**
  * Sidebar 组件样式 - Cyberpunk (Nav Panel)
+ *
+ * Design Concept: "System Navigation Panel"
+ * - Dark background with neon accents
+ * - Technical monospace typography
  */
 export const sidebarConfig = {
   slots: {
@@ -7,39 +11,36 @@ export const sidebarConfig = {
       'flex h-full w-[250px] flex-col border-r bg-background',
       'bg-black border-border/50',
     ],
-    
+
     header: [
       'flex h-14 items-center border-b px-4',
       'border-border/50',
     ],
-    
+
     content: [
       'flex-1 overflow-auto py-4',
     ],
-    
+
     footer: [
       'border-t p-4',
       'border-border/50',
     ],
 
-    trigger: [], // Added missing slot
-    overlay: [], // Added missing slot
+    group: [
+      'pb-4',
+    ],
 
-    group: [], // Added missing slot
-    groupLabel: [ // Added missing slot
+    groupLabel: [
       'px-4 py-2 text-xs font-semibold text-muted-foreground',
       'uppercase tracking-widest text-[10px]',
     ],
 
-    menu: [], // Added missing slot
-    
-    item: [], // Replaced by menuItem usually but keeping it if template has it?
-    // Error log said `menuItem` missing. It didn't say `item` missing (implied item was present or not checked).
-    // But template usually uses specific structure.
-    // Let's add `menuItem`, `menuButton`, `menuBadge`.
-    
+    menu: [
+      'space-y-1',
+    ],
+
     menuItem: [
-        'relative',
+      'relative',
     ],
 
     menuButton: [
@@ -50,15 +51,60 @@ export const sidebarConfig = {
     ],
 
     menuBadge: [
-        'ml-auto text-xs',
-    ],
-    
-    label: [
-      // Used to be here, replaced by groupLabel likely
+      'ml-auto text-xs',
+      'text-primary',
     ],
 
     separator: [
-        'mx-4 my-2 h-px bg-border',
-    ]
+      'mx-4 my-2 h-px bg-border',
+      'bg-primary/20',
+    ],
+
+    trigger: [
+      'inline-flex items-center justify-center rounded-none p-2',
+      'hover:bg-primary/10',
+    ],
+
+    overlay: [
+      'fixed inset-0 z-40 bg-black/80',
+    ],
+
+    mobileContainer: [
+      'fixed inset-y-0 left-0 z-50 w-[280px] bg-background',
+      'bg-black border-r border-primary/30',
+    ],
+  },
+  variants: {
+    variant: {
+      default: {
+        root: [],
+        header: [],
+        content: [],
+        footer: [],
+        menuButton: [],
+      },
+      inset: {
+        root: ['bg-transparent'],
+        header: [],
+        content: [],
+        footer: [],
+        menuButton: [],
+      },
+    },
+    collapsible: {
+      none: {
+        root: [],
+      },
+      icon: {
+        root: ['w-[60px]'],
+      },
+      offcanvas: {
+        root: ['w-0 overflow-hidden'],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    collapsible: 'none',
   },
 };

@@ -38,7 +38,9 @@ const toClassString = (value: string | string[] | undefined): string => {
 
 const skeletonBase = tv({
   slots: {
-    base: 'animate-pulse w-full h-full',
+    // ⚠️ 必须包含高度，否则 Skeleton 不会显示
+    // h-full 填充父容器高度，min-h-4 确保即使父容器无高度时也有最小高度
+    base: 'animate-pulse w-full h-full min-h-4',
   },
 });
 

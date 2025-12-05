@@ -1,6 +1,6 @@
 /**
  * Card 组件样式 - Cyberpunk (Upgraded)
- * 
+ *
  * Design Concept: "Secure Datapad"
  * - Visuals: Grid background, corner markers, technical feel.
  */
@@ -12,27 +12,27 @@ export const cardConfig = {
       // Grid Pattern Background (Subtle)
       'bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)]',
       'bg-[size:20px_20px]',
-      
+
       // Border
       'border border-border',
       'relative overflow-hidden',
-      
+
       // Shape: Top-Right Cut
       '[clip-path:polygon(0_0,calc(100%_-_20px)_0,100%_20px,100%_100%,0_100%)]',
-      
+
       // Tech Glow
-      'shadow-[0_0_0_1px_rgba(0,0,0,0.5)]', // Inner stroke definition
+      'shadow-[0_0_0_1px_rgba(0,0,0,0.5)]',
     ],
-    
+
     header: [
       'flex flex-col space-y-1.5 p-6',
       'border-b border-border/50',
-      'bg-surface-2/50', // Slightly lighter header
+      'bg-surface-2/50',
       'relative',
       // Decorative accent on left
       'after:absolute after:left-0 after:top-0 after:bottom-0 after:w-1 after:bg-primary',
     ],
-    
+
     title: [
       'font-bold leading-none tracking-wider text-xl uppercase font-mono',
       'text-primary',
@@ -40,17 +40,21 @@ export const cardConfig = {
       // "Tech" prefix icon simulation
       'before:content-["//"] before:text-muted-foreground before:text-sm before:mr-1',
     ],
-    
+
     description: [
       'text-sm text-muted-foreground font-mono mt-2',
-      'pl-7', // Align with text after "//"
+      'pl-7',
     ],
-    
+
+    action: [
+      'ml-auto flex items-center gap-2',
+    ],
+
     content: [
       'p-6 pt-6',
       'font-sans tracking-wide',
     ],
-    
+
     footer: [
       'flex items-center p-6 pt-0',
       'border-t border-border/30',
@@ -60,7 +64,15 @@ export const cardConfig = {
 
   variants: {
     variant: {
-      default: {},
+      default: {
+        base: [],
+        header: [],
+        title: [],
+        description: [],
+        action: [],
+        content: [],
+        footer: [],
+      },
 
       outline: {
         base: [
@@ -73,8 +85,8 @@ export const cardConfig = {
       ghost: {
         base: [
           'bg-transparent shadow-none border-none',
-          'bg-none', // Remove grid
-          '[clip-path:none]', // Remove cut
+          'bg-none',
+          '[clip-path:none]',
         ],
       },
 
@@ -86,5 +98,29 @@ export const cardConfig = {
         ],
       },
     },
+    size: {
+      sm: {
+        base: [],
+        header: ['p-4'],
+        content: ['p-4'],
+        footer: ['p-4'],
+      },
+      default: {
+        base: [],
+        header: [],
+        content: [],
+        footer: [],
+      },
+      lg: {
+        base: [],
+        header: ['p-8'],
+        content: ['p-8'],
+        footer: ['p-8'],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
   },
 };

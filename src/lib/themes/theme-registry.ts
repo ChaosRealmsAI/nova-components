@@ -3,8 +3,6 @@ import { shadcnDefaultTheme } from './shadcn-default';
 import { cyberpunkTheme } from './cyberpunk';
 import { neoBrutalismTheme } from './neo-brutalism';
 import { glassmorphismTheme } from './glassmorphism';
-import { retro80sTheme } from './retro-80s';
-import { cyberNeonTheme } from './cyber-neon';
 import { softClayTheme } from './soft-clay';
 
 /**
@@ -15,8 +13,6 @@ export const THEMES: Record<string, ThemeDefinition> = {
   'cyberpunk': cyberpunkTheme,
   'neo-brutalism': neoBrutalismTheme,
   'glassmorphism': glassmorphismTheme,
-  'retro-80s': retro80sTheme,
-  'cyber-neon': cyberNeonTheme,
   'soft-clay': softClayTheme,
 };
 

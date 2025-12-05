@@ -73,9 +73,43 @@ export const checkboxConfig = {
       'transition-all duration-75',
       'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
     ],
-
     indicator: [
       'flex items-center justify-center text-current',
     ],
+    icon: [
+      'h-3.5 w-3.5',
+    ],
+  },
+  variants: {
+    variant: {
+      default: {
+        base: [],
+        indicator: [],
+        icon: [],
+      },
+      destructive: {
+        base: ['border-destructive', 'data-[state=checked]:bg-destructive'],
+        indicator: [],
+        icon: [],
+      },
+    },
+    size: {
+      default: {
+        base: ['h-4 w-4'],
+        icon: ['h-3.5 w-3.5'],
+      },
+      sm: {
+        base: ['h-3.5 w-3.5'],
+        icon: ['h-3 w-3'],
+      },
+      lg: {
+        base: ['h-5 w-5'],
+        icon: ['h-4 w-4'],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
   },
 };

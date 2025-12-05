@@ -41,5 +41,41 @@ export const checkboxConfig = {
       'flex items-center justify-center',
       'text-primary-foreground',
     ].join(' '),
+
+    icon: [
+      'h-3.5 w-3.5',
+    ],
+  },
+  variants: {
+    variant: {
+      default: {
+        base: [],
+        indicator: [],
+        icon: [],
+      },
+      destructive: {
+        base: ['border-destructive/50', 'data-[state=checked]:bg-destructive/90'],
+        indicator: [],
+        icon: [],
+      },
+    },
+    size: {
+      default: {
+        base: ['h-5 w-5'],
+        icon: ['h-3.5 w-3.5'],
+      },
+      sm: {
+        base: ['h-4 w-4'],
+        icon: ['h-3 w-3'],
+      },
+      lg: {
+        base: ['h-6 w-6'],
+        icon: ['h-4 w-4'],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
   },
 };
