@@ -135,7 +135,7 @@ export function ComponentDetailModal() {
     filePaths: [] as string[],
   };
 
-  const currentCode = fileMap[activeFile] || (generatedResult ? '// Select a file to view code' : '// Loading...');
+  const currentCode = fileMap[activeFile] || (generatedResult ? t('selectFileToViewCode') : t('codeLoading'));
 
   // Prepare props with localization
   const prepareProps = () => {
@@ -237,14 +237,14 @@ export function ComponentDetailModal() {
               }`}
             >
               <Code2 className="w-4 h-4" />
-              <span className="font-medium">Code</span>
+              <span className="font-medium">{t('codeButton')}</span>
             </button>
             <button
               onClick={handleCopyAll}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              <span className="font-medium">{copied ? 'Copied!' : 'Copy All'}</span>
+              <span className="font-medium">{copied ? t('codeCopied') : t('codeCopyAll')}</span>
             </button>
             <button
               onClick={closeDetailModal}
@@ -285,13 +285,15 @@ export function ComponentDetailModal() {
             {/* Props Panel */}
             <div className="w-[280px] flex flex-col overflow-hidden shrink-0">
               <div className="px-4 py-2 border-b border-border shrink-0">
-                <h3 className="text-sm font-semibold">Properties</h3>
+                <h3 className="text-sm font-semibold">{t('panelProperties')}</h3>
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                {entry.props.filter((p) => p.type !== 'json').map((propMeta) => (
+                {entry.props.filter((p) => p.type !== 'json').map((propMeta) => {
+                  const propLabel = propMeta.labelKey ? t(propMeta.labelKey as MessageKey, propMeta.label) : (propMeta.label || propMeta.name);
+                  return (
                   <div key={propMeta.name} className="space-y-1">
                     <label className="text-xs font-medium text-foreground">
-                      {propMeta.name}
+                      {propLabel}
                     </label>
                     {propMeta.type === 'boolean' ? (
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -311,11 +313,14 @@ export function ComponentDetailModal() {
                         onChange={(e) => handlePropChange(propMeta.name, e.target.value)}
                         className="w-full px-2 py-1.5 text-xs rounded-md border border-border bg-background"
                       >
-                        {propMeta.options.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
+                        {propMeta.options.map((opt) => {
+                          const optLabel = opt.labelKey ? t(opt.labelKey as MessageKey, opt.label) : opt.label;
+                          return (
+                            <option key={opt.value} value={opt.value}>
+                              {optLabel}
+                            </option>
+                          );
+                        })}
                       </select>
                     ) : (
                       <input
@@ -323,13 +328,14 @@ export function ComponentDetailModal() {
                         value={componentProps[propMeta.name] ?? ''}
                         onChange={(e) => handlePropChange(propMeta.name, e.target.value)}
                         className="w-full px-2 py-1.5 text-xs rounded-md border border-border bg-background"
-                        placeholder={propMeta.name}
+                        placeholder={propLabel}
                       />
                     )}
                   </div>
-                ))}
+                  );
+                })}
                 {entry.props.filter((p) => p.type !== 'json').length === 0 && (
-                  <p className="text-xs text-muted-foreground">No configurable properties</p>
+                  <p className="text-xs text-muted-foreground">{t('noConfigurableProperties')}</p>
                 )}
               </div>
             </div>
@@ -350,7 +356,7 @@ export function ComponentDetailModal() {
                 <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
                   <div className="h-8 border-b border-border flex items-center justify-between px-4 shrink-0 bg-muted/30">
                     <span className="text-xs font-medium text-muted-foreground">
-                      {activeFile ? activeFile.split('/').pop() : 'Select a file'}
+                      {activeFile ? activeFile.split('/').pop() : t('selectFile')}
                     </span>
                     <button
                       onClick={() => setShowCode(false)}

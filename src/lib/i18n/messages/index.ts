@@ -1,20 +1,12 @@
 import type { Locale } from '../config';
 import { commonMessages } from './common';
-import { canvasMessages } from './canvas';
-import { inspectorMessages } from './inspector';
-import { drawerMessages } from './drawer';
 import { devmodeMessages } from './devmode';
-import { previewMessages } from './preview';
 import { themesMessages } from './themes';
 import { componentsMessages } from './components';
 
 const MESSAGES_BY_KEY = {
   ...commonMessages,
-  ...canvasMessages,
-  ...inspectorMessages,
-  ...drawerMessages,
   ...devmodeMessages,
-  ...previewMessages,
   ...themesMessages,
   ...componentsMessages,
 } as const;

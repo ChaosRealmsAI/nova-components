@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileCode, FileJson, Folder, FolderOpen, ChevronRight, ChevronDown, FileText } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/use-i18n';
 
 interface TreeNode {
   name: string;
@@ -160,6 +161,7 @@ interface FileTreeProps {
 }
 
 export function FileTree({ files, activeFile, onSelect }: FileTreeProps) {
+  const { t } = useI18n();
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 
   // 当文件列表变化时，自动展开所有文件夹
@@ -194,7 +196,7 @@ export function FileTree({ files, activeFile, onSelect }: FileTreeProps) {
   return (
     <div className="w-48 border-r border-[var(--border)] flex flex-col shrink-0 bg-[var(--surface-1)]">
       <div className="px-3 py-2.5 text-[10px] font-bold text-[var(--muted-foreground)] uppercase tracking-widest border-b border-[var(--border)]">
-        Files
+        {t('devModeFiles')}
       </div>
       <div className="flex-1 overflow-y-auto py-1">
         {tree.map((node) => (
