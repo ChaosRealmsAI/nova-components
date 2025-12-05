@@ -12,12 +12,17 @@ interface ComponentCardProps {
   component: GalleryComponent;
 }
 
+// Large components that need scaling in card preview
+const LARGE_COMPONENTS = ['sidebar', 'data-table', 'table', 'calendar', 'form', 'navigation-menu', 'carousel'];
+const SCALE_FACTOR = 0.6;
+
 export function ComponentCard({ component }: ComponentCardProps) {
   const { openDetailModal } = useGalleryStore();
   const { t } = useI18n();
 
   const entry = getComponentEntry(component.type);
   const label = component.labelKey ? t(component.labelKey as MessageKey, component.label) : component.label;
+  const isLarge = LARGE_COMPONENTS.includes(component.type);
 
   const renderComponent = () => {
     if (!entry) {
@@ -64,7 +69,7 @@ export function ComponentCard({ component }: ComponentCardProps) {
       className="group relative flex flex-col rounded-xl border border-border bg-card overflow-hidden cursor-pointer transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
     >
       {/* Preview Area */}
-      <div className="relative flex items-center justify-center min-h-[180px] p-6 bg-muted/30">
+      <div className="relative flex items-center justify-center h-[200px] p-6 bg-muted/30 overflow-hidden">
         {/* Grid Pattern Background */}
         <div
           className="absolute inset-0 opacity-50"
@@ -75,7 +80,13 @@ export function ComponentCard({ component }: ComponentCardProps) {
         />
 
         {/* Component */}
-        <div className="relative z-10 flex items-center justify-center">
+        <div
+          className="relative z-10 flex items-center justify-center"
+          style={isLarge ? {
+            transform: `scale(${SCALE_FACTOR})`,
+            transformOrigin: 'center center',
+          } : undefined}
+        >
           {renderComponent()}
         </div>
 
